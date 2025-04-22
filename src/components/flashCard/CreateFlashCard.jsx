@@ -1,45 +1,87 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-  ChevronDown,
-  ChevronUp,
   Image,
-  PlusCircle,
-  Trash2,
   Upload,
 } from "lucide-react";
 import { Select } from "@/components/ui/select.jsx";
 import { Input } from "@/components/ui/input.jsx";
-import { Textarea } from "@/components/ui/textArea.jsx";
-import { Button } from "@/components/ui/button.jsx";
 import PublishFlashCardHeader from "@/components/flashCard/PublishFlashCardHeader";
 import usePost from "@/hooks/usePost";
+import useImagePost from "@/hooks/useImagePost";
 
-export default function CreateFlashCard() {
-  const [cards, setCards] = useState([
-    { id: 1, options: ["Front", "Back"], open: true },
-  ]);
+export default function CreateFlashCard({setShowInFlashCard}) {
+  const fileInputRef = useRef(null);
   const [error, setError] = useState("")
+  const [imageLoading, setImageLoading] = useState(false);
+  const [flashcard, setFlashcard] = useState({
+    question : "",
+    answer : "",
+    hint : "",
+    imageUrl : "",
+    masteryLevel :0,
+    subject:"",
+    confidenceLevel :"",
+    
+  })
 
-  const addQuestion = () => {
-    setCards([
-      ...cards,
-      { id: cards.length + 1, options: ["Front", "Back"], open: false },
-    ]);
+  useEffect(()=>{
+    console.log(flashcard)
+  },[flashcard])
+
+  const handleChange = (e) => {
+    const {name, value} = e.target
+    if(name == "masteryLevel"){
+      setFlashcard((prev)=> ({
+        ...prev,
+        [name] : Number(value)
+      }))
+      return
+    }
+    setFlashcard((prev)=>({
+      ...prev,
+      [name] : value
+    }))
+  }
+
+  const handleUpload = async (eOrFiles, name) => {
+    setImageLoading(true)
+    // Support both input events and FileList directly
+    const file = eOrFiles.target?.files?.[0] || eOrFiles[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    const { data, error, status } = await useImagePost(
+      `/courses/upload-image`,
+      formData
+    );
+
+    if (data) {
+      setFlashcard((prev) => ({ ...prev, [name]: data }));
+    }
+
+    setImageLoading(false)
   };
 
-  const toggleQuestion = (index) => {
-    setCards(cards.map((q, i) => (i === index ? { ...q, open: !q.open } : q)));
+  const handleDrop = (event, name) => {
+    event.preventDefault();
+    if (event.dataTransfer && event.dataTransfer.files) {
+      handleUpload(event.dataTransfer.files, name);
+    } else {
+      console.warn("No files found in drop event");
+    }
   };
 
-  const removeQuestion = (index) => {
-    setCards(cards.filter((_, i) => i !== index));
+  const handleDragOver = (event) => {
+    event.preventDefault();
   };
 
   const handleCreateFlashCard = async() =>{
-    const {data, error, status} = await usePost(`/flashcards/create`)
+    console.log(flashcard)
+    const {data, error, status} = await usePost(`/flashcards/create`, {...flashcard, })
     if(status == 201){
-      setShowInCourse("Course")
+      setShowInFlashCard("FlashCards")
     }
     if(error){
       console.log(error)
@@ -54,100 +96,96 @@ export default function CreateFlashCard() {
       <div className=" p-6 bg-white rounded-lg shadow-md w-full mx-auto md:max-w-[80%] max-w-[95%]">
         {/* Cover Image Upload */}
         <div className="mb-4 ">
-          <label className="block text-gray-700">Title</label>
-          <Input placeholder="Write question here" className="my-5" />
+          <label className="block text-gray-700">Question</label>
+          <Input placeholder="Write question here" className="my-5" name="question" onChange={handleChange}/>
+        </div>
+
+        <div className="mb-4 ">
+          <label className="block text-gray-700">Answer</label>
+          <Input placeholder="Write Answer here" className="my-5" name="answer" onChange={handleChange}/>
+        </div>
+
+        <div className="mb-4 ">
+          <label className="block text-gray-700">Hint</label>
+          <Input placeholder="Write Hint here" className="my-5" name="hint" onChange={handleChange}/>
+        </div>
+
+        <div className="mb-4 ">
+          <label className="block text-gray-700">Subject</label>
+          <Input placeholder="Write Subject here" className="my-5" name="subject" onChange={handleChange}/>
+        </div>
+
+        <div className="mb-4 ">
+          <label className="block text-gray-700">Mastery Level</label>
+          <Input placeholder="Write Mastery Level here" className="my-5" type={"number"} name="masteryLevel" onChange={handleChange}/>
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-gray-700">Confidence Level</label>
+          <Select
+              name="confidenceLevel"
+              value={flashcard.confidenceLevel}
+              onChange={handleChange}
+              className="w-full"
+            >
+              <option value="">Choose category</option>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </Select>
         </div>
 
         {/* Thumbnail Upload */}
         <div className="mb-4">
-          <label className="block text-gray-700">Tags</label>
-          <Select className="w-full">
-            <option>Choose category</option>
-          </Select>
-        </div>
-
-        {/* Thumbnail Upload */}
-        <div className="mb-4">
-          <label className="block text-gray-700">Thumbnail</label>
-          <div className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500 cursor-pointer">
-            <Upload className="w-6 h-6 mb-2 text-purple-600" />
-            <p>Drag or drop image here</p>
-            <p className="text-xs">
-              Image should be horizontal, at least 1500 x 500 px
-            </p>
-          </div>
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700">File Parser</label>
-          <div className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500 cursor-pointer">
-            <Upload className="w-6 h-6 mb-2 text-purple-600" />
-            <p>Drag or drop image here</p>
-            <p className="text-xs">
-              Image should be horizontal, at least 1500 x 500 px
-            </p>
-          </div>
-        </div>
-
-        {/* Quiz and Card Topic Selection */}
-        <div className="mb-4">
-          <label className="block text-gray-700">Card Topic</label>
-          <Select className="w-full">
-            <option>Choose category</option>
-          </Select>
-        </div>
-
-        {/* Questions Section */}
-        <div className="mb-4 space-y-4">
-          {cards.map((q, index) => (
-            <div key={q.id} className="border p-4 rounded-lg mb-4">
-              <div
-                className="flex justify-between items-center cursor-pointer bg-gray-100 p-3 rounded-lg"
-                onClick={() => toggleQuestion(index)}
-              >
-                <span className="text-gray-700 font-medium">Card {q.id}</span>
-                <div className="flex gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeQuestion(index);
-                    }}
-                  >
-                    <Trash2 size={16} className="text-red-500" />
-                  </button>
-                  {q.open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                </div>
-              </div>
-              {q.open && (
-                <div className="mt-3">
-                  <div className="w-full">
-                    {q.options.map((option, idx) => (
-                      <div key={idx} className="flex items-center gap-2 mb-2 first:border-t-0 p-2">
-                        <div className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center p-4">
-                            <Image className="text-purple-600 text-sm"/>
-                          <span className="text-gray-500 text-sm mt-2">
-                            img
-                          </span>
-                        </div>
-                        <div className="w-full">
-                          <label>{option}</label>
-                          <Input
-                            placeholder="Enter Title here"
-                            className="my-5 w-full"
-                          />
-                        </div>
+          <label className="block text-gray-700">Image</label>
+          {!flashcard.imageUrl ? (
+                      <div
+                        className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500 "
+                        onDrop={(e)=>{handleDrop(e, "imageUrl")}}
+                        onDragOver={(e)=>{handleDragOver(e, "imageUrl")}}
+                      >
+                        {imageLoading ? (
+                          <div className="w-12 h-12 border-4 border-t-purple-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <label className="ud-btn btn-white text-center cursor-pointer">
+                            <div className="icon mb5">
+                              <Upload className="w-6 h-6 mb-2 text-purple-600 justify-self-center " />
+                            </div>
+                            <h4 className="title fz17 mb1">
+                              Upload/Drag photos of your Quiz Thumbnail
+                            </h4>
+                            <p className="text fz-10 mb10">
+                              Photos must be JPEG or PNG format and at least 2048x768
+                            </p>
+                            Browse Files
+                            <input
+                              ref={fileInputRef}
+                              id="fileInput"
+                              type="file"
+                              name="imageUrl"
+                              multiple
+                              className="ud-btn btn-white"
+                              onChange={(e) => {
+                                handleUpload(e, "imageUrl");
+                              }}
+                              style={{ display: "none" }}
+                              required
+                            />
+                          </label>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                  <label>Extras</label>
-                  <Textarea placeholder="Enter Title here" />
-                </div>
-              )}
-            </div>
-          ))}
-          <Button onClick={addQuestion} className="flex items-center gap-2">
-            <PlusCircle size={16} /> Add Question
-          </Button>
+                    ) : (
+                      <div>
+                        <Image
+                          src={flashcard.imageUrl}
+                          height={400}
+                          width={200}
+                          alt="cover-image"
+                        />
+                      </div>
+                    )}
         </div>
+
       </div>
     </>
   );

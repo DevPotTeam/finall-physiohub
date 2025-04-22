@@ -23,15 +23,16 @@ import useGet from "@/hooks/useGet";
 
 export default function Quizs({ setShowInQuiz }) {
   const [articles, setArticles] = useState([])
-  const fetchTeacherQuizs = () =>{
-
-  }
-  useEffect(()=>{
-    const {data, error, status} = useGet(`/quizzes`)
+  const fetchTeacherQuizs = async () =>{
+    const {data, error, status} = await useGet(`/quizzes`)
     if(status == 200){
       setArticles(data)
     }
+  }
+  useEffect(()=>{
+    fetchTeacherQuizs()
   },[])
+
   const handleQuizDelete = async (id) => {
     const { data, error, status } = await useDelete(`/courses/delete/${id}`);
     console.log(status);
@@ -53,9 +54,9 @@ export default function Quizs({ setShowInQuiz }) {
                 <div className="flex items-center gap-5 w-full">
                   <div className="h-[180px] w-[230px]">
                     <Image
-                      src={"/auth-activity.png"}
+                      src={"/auth-activity.png"|| article.banner}
                       alt="image"
-                      height={200}
+                      height={200}  
                       width={240}
                       className="object-cover h-full w-full rounded-2xl"
                     />
@@ -69,8 +70,7 @@ export default function Quizs({ setShowInQuiz }) {
                     </h3>
                     <p className="text-sm text-gray-400 mt-2 flex items-center">
                       <MessageSquareText size={14} />
-                      &nbsp;{article.questions}&nbsp; • &nbsp;
-                      <Clock size={14} />
+                      &nbsp;{article.questions.length}&nbsp; Questions
                       &nbsp;{article.time}
                     </p>
                   </div>

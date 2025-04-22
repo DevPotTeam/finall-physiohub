@@ -7,20 +7,6 @@ import useGet from "@/hooks/useGet";
 import { useEffect, useState } from "react";
 import useDelete from "@/hooks/useDelete";
 
-const articles = [
-  {
-    category: "Geriatric",
-    title: "Musculoskeletal Physiology Anatomy",
-    questions: "125 Cards",
-    time: "20 min",
-  },
-  {
-    category: "Geriatric",
-    title: "Ligament Physiotherapy",
-    questions: "120 Cards ",
-    time: "20 min",
-  },
-];
 
 export default function FlashCards({setShowInFlashCard}) {
   const [flashCards, setFlashCards] = useState([])
@@ -35,8 +21,8 @@ export default function FlashCards({setShowInFlashCard}) {
     fetchFlashCards()
   },[])
 
-  const handleFlashCardDelete = (id) =>{
-    const {data, error, status} = useDelete(`flashcards/delete/${id}`)
+  const handleFlashCardDelete = async (id) =>{
+    const {data, error, status} = await useDelete(`flashcards/delete/${id}`)
     console.log(data)
     if (status === 200) {
       window.location.reload();
@@ -52,7 +38,7 @@ export default function FlashCards({setShowInFlashCard}) {
             <div className="flex justify-between items-center ">
                 <div className="flex items-center gap-5 w-full">
             <div className="h-[180px] w-[230px]">
-                {!article.imageUrl?(<Image src={article?.imageUrl} alt="image" height={200} width={240} className="object-cover h-full w-full rounded-2xl"/>) : (
+                { article.imageUrl?(<Image src={article?.imageUrl} alt="image" height={200} width={240} className="object-cover h-full w-full rounded-2xl"/>) : (
                       <div className="bg-gray-300 h-full w-full rounded animate-pulse"></div>
                     )}
             </div>
