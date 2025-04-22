@@ -10,6 +10,10 @@ const nextConfig = {
             hostname: "res.cloudinary.com",
             pathname: "/derpthkas/image/upload/**",
           },
+          {
+            protocol: "https",
+            hostname: "example.com",
+          },
         ],
       },
 };

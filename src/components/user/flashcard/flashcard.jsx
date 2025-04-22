@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from "react";
 import {
   Star,
@@ -11,9 +12,14 @@ import {
 } from "lucide-react";
 import { Rating } from "@mui/material";
 
-function Flashcard({ flashCardData, handleAnswerChange }) {
-
-
+function Flashcard({
+  flashCardData,
+  handleAnswerChange,
+  isCorrect,
+  correctAnswer,
+  isAnswered,
+}) {
+  const [showHint, setShowHint] = useState(false);
   return (
     <>
       <div className=" bg-white rounded-xl shadow border border-gray-200 p-4 space-y-3">
@@ -26,10 +32,22 @@ function Flashcard({ flashCardData, handleAnswerChange }) {
         <div className="bg-indigo-50 rounded-lg p-6 min-h-[350px] relative">
           <div className="absolute top-3 left-3 flex items-center gap-2">
             <Volume2 className="w-5 h-5 text-gray-500 cursor-pointer" />
-            <button className="flex items-center gap-1 text-sm bg-white px-2 py-1 rounded-full border hover:shadow">
-              <WandSparkles className="w-4 h-4 text-purple-600" />
-              <span className="text-purple-600 font-medium">Get a hint</span>
-            </button>
+            <div
+              className="relative inline-block"
+              onMouseEnter={() => setShowHint(true)}
+              onMouseLeave={() => setShowHint(false)}
+            >
+              <button className="flex items-center gap-1 text-sm bg-white px-2 py-1 rounded-full border hover:shadow cursor-pointer">
+                <WandSparkles className="w-4 h-4 text-purple-600 " />
+                <span className="text-purple-600 font-medium">Get a hint</span>
+              </button>
+
+              {showHint && (
+                <div className="absolute top-full left-16 transform -translate-x-1/2 mt-2 px-3 py-2 bg-white text-gray-800 rounded-lg shadow-lg w-48 text-sm">
+                  {flashCardData.hint}
+                </div>
+              )}
+            </div>
           </div>
           <div className="absolute top-3 right-3 flex items-center gap-2 bg-white p-2 rounded-lg">
             <Star className="w-4 h-4 text-gray-400" />
@@ -41,10 +59,32 @@ function Flashcard({ flashCardData, handleAnswerChange }) {
           {flashCardData?.question}{" "}
         </p>
 
-        <textarea name="" id="" cols={5} className="w-full border outline-none p-2 rounded-lg" placeholder="Answer" onChange={handleAnswerChange}></textarea>
+        <textarea
+          name=""
+          id=""
+          cols={5}
+          className={`w-full border outline-none p-2 rounded-lg ${
+            isAnswered ? "cursor-not-allowed" : ""
+          }`}
+          placeholder="Answer"
+          onChange={handleAnswerChange}
+          readOnly={isAnswered}
+        ></textarea>
+        {isAnswered && !isCorrect && (
+          <>
+            <div className="w-full py-2 px-3 bg-[#E2F9FC] mt-3 rounded-md sm:text-sm text-xs border border-green-300">
+              <p>
+                <span className="font-semibold sm:text-base text-xsf">
+                  The Correct Answer is {correctAnswer}
+                </span>
+                {/* {explanation} */}
+              </p>
+            </div>
+          </>
+        )}
 
         {/* Controls Below Text */}
-        <div className="flex justify-between items-center gap-2 ">
+        <div className="flex md:flex-row flex-col justify-between items-center gap-2 ">
           <div className="flex items-center gap-2">
             <Repeat className=" text-gray-500 cursor-pointer" />
             <Settings className=" text-gray-500 cursor-pointer" />
@@ -64,7 +104,7 @@ function Flashcard({ flashCardData, handleAnswerChange }) {
       </div>
 
       {/* {confidence level} */}
-      <div className=" bg-white rounded-xl shadow border border-gray-200 p-4 space-y-4 flex items-center justify-between">
+      <div className=" bg-white rounded-xl shadow border border-gray-200 p-4 space-y-4 flex md:flex-row flex-col items-center justify-between">
         <p className="text-lg font-medium text-gray-700">Confidence Level</p>
         <div className="flex gap-3">
           {[
@@ -87,7 +127,7 @@ function Flashcard({ flashCardData, handleAnswerChange }) {
       </div>
 
       {/* {rating card} */}
-      <div className="bg-white rounded-xl shadow border border-gray-200 p-4 space-y-4 flex items-center justify-between   ">
+      <div className="bg-white rounded-xl shadow border border-gray-200 p-4 space-y-4 flex md:flex-row flex-col items-center justify-between   ">
         {/* Left: Verified */}
         <div className="flex items-center gap-2 text-sm text-gray-700 font-medium">
           <Verified className="text-blue-500" />
@@ -98,9 +138,15 @@ function Flashcard({ flashCardData, handleAnswerChange }) {
         <div className="flex items-center gap-2">
           <span className="text-2xl font-semibold text-gray-900">4.8</span>
           <div className="flex text-orange-400">
-            <Rating name="simple-controlled" value={flashCardData.rating} readOnly/>
+            <Rating
+              name="simple-controlled"
+              value={flashCardData.rating}
+              readOnly
+            />
           </div>
-          <span className="text-sm text-gray-500">{flashCardData.ratingCount} Ratings</span>
+          <span className="text-sm text-gray-500">
+            {flashCardData.ratingCount} Ratings
+          </span>
           <span className="text-gray-400 text-sm ml-2">›</span>
         </div>
       </div>

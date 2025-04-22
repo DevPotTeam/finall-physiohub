@@ -1,13 +1,15 @@
 "use client";
+import { Input } from "@/components/ui/input";
 import useGet from "@/hooks/useGet";
 import { AlarmClock, BadgeCheck, FileText } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
-const Flashcard = ({ imageSrc, title, tags, description, cards, time }) => {
+const Flashcard = ({ imageSrc, title, tags, description, cards, time, id }) => {
   return (
-    <div className="flex flex-col justify-between bg-white rounded-xl border overflow-hidden p-4 w-[inherit] md:w-[inherit] lg:w-[350px] relative cursor-pointer">
-      <div className="h-[180px] w-[230px]">
+    <Link href={`/flashcard/${id}`} className="flex flex-col justify-between bg-white rounded-xl border overflow-hidden p-4 w-[350px] relative cursor-pointer">
+      <div className="h-[180px] w-[100%]">
         {imageSrc ? (
           <Image
             src={imageSrc}
@@ -35,17 +37,17 @@ const Flashcard = ({ imageSrc, title, tags, description, cards, time }) => {
         </div>
         <p className="text-sm text-gray-600">{description}</p>
         <div className="flex justify-between items-center mt-4 text-gray-500 text-sm">
-          <span className="flex">
+          {/* <span className="flex">
             <FileText size={18} />
             &nbsp;&nbsp;{cards} cards
-          </span>
-          <span className="flex">
+          </span> */}
+          {/* <span className="flex">
             <AlarmClock size={18} />
             &nbsp;{time} min
-          </span>
+          </span> */}
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
@@ -64,18 +66,25 @@ useEffect(()=>{
   return (
     <>
       <div className="mt-4 w-full mx-auto max-w-[80%] ">
-        <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row gap-4 mt-4 overflow-x-auto overflow-y-hidden">
-          {flashCards?.map((flashcard) => (
+        <div className="flex flex-col">
+          <h6 className="font-semibold text-3xl">All Flashcards</h6>
+          <p className="my-2">A perfect tool for quick revisions and reinforcing your learning, making complex information easy to remember.</p>
+            <Input className="max-w-96"placeholder="Search"/>
+          <div className="w-full flex flex-row gap-4 mt-4 overflow-x-auto overflow-y-hidden">
+
+          {...flashCards?.map((flashcard) => (
             <Flashcard
-                key={flashcard._id}
-              imageSrc={"/auth-activity.png"}
-              title="Musculoskeletal Physiology"
-              tags={["Muscle", "Cardiovascular", "Ribs"]}
-              description="Exercise Therapy is a treatment method that uses physical exercise to address various medical conditions."
-              cards="120"
-              time="20"
+            key={flashcard._id}
+            imageSrc={"/auth-activity.png"}
+            title="Musculoskeletal Physiology"
+            tags={["Muscle", "Cardiovascular", "Ribs"]}
+            description="Exercise Therapy is a treatment method that uses physical exercise to address various medical conditions."
+            cards="120"
+            time="20"
+            id={flashcard._id}
             />
           ))}
+          </div>
         </div>
       </div>
     </>

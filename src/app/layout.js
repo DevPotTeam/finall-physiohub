@@ -1,15 +1,24 @@
-"use client"
-import "./globals.css";
-// import Header from  "../components/header&footer/Header.jsx"
-// import Footer from  "../components/header&footer/Footer.jsx"
-const api_url = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+import "./globals.css";
+import ProtectedRoutes from "@/components/protectedRoute/ProtectedRoute"
+import Cookies from "js-cookie"
+
+export const metadata = {
+  title: "PhysioHub",
+  description: "Your app description",
+  icons: {
+    icon: "/favicon.png", // path inside public/
+  },
+};
 
 export default function RootLayout({ children }) {
+  const user = Cookies.get("role")
   return (
     <html lang="en">
       <body>
+        {/* <ProtectedRoutes user={user}> */}
         {children}
+        {/* </ProtectedRoutes> */}
         
       </body>
     </html>

@@ -139,7 +139,7 @@ const QuizCard2 = ({
   );
 };
 
-const SavedQuiz = () => {
+const SavedQuiz = ({quizs}) => {
   return (
     <div className="mt-4">
       <div className="flex justify-between items-center">
@@ -152,22 +152,18 @@ const SavedQuiz = () => {
         </Link>
       </div>
       <div className=" flex flex-col gap-4 mt-4 overflow-x-auto overflow-y-hidden">
+       {quizs.map((q)=>(
         <QuizCard2
-          imageSrc={"/lungsfull.png"}
-          title="Exercise Therapy"
-          tags={["Muscle", "Cardiovascular", "Ribs"]}
-          description="This quiz will test your knowledge of different types of exercise therapy, its benefits, and its application methods."
-          questions="140"
-          time="20"
-        />
-        <QuizCard2
-          imageSrc={"/lungsfull.png"}
-          title="Exercise Therapy"
-          tags={["Muscle", "Cardiovascular", "Ribs"]}
-          description="This quiz will test your knowledge of different types of exercise therapy, its benefits, and its application methods."
-          questions="140"
-          time="20"
-        />
+        key={q._id}
+        imageSrc={"/lungsfull.png"}
+        title="Exercise Therapy"
+        tags={["Muscle", "Cardiovascular", "Ribs"]}
+        description="This quiz will test your knowledge of different types of exercise therapy, its benefits, and its application methods."
+        questions="140"
+        time="20"
+        id={q._id}
+      />
+       )) }
       </div>
     </div>
   );
@@ -409,6 +405,7 @@ const ProfileCard = () => {
 
 export default function Discover() {
   const [flashCards, setFlashCards] = useState([]);
+  const [quizs, setQuizs] = useState([])
   const fetchFlashCardsData = async () => {
     const { data, error, status } = await useGet(
       `/flashcards/getAllFlashcards`
@@ -421,6 +418,15 @@ export default function Discover() {
   useEffect(() => {
     fetchFlashCardsData();
   }, []);
+  
+  const fetchQuizs = async () => {
+    const { data, error, status } = await useGet(`/quizzes`);
+    console.log(data);
+    setQuizs(data)
+  };
+  useEffect(() => {
+    fetchQuizs();
+  }, []);
   return (
     <div className="flex justify-between w-[100%]">
       <div className="flex flex-col w-[100%] lg:w-[60%] md:w-[100%]">
@@ -432,7 +438,7 @@ export default function Discover() {
           <QuizCard />
         </div>
         <SuggestedQuizBanner />
-        <SavedQuiz />
+        <SavedQuiz quizs={quizs}/>
         <FlashcardSet flashCards={flashCards}/>
       </div>
       <div className="hidden flex-col items-end w-[40%] lg:flex p-2 pt-0">

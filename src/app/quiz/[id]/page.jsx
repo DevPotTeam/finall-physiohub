@@ -11,75 +11,76 @@ import { IoIosCheckmark } from "react-icons/io";
 import Link from "next/link";
 import ReportModal from "@/components/common/ReportModal";
 import useGet from "@/hooks/useGet";
+import usePost from "@/hooks/usePost";
 
-const questions = [
-  {
-    question:
-      "A 25-year-old man comes to the emergency department because of acute onset hoarseness of voice within the past 3 days. He also reports coughing, frequent throat clearing, and flu-like symptoms. He reports having an upper respiratory infection from babysitting his younger cousin 5 days ago. A laryngoscopy is done and shows erythematous and oedematous laryngeal tissue. Which of the following is the next best step in management for this patient?",
-    options: [
-      {
-        id: "A",
-        text: "90% inorganic material & 10% organic material",
-        correct: false,
-      },
-      {
-        id: "B",
-        text: "35% inorganic material & 65% organic material",
-        correct: true,
-      },
-      {
-        id: "C",
-        text: "50% inorganic material & 50% organic material",
-        correct: false,
-      },
-      {
-        id: "D",
-        text: "65% inorganic material & 35% organic material",
-        correct: false,
-      },
-    ],
-    explanation:
-      "The Biceps Brachii muscle is located in the upper arm and is primarily responsible for flexion of the elbow. It helps in bringing the forearm towards the shoulder.",
-    image: "http://example.jpg",
-    type: "chooseTheCorrect",
-  },
-  {
-    question:
-      "Which structure is responsible for producing cerebrospinal fluid?",
-    answer: "abcd",
-    explanation:
-      "The Biceps Brachii muscle is located in the upper arm and is primarily responsible for flexion of the elbow. It helps in bringing the forearm towards the shoulder.",
-    type: "text",
-  },
-  {
-    question:
-      "What are the common goals of physiotherapy for patients with stroke? (Select all that apply)",
-    options: [
-      { id: "A", text: "Choroid Plexus" },
-      { id: "B", text: "Pineal Gland" },
-      { id: "C", text: "Cerebellum" },
-      { id: "D", text: "Thalamus" },
-    ],
-    explanation:
-      "The Biceps Brachii muscle is located in the upper arm and is primarily responsible for flexion of the elbow. It helps in bringing the forearm towards the shoulder.",
-    type: "multipleChoice",
-  },
-  {
-    question:
-      "What are the common goals of physiotherapy for patients with stroke? (Select all that apply)",
-    options: [
-      { id: "A", text: "True", correct: false },
-      { id: "B", text: "False", correct: true },
-    ],
-    explanation:
-      "The Biceps Brachii muscle is located in the upper arm and is primarily responsible for flexion of the elbow. It helps in bringing the forearm towards the shoulder.",
-    type: "trueFalse",
-  },
-];
+// const questions = [
+//   {
+//     question:
+//       "A 25-year-old man comes to the emergency department because of acute onset hoarseness of voice within the past 3 days. He also reports coughing, frequent throat clearing, and flu-like symptoms. He reports having an upper respiratory infection from babysitting his younger cousin 5 days ago. A laryngoscopy is done and shows erythematous and oedematous laryngeal tissue. Which of the following is the next best step in management for this patient?",
+//     options: [
+//       {
+//         id: "A",
+//         text: "90% inorganic material & 10% organic material",
+//         correct: false,
+//       },
+//       {
+//         id: "B",
+//         text: "35% inorganic material & 65% organic material",
+//         correct: true,
+//       },
+//       {
+//         id: "C",
+//         text: "50% inorganic material & 50% organic material",
+//         correct: false,
+//       },
+//       {
+//         id: "D",
+//         text: "65% inorganic material & 35% organic material",
+//         correct: false,
+//       },
+//     ],
+//     explanation:
+//       "The Biceps Brachii muscle is located in the upper arm and is primarily responsible for flexion of the elbow. It helps in bringing the forearm towards the shoulder.",
+//     image: "http://example.jpg",
+//     type: "chooseTheCorrect",
+//   },
+//   {
+//     question:
+//       "Which structure is responsible for producing cerebrospinal fluid?",
+//     answer: "abcd",
+//     explanation:
+//       "The Biceps Brachii muscle is located in the upper arm and is primarily responsible for flexion of the elbow. It helps in bringing the forearm towards the shoulder.",
+//     type: "text",
+//   },
+//   {
+//     question:
+//       "What are the common goals of physiotherapy for patients with stroke? (Select all that apply)",
+//     options: [
+//       { id: "A", text: "Choroid Plexus" },
+//       { id: "B", text: "Pineal Gland" },
+//       { id: "C", text: "Cerebellum" },
+//       { id: "D", text: "Thalamus" },
+//     ],
+//     explanation:
+//       "The Biceps Brachii muscle is located in the upper arm and is primarily responsible for flexion of the elbow. It helps in bringing the forearm towards the shoulder.",
+//     type: "multipleChoice",
+//   },
+//   {
+//     question:
+//       "What are the common goals of physiotherapy for patients with stroke? (Select all that apply)",
+//     options: [
+//       { id: "A", text: "True", correct: false },
+//       { id: "B", text: "False", correct: true },
+//     ],
+//     explanation:
+//       "The Biceps Brachii muscle is located in the upper arm and is primarily responsible for flexion of the elbow. It helps in bringing the forearm towards the shoulder.",
+//     type: "trueFalse",
+//   },
+// ];
 
 export default function QuizCard({params}) {
   const { id } = React.use(params); 
-  // const [questions, setQuestions] = useState([])
+  const [questions, setQuestions] = useState([])
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [explanation, setExplanation] = useState("");
@@ -90,25 +91,37 @@ export default function QuizCard({params}) {
   const [isAnswered, setIsAnswered] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [timeLeft, setTimeLeft] = useState(150);
-  const [isSubmited, setIsSubmited] = useState(true);
+  const [isSubmited, setIsSubmited] = useState(false);
+  const [correctAnswer, setCorrectAnswer] = useState("");
+  const [userAnswers, setUserAnswers] = useState([]);
+  const [startTime, setStartTime] = useState(null);
+  const [elapsed, setElapsed] = useState(0);
+  const [result, setResult] = useState([])
 
   const fetchQuizData = async ()=>{
     const {data, error, status} = await useGet(`/quizzes/${id}`)
-    console.log(data)
+    
     if(status == 200){
       setQuestions(data.questions)
     }
   }
   useEffect(()=>{
     fetchQuizData()
+    if (startTime === null) {
+      setStartTime(Date.now());
+    }
   },[])
 
 
   useEffect(() => {
-    if (timeLeft <= 0) return;
-    const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
-    return () => clearInterval(timer);
-  }, [timeLeft]);
+    if (!startTime) return;
+  
+    const interval = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - startTime) / 1000));
+    }, 1000);
+  
+    return () => clearInterval(interval);
+  }, [startTime]);
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -116,48 +129,106 @@ export default function QuizCard({params}) {
     return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
+  // const handleCheckAnswer = () => {
+  //   if (isAnswered) return;
+  //   const current = questions[currentQuestion];
+  //   let correct = false;
+  //   const correctAnswer = questions[currentQuestion].options
+  //   .filter((opt) => opt.correctAnswer)
+  //   setCorrectAnswer(correctAnswer.value)
+  //   console.log()
+
+  //   if (current.type === "checkbox") {
+  //     const correctAnswers = current.options
+  //       .filter((opt) => opt.correctAnswer)
+  //       .map((opt) => opt._id);
+
+  //     correct =
+  //       multipleOptions.length === correctAnswers.length &&
+  //       multipleOptions.every((id) => correctAnswers.includes(id));
+  //   } else if (current.type === "radio") {
+  //     const correctAnswer = current.options.find((opt) => opt.correctAnswer)?._id;
+  //     correct = selectedOption === correctAnswer;
+  //   } else if (current.type === "short-answer") {
+  //     const correctAnswer = current.answer?.toLowerCase().trim();
+  //     correct = textAnswer.toLowerCase().trim() === correctAnswer;
+  //   }
+
+  //   let selectedTextOption = "";
+  //   if (current.type === "checkbox") {
+  //     selectedTextOption = current.options
+  //       .filter((opt) => multipleOptions.includes(opt._id))
+  //       .map((opt) => opt.text)
+  //       .join(", ");
+  //   } else if (current.type === "radio") {
+  //     selectedTextOption = current.options.find((opt) => opt._id === selectedOption)?.text || "";
+  //   } else if (current.type === "short-answer") {
+  //     selectedTextOption = textAnswer;
+  //   }
+  
+  //   // Save answer
+  //   setUserAnswers((prev) => [
+  //     ...prev,
+  //     {
+  //       questionIndex: currentQuestion,
+  //       selectedTextOption,
+  //     },
+  //   ]);
+
+  //   setIsCorrect(correct);
+  //   setExplanation(current.explanation || "");
+  //   setIsAnswered(true);
+  // };
+
   const handleCheckAnswer = () => {
     if (isAnswered) return;
-
+  
     const current = questions[currentQuestion];
     let correct = false;
-
-    if (current.type === "multipleChoice") {
+  
+    if (current.type === "checkbox") {
       const correctAnswers = current.options
-        .filter((opt) => opt.correct)
-        .map((opt) => opt.id);
-
+        .filter((opt) => opt.correctAnswer)
+        .map((opt) => opt._id);
+  
       correct =
         multipleOptions.length === correctAnswers.length &&
         multipleOptions.every((id) => correctAnswers.includes(id));
-    } else if (current.type === "chooseTheCorrect") {
-      const correctAnswer = current.options.find((opt) => opt.correct)?.id;
+    } else if (current.type === "radio") {
+      const correctAnswer = current.options.find((opt) => opt.correctAnswer)?._id;
       correct = selectedOption === correctAnswer;
-    } else if (current.type === "text") {
+    } else if (current.type === "short-answer") {
       const correctAnswer = current.answer?.toLowerCase().trim();
       correct = textAnswer.toLowerCase().trim() === correctAnswer;
     }
-
+  
+    // Get selected text option
+    let selectedTextOption = "";
+    if (current.type === "checkbox") {
+      selectedTextOption = current.options
+        .filter((opt) => multipleOptions.includes(opt._id))
+        .map((opt) => opt.value)
+        .join(", ");
+    } else if (current.type === "radio") {
+      selectedTextOption = current.options.find((opt) => opt._id === selectedOption)?.value || "";
+    } else if (current.type === "short-answer") {
+      selectedTextOption = textAnswer;
+    }
+  
+    // Save answer
+    setUserAnswers((prev) => [
+      ...prev,
+      {
+        questionIndex: currentQuestion,
+        selectedTextOption,
+      },
+    ]);
+  
     setIsCorrect(correct);
     setExplanation(current.explanation || "");
     setIsAnswered(true);
   };
-
-  // const handleOptionChange = (optionId) => {
-  //   if (isAnswered) return;
-
-  //   const current = questions[currentQuestion];
-
-  //   if (current.type === "multipleChoice") {
-  //     if (multipleOptions.includes(optionId)) {
-  //       setMultipleOptions((prev) => prev.filter((id) => id !== optionId));
-  //     } else {
-  //       setMultipleOptions((prev) => [...prev, optionId]);
-  //     }
-  //   } else if (current.type === "chooseTheCorrect") {
-  //     setSelectedOption(optionId);
-  //   }
-  // };
+  
 
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
@@ -183,9 +254,33 @@ export default function QuizCard({params}) {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
     setIsSubmited(true);
+    const endTime = Date.now();
+    const completionTimeInSeconds = Math.floor((endTime - startTime) / 1000);
+  
+    const finalPayload = {
+      answers: userAnswers,
+      completionTime: completionTimeInSeconds,
+    };
+  
+    const {data, error, status} = await usePost(`/quizzes/submit-quiz/${id}`, finalPayload)
+    console.log(data);
+    if(status == 201){
+      fetchResult()
+    }
   };
+
+
+ const fetchResult =  async() => {
+    const { data, error, status } = await usePost(`/quizzes/generate-results/${id}`);
+    
+    if (status === 201 && Array.isArray(data)) {
+      const lastResult = data[data.length - 1]; // get last object
+      console.log(lastResult)
+      setResult(lastResult);
+    }
+  }
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg">
@@ -206,7 +301,7 @@ export default function QuizCard({params}) {
         </div>
       </div>
       {/* <SignInBanner /> */}
-      {isSubmited ? (
+      {!isSubmited ? (
         <>
           <div className="flex items-center justify-between md:gap-0 gap-2 mb-4 bg-gray-100 rounded-md py-2 px-2">
             <div className="flex md:justify-start justify-center items-center md:space-x-3 space-x-2">
@@ -221,9 +316,9 @@ export default function QuizCard({params}) {
             </div>
 
             <div className="text-gray-600 md:text-sm text-xs">
-              <span className="font-semibold">Time remaining</span>
+              <span className="font-semibold">Quize Started </span>
               <div className="text-lg   font-bold text-center">
-                {formatTime(timeLeft)}
+                {formatTime(elapsed)} 
               </div>
             </div>
             <div className="text-gray-700 md:text-base text-xs font-semibold">
@@ -238,7 +333,7 @@ export default function QuizCard({params}) {
             </h3>
             {questions[currentQuestion]?.image && (
               <div className="md:w-52 w-38 md:h-52 h-38 rounded-md justify-self-center">
-                <img src="" className="w-full h-full" alt="question Image"/>
+                <img src={questions[currentQuestion].image} className="w-full h-full" alt="question Image"/>
               </div>
             )}
             <p className="text-gray-800 mt-2 md:text-[15px] text-[14px]">
@@ -249,23 +344,21 @@ export default function QuizCard({params}) {
               <div className="w-full py-2 px-3 bg-[#E2F9FC] mt-3 rounded-md sm:text-sm text-xs border border-green-300">
                 <p>
                   <span className="font-semibold sm:text-base text-xsf">
-                    The Correc Answer is {selectedAnswer.id}.{" "}
-                    {selectedAnswer.text}.{" "}
+                    The Correct Answer is {correctAnswer}.
                   </span>
-                  {explanation}
                 </p>
               </div>
             )}
 
             <div className="mt-8 mb-10 space-y-2 ">
-              {questions[currentQuestion]?.type == "chooseTheCorrect" &&
-                questions[currentQuestion]?.options.map((option) => {
+              {questions[currentQuestion]?.type == "radio" &&
+                questions[currentQuestion]?.options.map((option, index) => {
                   let borderColor = "border-gray-300";
                   let bgColor = "";
                   if (
                     isAnswered &&
-                    selectedOption === option.id &&
-                    !option.correct
+                    selectedOption === option._id &&
+                    !option.correctAnswer
                   ) {
                     borderColor = "border-red-500"; // Wrong answer gets a red border
                     bgColor = "bg-red-50";
@@ -273,7 +366,7 @@ export default function QuizCard({params}) {
 
                   return (
                     <label
-                      key={option.id}
+                      key={option._id}
                       className={`flex items-center p-2 border rounded-lg cursor-pointer gap-2 ${borderColor} ${bgColor} ${
                         selectedOption === option.id
                           ? "border-[#6C4CE6] bg-purple-50"
@@ -285,28 +378,28 @@ export default function QuizCard({params}) {
                         name="quiz"
                         className="hidden"
                         onChange={() => {
-                          setSelectedOption(option.id);
-                          setSelectedAnswer(option);
+                          setSelectedOption(option._id);
+                          setSelectedAnswer(option.value);
                         }}
                         disabled={isAnswered}
                       />
                       <div
                         className={`py-1 md:px-3 px-2 rounded md:text-base text-sm ${
-                          selectedOption === option.id
+                          selectedOption === option._id
                             ? isAnswered && !isCorrect
                               ? "bg-red-500 text-white"
                               : "bg-[#6C4CE6] text-white"
                             : "bg-gray-100"
                         }`}
                       >
-                        {option.id}
+                        {index+1}
                       </div>
                       <div className="w-full flex justify-between items-center">
                         <p className="md:text-sm text-[13px] font-semibold">
-                          {option.text}
+                          {option.value}
                         </p>
                         <span className="md:w-6 w-[22px] md:h-6 h-[20px] border-2 rounded-full flex items-center justify-center">
-                          {selectedOption === option.id && (
+                          {selectedOption === option._id && (
                             <span
                               className={`md:w-3 w-2 md:h-3 h-2 ${
                                 isAnswered && !isCorrect && "bg-red-500"
@@ -332,7 +425,7 @@ export default function QuizCard({params}) {
                   ></textarea>
                 </div>
               )}
-              {questions[currentQuestion]?.type == "multipleChoice" &&
+              {questions[currentQuestion]?.type == "checbox" &&
                 questions[currentQuestion]?.options.map((option) => (
                   <label
                     key={option.id}
@@ -567,32 +660,28 @@ export default function QuizCard({params}) {
               <div className="sm:w-[150px] w-[100px] sm:h-[150px] h-[100px]">
                 <LottiePlayer animationFile={run} width="100%" height="100%" />
               </div>
-              <h1 className="text-xl font-bold">Session complete!</h1>
+              <h1 className="text-xl font-bold">Quiz complete!</h1>
               <p>Here's a detailed report of your performance.</p>
-              <div className="grid md:grid-cols-2 grid-cols-1 gap-4 mt-10">
+              <div className="md:w-[60%] w-[80%] gap-4 mt-10">
                 <div className="bg-[#EEF2F6] p-4 rounded-md">
-                  <img src="/CompletionBadge.png" alt="" />
-                  <h1>Completed Quiz</h1>
-                  <h3>+ 1782 P</h3>
-                  <h3>Correct answer : 18/20</h3>
-                </div>
-                <div className="bg-[#EEF2F6] p-4 rounded-md">
-                  <img src="/AccuracyBadge.png" alt="" />
-                  <h1>Accuracy</h1>
-                  <h3>+ 172 P</h3>
-                  <h3>Correct answer : 80%</h3>
+                  <img src="/CompletionBadge.png" alt="" className="justify-self-center"/>
+                  <h1 className="text-center">Completed Quiz</h1>
+                  <h3>Score : {result.score}</h3>
+                  <h3>Rank : {result.rank}</h3>
+                  <h3>Completed in : {result.completionTime}</h3>
+                  <h3>Correct answer : {result.correctAnswers}</h3>
+                  <h3>Incorrect answer : {result.incorrectAnswers}</h3>
                 </div>
               </div>
-
               <div className="flex justify-between items-center w-full mt-10">
                 <button className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100 flex items-center">
                   Back <span className="sm:block hidden">&nbsp; to Dashboard</span>
                 </button>
                 <Link
-                  href={"/all/quizs"}
+                  href={"/user/quizs"}
                   className="px-4 py-2 sm:text-base text-sm cursor-pointer rounded-lg bg-[#6C4CE6] text-white flex items-center"
                 >
-                  Continue <span className="sm:block hidden">&nbsp; to next lesson</span>
+                  Continue <span className="sm:block hidden">&nbsp; to next quiz</span>
                 </Link>
               </div>
             </div>
