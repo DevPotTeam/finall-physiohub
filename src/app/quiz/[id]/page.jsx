@@ -297,7 +297,11 @@ export default function QuizCard({params}) {
           onClick={handleBack}
         />
         <div className="w-full h-2 bg-gray-200 rounded-full mx-4">
-          <div className="w-[25%] h-full bg-[#6c4ce6] rounded-full"></div>
+          <div className=" h-full bg-[#6c4ce6] rounded-full"
+            style={{
+              width : `${(currentQuestion + 1 / questions.length) *100 }%`
+            }}
+          ></div>
         </div>
       </div>
       {/* <SignInBanner /> */}

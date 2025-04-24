@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ChevronDown,
   ChevronUp,
@@ -11,23 +11,56 @@ import {
 import { Select, SelectItem } from "@/components/ui/select.jsx";
 import { Input } from "@/components/ui/input.jsx";
 import { Textarea } from "@/components/ui/textArea.jsx";
+import { Switch } from "@/components/ui/switch.jsx";
 import { Button } from "@/components/ui/button.jsx";
-import PublishLessonHeader from "@/components/course/PublishLessonHeader";
-import usePost from "@/hooks/usePost";
+import UpdateLessonHeader from "@/components/course/UpdateLessonHeader"
 import { useRouter } from "next/navigation";
 import useImagePost from "@/hooks/useImagePost";
+import useGet from "@/hooks/useGet";
+import usePut from "@/hooks/usePut"
+
 
 export default function AddLessons({params}) {
   const { id } = React.use(params); 
+  const [cardsData, setCardsData] = useState([])
+  const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
-  const [cards, setCards] = useState([
-    { id: 1, type: "", title: "", url: "", open: true },
-  ]);
+  const [cards, setCards] = useState([]);
   const [type, setType] = useState(""); // default to "true" (Free)
-  const [formData, setFormData] = useState({
-    lessonTitle: "",
-    contents: cards,
-  });
+  const [formData, setFormData] = useState([]);
+
+  const fetch = async() =>{
+    const {data, status} = await useGet(`/courses/get/${id}`)
+    if(status == 200){
+      setData(data.lessons)
+      console.log(data.lessons)
+    }
+  }
+  
+  useEffect(()=>{
+    fetch()
+  },[])
+
+  
+  useEffect(() => {
+    if (data && data.length > 0) {
+        data.map((d) =>{
+
+            const cardsWithOpen = d.contents.map(item => ({
+              ...item,
+              open: true, // default to true or false based on your UI preference
+            }));
+        
+            setCards((prev) =>([...prev, ...cardsWithOpen]));
+            setFormData((prev)=>([...prev,{
+              lessonTitle: d.lessonTitle,
+              contents: cardsWithOpen,
+            }]));
+        })
+    }
+  }, [data]);
+
+
   const fileInputRef = useRef(null);
   const router = useRouter()
   const options = [
@@ -69,21 +102,25 @@ export default function AddLessons({params}) {
     setCards(cards.filter((_, i) => i !== index));
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e, lessonIndex) => {
     const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  
+    setFormData(prev => {
+      const updated = [...prev];
+      updated[lessonIndex][name] = value;
+      return updated;
+    });
   };
 
-  const handleCardChange = (index, field, value) => {
-    const updatedCards = [...cards];
-    updatedCards[index][field] = value;
-    setCards(updatedCards);
+  const handleCardChange = (lessonIndex, cardIndex, field, value) => {
+    setFormData(prev => {
+      const updated = [...prev];
+      const updatedContents = [...updated[lessonIndex].contents];
+      updatedContents[cardIndex][field] = value;
+      updated[lessonIndex].contents = updatedContents;
+      return updated;
+    });
   };
-
   const handleImageUpload = async (e, index) => {
     const file = e.target.files[0];
     const formImageData = new FormData();
@@ -116,22 +153,17 @@ export default function AddLessons({params}) {
     }
   };
 
-  const handleDrop = (event, index, type) => {
+  const handleDrop = (event) => {
     event.preventDefault();
-    if(type === "image"){
-      handleImageUpload(event, index)
-    }
-    if(type === "video"){
-      handleVideoUpload(event.dataTransfer.files, index);
-    }
+    handleUpload(event.dataTransfer.files);
   };
 
   const handleDragOver = (event) => {
     event.preventDefault();
   };
 
-  const handleLessonsAdd = async () => {
-    const {data, error, status} = await usePost(`/courses/add-to-course/${id}`, formData)
+  const handleLessonsUpdate = async () => {
+    const {data, error, status} = await usePut(`/courses/update/${id}`, formData)
     console.log(data)
     if(status == 201){
       router.push("/teacher/course")
@@ -140,8 +172,10 @@ export default function AddLessons({params}) {
 
   return (
     <>
-      <PublishLessonHeader handleLessonsAdd={handleLessonsAdd} />
+      <UpdateLessonHeader handleLessonsUpdate={handleLessonsUpdate} id={id} />
       <div className=" p-6 bg-white rounded-lg shadow-md w-full mx-auto md:max-w-[80%] max-w-[95%]">
+        {formData.map((formdata, index)=>(<div key={index}>
+            {console.log("inside")}
         {/*  Title */}
         <div className="mb-4 ">
           <label className="block text-gray-700 font-semibold">
@@ -151,24 +185,24 @@ export default function AddLessons({params}) {
             placeholder="Lesson title"
             className="my-5"
             name="lessonTitle"
-            value={formData.title}
-            onChange={handleChange}
+            value={formdata.lessonTitle}
+            onChange={(e)=>{handleChange(e, index)}}
           />
         </div>
 
         <div className="mb-4 space-y-4">
-          {cards.map((q, index) => (
-            <div key={q.id} className="border p-4 rounded-lg mb-4">
+          {formdata.contents.map((q, i) => (
+            <div key={i} className="border p-4 rounded-lg mb-4">
               <div
                 className="flex justify-between items-center cursor-pointer bg-gray-100 p-3 rounded-lg"
-                onClick={() => toggleQuestion(index)}
+                onClick={() => toggleQuestion(i)}
               >
                 <span className="text-gray-700 font-medium">Lesson {q.id}</span>
                 <div className="flex gap-2">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      removeQuestion(index);
+                      removeQuestion(i);
                     }}
                   >
                     <Trash2 size={16} className="text-red-500" />
@@ -176,7 +210,7 @@ export default function AddLessons({params}) {
                   {q.open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </div>
               </div>
-              {q.open && (
+              {true && (
                 <div className="mt-3">
                   <div className="w-full">
                     <div className=" mb-2 first:border-t-0 p-2">
@@ -187,7 +221,7 @@ export default function AddLessons({params}) {
                           className="my-5 w-full"
                           value={q.title}
                           onChange={(e) =>
-                            handleCardChange(index, "title", e.target.value)
+                            handleCardChange(index, i, "title", e.target.value)
                           }
                         />
                       </div>
@@ -199,7 +233,7 @@ export default function AddLessons({params}) {
                           className="w-full"
                           value={q.type}
                           onChange={(e) =>
-                            handleCardChange(index, "type", e.target.value)
+                            handleCardChange(index, i, "type", e.target.value)
                           }
                         >
                           {options.map((opt) => (
@@ -214,10 +248,10 @@ export default function AddLessons({params}) {
                           <label className="block text-gray-700 font-semibold">
                             Video
                           </label>
-                          {!formData.contents[index].url ? (
+                          {!formdata.contents[i]?.url ? (
                             <div
                               className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500 "
-                              onDrop={(e)=>{handleDrop(e, index, q.type )}}
+                              onDrop={handleDrop}
                               onDragOver={handleDragOver}
                             >
                               {loading? <div className="w-12 h-12 border-4 border-t-purple-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div>:<label className="ud-btn btn-white text-center cursor-pointer">
@@ -237,7 +271,7 @@ export default function AddLessons({params}) {
                                   multiple
                                   className="ud-btn btn-white"
                                   onChange={(e) => {
-                                    handleVideoUpload(e, index);
+                                    handleVideoUpload(e, i);
                                   }}
                                   style={{ display: "none" }}
                                   required
@@ -247,7 +281,7 @@ export default function AddLessons({params}) {
                           ) : (
                             <div className="h-[200px] w-[100px]">
                               <video
-                                src={formData.contents[index].url}
+                                src={formdata.contents[i].url}
                                 height={300}
                                 width={200}
                                 alt="cover-image"
@@ -266,7 +300,7 @@ export default function AddLessons({params}) {
                           {!formData.coverImage ? (
                             <div
                               className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500 "
-                              onDrop={(e)=>{handleDrop(e, index, q.type)}}
+                              onDrop={handleDrop}
                               onDragOver={handleDragOver}
                             >
                               <label className="ud-btn btn-white text-center cursor-pointer">
@@ -320,11 +354,12 @@ export default function AddLessons({params}) {
               )}
             </div>
           ))}
+        </div>
+        </div>))}
           <Button onClick={addQuestion} className="flex items-center gap-2">
             <PlusCircle size={16} /> Add Question
           </Button>
-        </div>
       </div>
     </>
   );
-}
+} 

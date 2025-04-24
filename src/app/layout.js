@@ -2,6 +2,7 @@
 import "./globals.css";
 import ProtectedRoutes from "@/components/protectedRoute/ProtectedRoute"
 import Cookies from "js-cookie"
+import '../../public/styles/flashcard.css';
 
 export const metadata = {
   title: "PhysioHub",

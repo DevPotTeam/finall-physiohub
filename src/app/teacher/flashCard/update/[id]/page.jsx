@@ -1,16 +1,18 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { Upload, X } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import {  Upload, X } from "lucide-react";
 import { Select } from "@/components/ui/select.jsx";
 import { Input } from "@/components/ui/input.jsx";
 import PublishFlashCardHeader from "@/components/flashCard/PublishFlashCardHeader";
-import usePost from "@/hooks/usePost";
 import useImagePost from "@/hooks/useImagePost";
-import { FaTimesCircle } from "react-icons/fa";
-import Image from "next/image";
 import useGet from "@/hooks/useGet";
-
-export default function CreateFlashCard({ setShowInFlashCard }) {
+import { useRouter } from "next/navigation";
+import usePatch from "@/hooks/usePatch"
+import Image from "next/image";
+export default function UpdateFlashCard({params}) {
+  const router = useRouter()
+  const {id} = React.use(params)
+  const [data, setData] = useState({})
   const fileInputRef = useRef(null);
   const [error, setError] = useState("");
   const [imageLoading, setImageLoading] = useState(false);
@@ -32,20 +34,44 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
     topic: "",
   });
 
+
+  const fetch = async() =>{
+    const {data, status} = await useGet(`/flashcards/getFlashcardById/${id}`)
+    if(status == 200){
+      setData(data)
+    }
+  }
+  
   const fetchTopics = async () => {
     const { data, error, status } = await useGet(`/main-topics/`);
     if (status === 200) {
       setTopics(data);
     }
   };
+  useEffect(()=>{
+    fetch()
+    fetchTopics()
+  },[])
 
-  useEffect(() => {
-    fetchTopics();
-  }, []);
 
-  useEffect(() => {
-    console.log(flashcard);
-  }, [flashcard]);
+  
+useEffect(() => {
+    setFlashcard(()=>({
+      title : data.title || "",
+      description : data.description || "",
+      hint: data.hint || "",
+      imageUrl: data.imageUrl || "",
+      masteryLevel: data.masteryLevel || 0,
+      subject: data.subject || "",
+      confidenceLevel: data.confidenceLevel || "",
+      frontImage : data.frontImage || "",
+      frontContent : data.frontContent || "",
+      backImage : data.backImage || "",
+      backContent : data.backContent || "",
+      topics : data.topics || ""
+    })); 
+}, [data]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -101,10 +127,6 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
     }
   };
 
-  const handleDragOver = (event) => {
-    event.preventDefault();
-  };
-
   const handleRemoveImage = (name) => {
     setFlashcard((prev) => ({
       ...prev,
@@ -112,13 +134,18 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
     }));
   };
 
-  const handleCreateFlashCard = async () => {
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
+  };
+
+  const handleUpdateFlashCard = async () => {
     console.log(flashcard);
-    const { data, error, status } = await usePost(`/flashcards/create`, {
+    const { data, error, status } = await usePatch(`/flashcards/updateFlashcardById/${id}`, {
       ...flashcard,
     });
-    if (status == 201) {
-      setShowInFlashCard("FlashCards");
+    if (status == 200) {
+      router.push(`/teacher/flashCard`)
     }
     if (error) {
       console.log(error);
@@ -128,7 +155,7 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
 
   return (
     <>
-      <PublishFlashCardHeader handleCreateFlashCard={handleCreateFlashCard} />
+      <PublishFlashCardHeader handleUpdateFlashCard={handleUpdateFlashCard} />
       {error && <p className="text-red-500 mb-3">{error}</p>}
       <div className=" p-6 bg-white rounded-lg shadow-md w-full mx-auto md:max-w-[80%] max-w-[95%]">
         {/* Cover Image Upload */}
@@ -213,8 +240,8 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
               className="w-full"
             >
               <option value="">Choose Topic</option>
-              {topics.map((topic) => (
-                <option value={topic._id}>{topic.name}</option>
+              {topics.map((topic, index) => (
+                <option key={index} value={topic._id}>{topic.name}</option>
               ))}
             </Select>
           </div>

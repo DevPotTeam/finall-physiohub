@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import Courses from "@/components/course/Courses";
+import Courses from "@/components/course/Courses"
 import CreateCourse from "@/components/course/CreateCourse"
 import useGet from "@/hooks/useGet"
 
@@ -11,7 +11,9 @@ export default function Course() {
 
   const fetchData = async() =>{
     const {data, error, status} = await useGet(`/courses/getAllCourses`)
-    setCourses(data)
+    if(status == 200){
+      setCourses(data)
+    }
   }
 
   useEffect(()=>{

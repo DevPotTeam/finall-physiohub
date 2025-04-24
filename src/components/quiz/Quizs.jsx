@@ -5,6 +5,8 @@ import { Trash2, Edit, MessageSquareText, Clock } from "lucide-react";
 import QuizHeader from "@/components/quiz/QuizHeader";
 import { useEffect, useState } from "react";
 import useGet from "@/hooks/useGet";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 // const articles = [
 //   {
@@ -22,16 +24,17 @@ import useGet from "@/hooks/useGet";
 // ];
 
 export default function Quizs({ setShowInQuiz }) {
-  const [articles, setArticles] = useState([])
-  const fetchTeacherQuizs = async () =>{
-    const {data, error, status} = await useGet(`/quizzes`)
-    if(status == 200){
-      setArticles(data)
+  const router = useRouter();
+  const [articles, setArticles] = useState([]);
+  const fetchTeacherQuizs = async () => {
+    const { data, error, status } = await useGet(`/quizzes`);
+    if (status == 200) {
+      setArticles(data);
     }
-  }
-  useEffect(()=>{
-    fetchTeacherQuizs()
-  },[])
+  };
+  useEffect(() => {
+    fetchTeacherQuizs();
+  }, []);
 
   const handleQuizDelete = async (id) => {
     const { data, error, status } = await useDelete(`/courses/delete/${id}`);
@@ -54,9 +57,9 @@ export default function Quizs({ setShowInQuiz }) {
                 <div className="flex items-center gap-5 w-full">
                   <div className="h-[180px] w-[230px]">
                     <Image
-                      src={"/auth-activity.png"|| article.banner}
+                      src={"/auth-activity.png" || article.banner}
                       alt="image"
-                      height={200}  
+                      height={200}
                       width={240}
                       className="object-cover h-full w-full rounded-2xl"
                     />
@@ -70,8 +73,8 @@ export default function Quizs({ setShowInQuiz }) {
                     </h3>
                     <p className="text-sm text-gray-400 mt-2 flex items-center">
                       <MessageSquareText size={14} />
-                      &nbsp;{article.questions.length}&nbsp; Questions
-                      &nbsp;{article.time}
+                      &nbsp;{article.questions.length}&nbsp; Questions &nbsp;
+                      {article.time}
                     </p>
                   </div>
                 </div>
@@ -81,18 +84,20 @@ export default function Quizs({ setShowInQuiz }) {
                     size="icon"
                     className="border-gray-300 text-gray-600 hover:bg-gray-100"
                     onClick={() => {
-                      handleQuizDelete(course._id);
+                      handleQuizDelete(article._id);
                     }}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="border-gray-300 text-gray-600 hover:bg-gray-100"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
+                  <Link href={`/teacher/quiz/update/${article._id}`}>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="border-gray-300 text-gray-600 hover:bg-gray-100"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>
