@@ -8,7 +8,7 @@ import useDelete from "@/hooks/useDelete";
 import { useRouter } from "next/navigation";
 import { Rating } from "@mui/material";
 
-export default function Course({ setShowInCourse, data }) {
+export default function Courses({ setShowInCourse, data }) {
 
   const handleCourseDelete = async (id) => {
     const { data, error, status } = await useDelete(`/courses/delete/${id}`);
@@ -87,6 +87,9 @@ export default function Course({ setShowInCourse, data }) {
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
+                        <Link
+                          href={`/teacher/course/update/${course._id}`}
+                        >
                         <Button
                           variant="outline"
                           size="icon"
@@ -94,6 +97,7 @@ export default function Course({ setShowInCourse, data }) {
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
+                        </Link>
                       </div>
                       <div className="mt-2">
                       <Rating

@@ -1,16 +1,21 @@
-// import { Navigate, useLocation } from "react-router-dom";
+"use client";
 
-// const ProtectedRoute = ({ children, user }) => {
-//   const location = useLocation();
+import { useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 
-//   const isTeacherRoute = location.pathname.includes("teacher");
+const ProtectedRoute = ({ user, children }) => {
+  const router = useRouter();
+  const pathname = usePathname();
 
-//   // Example: only allow access if user is a teacher
-//   if (isTeacherRoute && user?.role !== "teacher") {
-//     return <Navigate to="/user/dashboard" replace />;
-//   }
+  useEffect(() => {
+    const isTeacherRoute = pathname.includes("teacher");
 
-//   return children;
-// };
+    if (isTeacherRoute && user?.role !== "teacher") {
+      router.replace("/");
+    }
+  }, [pathname, user, router]);
 
-// export default ProtectedRoute;
+  return children;
+};
+
+export default ProtectedRoute;

@@ -6,7 +6,7 @@ import { ArrowLeft, Search, Upload } from "lucide-react";
 
 export default function PublishFlashCardHeader({handleCreateFlashCard}) {
   return (
-    <div className=" w-full mx-auto max-w-[80%] flex justify-between items-center p-4 rounded-lg">
+    <div className=" w-full mx-auto md:max-w-[80%] flex justify-between items-center p-4 rounded-lg">
       <div className="flex items-center gap-2">
         <ArrowLeft className="w-5 h-5 text-gray-700 cursor-pointer" />
         <h2 className="text-lg font-semibold">Create Flash Card</h2>
@@ -16,7 +16,7 @@ export default function PublishFlashCardHeader({handleCreateFlashCard}) {
           Save as Draft
         </Button>
         <Button className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg" onClick={handleCreateFlashCard}>
-          <Upload/> Publish
+          <Upload/> Create
         </Button>
       </div>
     </div>

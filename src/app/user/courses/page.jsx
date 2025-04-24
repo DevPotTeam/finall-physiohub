@@ -7,7 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
-const Flashcard = ({ imageSrc, title, description, rating, totalRating, id, verified }) => {
+const Course = ({ imageSrc, title, description, rating, totalRating, id, verified }) => {
   return (
     <Link href={`/flashcard/${id}`} className="flex flex-col justify-between bg-white rounded-xl border overflow-hidden p-4 w-[320px] relative cursor-pointer">
       <div className="h-[180px] w-[100%]">
@@ -43,10 +43,10 @@ const Flashcard = ({ imageSrc, title, description, rating, totalRating, id, veri
   );
 };
 
-function Flashcards() {
+function Courses() {
   const [flashCards, setFlashCards] = useState([]);
   const fetchFlashCardsData = async() => {
-    const { data, error, status } = await useGet(`/flashcards/getAllFlashcards`);
+    const { data, error, status } = await useGet(`/courses/getAllCourses`);
     console.log(data)
     if (status == 200) {
       setFlashCards(data);
@@ -59,15 +59,15 @@ useEffect(()=>{
     <>
       <div className="mt-4 w-full mx-auto max-w-[80%] ">
         <div className="flex flex-col">
-          <h6 className="font-semibold text-3xl">All Flashcards</h6>
+          <h6 className="font-semibold text-3xl">All Courses</h6>
           <p className="my-2">A perfect tool for quick revisions and reinforcing your learning, making complex information easy to remember.</p>
             <Input className="max-w-96"placeholder="Search"/>
-          <div className="w-full grid xl:grid-cols-3 sm:grid-cols-2 mt-4">
+          <div className="w-full grid xl:grid-cols-3 sm:grid-cols-2 gap-2 mt-4">
 
           {...flashCards?.map((flashcard) => (
-            <Flashcard  
+            <Course  
             key={flashcard._id}
-            imageSrc={"/auth-activity.png"}
+            imageSrc={flashcard.coverImageUrl}
             title={flashcard.title}
             verified={flashcard.verifiedByAdmin}
             description={flashcard.description}
@@ -83,4 +83,4 @@ useEffect(()=>{
   );
 }
 
-export default Flashcards;
+export default Courses;

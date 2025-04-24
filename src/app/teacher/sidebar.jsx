@@ -1,17 +1,25 @@
 'use client'
 
-import { LayoutGrid, MessageSquareText, FileText, BookCopy, ChevronDown, X, Settings } from "lucide-react";
+import { LayoutGrid, MessageSquareText, FileText, BookCopy, ChevronDown, X, Settings, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+// import Cookies from "js-cookie"
 
 
 const Sidebar = ({onClose}) => {
+    const [user, setUser] = useState({})
     const router = useRouter()
     const pathname = usePathname()
 
     const handleSelect = (item) => {
         router.push('/teacher/'+item)
     };
+        useEffect(()=>{
+           setUser(JSON.parse( localStorage.getItem("user")))
+        //    const user = Cookies.get("user")
+        //    setUser(user)
+        },[])
 
     return (
         <div className="flex h-[100%] w-[inherit]">
@@ -59,13 +67,13 @@ const Sidebar = ({onClose}) => {
                         <BookCopy size={24} /> {/* Increased size for the icon */}
                         <span className="md:hidden lg:block">Flash cards</span>
                     </button>
-                    <button
-                        onClick={() => handleSelect('settings')}
-                        className={`mb-4 flex items-center md:space-x-0 lg:space-x-2 space-x-2 text-sm cursor-pointer font-semibold p-4 rounded-lg w-full ${pathname === '/teacher/settings' ? 'bg-[#F6F9FC] text-[#7240FD]' : 'hover:bg-[#F6F9FC] hover:text-[#7240FD] text-[#687494]'}`}
-                    >
-                        <Settings size={24} /> {/* Increased size for the icon */}
-                        <span className="md:hidden lg:block">Settings</span>
-                    </button>
+                        {/* <button
+                            onClick={() => handleSelect('settings')}
+                            className={`mb-4 flex items-center md:space-x-0 lg:space-x-2 space-x-2 text-sm cursor-pointer font-semibold p-4 rounded-lg w-full ${pathname === '/teacher/settings' ? 'bg-[#F6F9FC] text-[#7240FD]' : 'hover:bg-[#F6F9FC] hover:text-[#7240FD] text-[#687494]'}`}
+                        >
+                            <Settings size={24} /> 
+                            <span className="md:hidden lg:block">Settings</span>
+                        </button> */}
                 </div>
 
                 {/* User Info */}
@@ -73,17 +81,19 @@ const Sidebar = ({onClose}) => {
                     <div className="flex items-center md:justify-center lg:justify-between sm:justify-between justify-between w-[100%]  p-2 bg-white rounded-lg shadow-md border border-gray-200">
                         {/* Avatar */}
                         <div className="flex  items-center md:space-x-0 lg:space-x-4 space-x-4">
-                            <div className="w-8 h-8 rounded-full overflow-hidden">
+                            {user.image?<div className="w-8 h-8 rounded-full overflow-hidden">
                                 <img
                                     src="https://i.pravatar.cc/150?img=5" // Placeholder avatar image
                                     alt="User Avatar"
                                     className="w-full h-full object-cover"
                                 />
-                            </div>
+                            </div> : <div className="w-8 h-8 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center">
+                            <User/>
+                            </div> }
                             {/* User Information */}
                             <div className="md:hidden lg:block">
-                                <div className="font-semibold text-gray-800">Young Alaska</div>
-                                <div className="text-sm text-gray-400">alskayng@gmail.com</div>
+                                <div className="font-semibold text-gray-800">{user.name}</div>
+                                <div className="text-sm text-gray-400">{user.email}</div>
                             </div>
                         </div>
 

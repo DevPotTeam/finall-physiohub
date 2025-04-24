@@ -37,6 +37,18 @@ export async function ApiPostRequest(url, request){
         }
     }
 }
+export async function ApiPatchRequest(url, request){
+    try {
+        const res = await api.patch(`${api_url}${url}`, request)
+        return res
+    } catch (error) {
+        if(error.response && error.response.status == 401){
+            window.location.href = "/auth/login"
+        } else {
+            throw error
+        }
+    }
+}
 export async function ApiDeleteRequest(url){
     try {
         const res = await api.delete(`${api_url}${url}`)

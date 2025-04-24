@@ -6,8 +6,8 @@ import { ArrowLeft, Search, Upload } from "lucide-react";
 
 export default function PublishLessonHeader({handleLessonsAdd}) {
   return (
-    <div className=" hidden w-full mx-auto max-w-[80%] md:flex justify-between items-center p-4 rounded-lg">
-      <div className="flex items-center gap-2">
+    <div className="  w-full mx-auto max-w-[80%] flex justify-between items-center p-4 rounded-lg">
+      <div className="md:flex hidden items-center gap-2 ">
         <ArrowLeft className="w-5 h-5 text-gray-700 cursor-pointer" />
         <h2 className="text-lg font-semibold">Add Lessons</h2>
       </div>
