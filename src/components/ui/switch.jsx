@@ -19,7 +19,7 @@ export function Switch({ checked = false, onChange, w = "w-14" }) {
     >
       <span
         className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform ${
-          isOn ? "translate-x-4" : "translate-x-0"
+          isOn ? "translate-x-7" : "translate-x-0"
         }`}
       ></span>
     </button>
