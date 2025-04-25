@@ -11,6 +11,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import Cookies from "js-cookie";
+const api_url = process.env.NEXT_PUBLIC_API_BASE_URL
 
 export default function LoginPage() {
   const [firstVisit, setFirstVisit] = useState(true)
@@ -63,13 +64,12 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:8000/api/v1/auth/login", formData,{
+      const response = await axios.post(`${api_url}/auth/login`, formData,{
         withCredentials: true
       });
       const { token, user, message } = response.data;
 
       // Store in localStorage (or cookies, or context)
-      console.log(user)
       localStorage.setItem("user", JSON.stringify(user));
       if(!user.isEmailVerified){
         router.push("/auth/verify-email")
@@ -82,8 +82,7 @@ export default function LoginPage() {
       }
 
     } catch (error) {
-      const errMsg =
-        error.response?.data?.message || "Something went wrong. Please try again.";
+      const errMsg = error.response?.data?.errorMessage?.message;
       setApiError(errMsg);
     } finally {
       setLoading(false);
@@ -91,28 +90,15 @@ export default function LoginPage() {
 
   };
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get("token");
-    const role = params.get("role");
-  
-    if (token) {
-      Cookies.set("token", token)
-      Cookies.set("role", role)
-      router.push("/"); // or wherever you want
-    }
-  }, []);
 
   const handleGoogleAuth = async()=>{
     try {
       // const response = await axios.get("http://localhost:8000/api/v1/auth/google",{
       //   withCredentials: true
       // });
-      window.location.href = "http://localhost:8000/api/v1/auth/google";
+      window.location.href = `${api_url}/auth/google`;
       const { token, user, message } = response.data;
-      console.log(response)
       // Store in localStorage (or cookies, or context)
-      // console.log(user)
       // localStorage.setItem("user", JSON.stringify(user));
       // if(!user.isEmailVerified){
       //   router.push("/auth/verify-email")

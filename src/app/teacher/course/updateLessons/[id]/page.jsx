@@ -33,7 +33,6 @@ export default function AddLessons({params}) {
     const {data, status} = await useGet(`/courses/get/${id}`)
     if(status == 200){
       setData(data.lessons)
-      console.log(data.lessons)
     }
   }
   
@@ -84,7 +83,6 @@ export default function AddLessons({params}) {
 
   const handleTypeSelect = (e) => {
     setType(e.target.value);
-    console.log(e.target.value);
   };
 
   const addQuestion = () => {
@@ -148,7 +146,6 @@ export default function AddLessons({params}) {
     
     if (status == 201) {
       setLoading(false)
-      console.log(data)
       handleCardChange(index, "url", data);
     }
   };
@@ -164,7 +161,6 @@ export default function AddLessons({params}) {
 
   const handleLessonsUpdate = async () => {
     const {data, error, status} = await usePut(`/courses/update/${id}`, formData)
-    console.log(data)
     if(status == 201){
       router.push("/teacher/course")
     }
@@ -175,7 +171,6 @@ export default function AddLessons({params}) {
       <UpdateLessonHeader handleLessonsUpdate={handleLessonsUpdate} id={id} />
       <div className=" p-6 bg-white rounded-lg shadow-md w-full mx-auto md:max-w-[80%] max-w-[95%]">
         {formData.map((formdata, index)=>(<div key={index}>
-            {console.log("inside")}
         {/*  Title */}
         <div className="mb-4 ">
           <label className="block text-gray-700 font-semibold">

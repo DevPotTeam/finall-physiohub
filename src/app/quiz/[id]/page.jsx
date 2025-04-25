@@ -105,7 +105,6 @@ export default function QuizCard({params}) {
     if(status == 200){
       setQuestions(data.questions)
       // setMainTopic(data.mainTopic.name)
-      // console.log(data.mainTopic)
     }
   }
   useEffect(()=>{
@@ -139,7 +138,6 @@ export default function QuizCard({params}) {
   //   const correctAnswer = questions[currentQuestion].options
   //   .filter((opt) => opt.correctAnswer)
   //   setCorrectAnswer(correctAnswer.value)
-  //   console.log()
 
   //   if (current.type === "checkbox") {
   //     const correctAnswers = current.options
@@ -186,9 +184,6 @@ export default function QuizCard({params}) {
   const handleCheckAnswer = () => {
     if (isAnswered) return;
 
-    console.log(`${((currentQuestion + 1) / questions.length) * 100} %` )
-    console.log(`currentQuestion ${currentQuestion+1}`)
-    console.log(`length ${questions.length}`)
 
     const current = questions[currentQuestion];
     let correct = false;
@@ -276,7 +271,6 @@ export default function QuizCard({params}) {
     };
     
       const {data, error, status} = await usePost(`/quizzes/submit-quiz/${id}`, finalPayload)
-      console.log(data);
       if(status == 201){
         const {data, error, status} = usePost("/users/attendance")
         if(status == 201){
@@ -293,7 +287,6 @@ export default function QuizCard({params}) {
     
     if (status === 201 && Array.isArray(data)) {
       const lastResult = data[data.length - 1]; // get last object
-      console.log(lastResult)
       setResult(lastResult);
     }
   }

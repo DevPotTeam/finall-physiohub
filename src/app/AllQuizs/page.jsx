@@ -27,7 +27,6 @@ export default function AllQuizs() {
     const [articles, setArticles] = useState([])
   const fetchQuizs = async () => {
     const { data, error, status } = await useGet(`/quizzes`);
-    console.log(data);
     setArticles(data)
   };
   useEffect(() => {

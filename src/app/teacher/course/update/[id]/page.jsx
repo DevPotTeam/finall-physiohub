@@ -89,9 +89,7 @@ useEffect(() => {
     }
   };
   
-  useEffect(()=>{
-    console.log(formData.isFree)
-  },[formData])
+ 
   
 
   const handleUpload = async (e) => {
@@ -133,7 +131,6 @@ useEffect(() => {
       router.push(`/teacher/course`)
     }
     if(error){
-      console.log(error)
       setError(error)
     }
   };

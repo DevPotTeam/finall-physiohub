@@ -71,7 +71,6 @@ export default function CreateCourse({setShowInCourse}) {
       setShowInCourse("Course")
     }
     if(error){
-      console.log(error)
       setError(error)
     }
   };

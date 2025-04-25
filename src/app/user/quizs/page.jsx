@@ -53,7 +53,6 @@ const QuizCard = ({ imageSrc, title, questions, cards, time, id }) => {
     }
     if (error) {
       setError(error);
-      console.log(error);
       showToast(error, "error")
       setLoading(false);
     }
@@ -113,7 +112,6 @@ export default function Quizs() {
   const [articles, setArticles] = useState([]);
   const fetchQuizs = async () => {
     const { data, error, status } = await useGet(`/quizzes`);
-    console.log(data);
     setArticles(data);
   };
   useEffect(() => {

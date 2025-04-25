@@ -23,7 +23,6 @@ export default function FlashCards({ setShowInFlashCard }) {
 
   const handleFlashCardDelete = async (id) => {
     const { data, error, status } = await useDelete(`flashcards/delete/${id}`);
-    console.log(data);
     if (status === 200) {
       window.location.reload();
     }

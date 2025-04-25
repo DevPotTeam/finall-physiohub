@@ -3,8 +3,6 @@ import { ApiPatchRequest } from "@/axios/apiRequest";
 const usePatch = async (url, request) => {
   try {
     const response = await ApiPatchRequest(url, request);
-    console.log(response); // ✅ Now it will always log when there’s a response
-    console.log("called");
 
     return {
       data: response.status === 201 || response.status === 200 ? response.data.data : null,

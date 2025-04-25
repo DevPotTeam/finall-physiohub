@@ -49,7 +49,6 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
   }, []);
 
   useEffect(() => {
-    console.log(flashcard);
   }, [flashcard]);
 
   const handleChange = (e) => {
@@ -118,7 +117,6 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
   };
 
   const handleCreateFlashCard = async () => {
-    console.log(flashcard);
     const { data, error, status } = await usePost(`/flashcards/create`, {
       ...flashcard,
     });
@@ -127,7 +125,6 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
       showToast("FlashCard Created Successfully", "success")
     }
     if (error) {
-      console.log(error);
       showToast(error[0], "error")
     }
   };

@@ -249,12 +249,10 @@ export default function CreateQuiz({ setShowInQuiz }) {
         "/quizzes/create",
         quizPayload
       );
-      console.log(data);
       if (status == 201) {
         setShowInQuiz("Quizs");
       }
       if (error) {
-        console.log(error);
         setError(error[0]);
       }
     } catch (error) {

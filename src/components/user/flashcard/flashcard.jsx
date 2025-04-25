@@ -32,7 +32,7 @@ function Flashcard({flashCardData, length, currentCard}) {
         <div className="flex items-center justify-baseline gap-5 w-full">
         <p className="text-sm text-gray-500 font-medium uppercase">Card {currentCard + 1} of {length}</p>
         <p className="text-sm text-gray-500 font-medium uppercase">
-          Subject :{" "}
+          Topic :{" "}
           <span className="text-gray-600 font-semibold ">
             {flashCardData?.subject}
           </span>

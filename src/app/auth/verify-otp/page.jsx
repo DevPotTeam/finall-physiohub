@@ -7,8 +7,9 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 
 function VerifyOTP() {
+  const email = localStorage.getItem("email")
   const [otp, setOtp] = useState(new Array(6).fill(""));
-  const [email, setEmail] = useState("")
+  // const [email, setEmail] = useState("")
   const [resendOtp, setResendOtp] = useState(false)
   const [isVerified, setIsVerified] = useState(false);
   const [timeLeft, setTimeLeft] = useState(180);
@@ -81,9 +82,12 @@ function VerifyOTP() {
     
     const otp_number = otp.join("");
     if(ot === "varify"){
-      const {data, error, status} = await usePost(`/auth/verify-otp`, {otp: otp_number})
+      const {data, error, status} = await usePost(`/auth/verify-email`, {"otp": otp_number, "email" : email})
       if(data){
         router.push("/auth/login")
+      }
+      if(error){
+        setError(error)
       }
     } 
     if(ot === "forgot"){

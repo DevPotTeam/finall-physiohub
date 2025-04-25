@@ -130,7 +130,6 @@ export default function Onboarding() {
     goals: [],
     notification: null,
   })
-  console.log(formData)
   const router = useRouter();
   const handleStepData = (value) => {
     setSelected((prev) => {
@@ -220,7 +219,6 @@ export default function Onboarding() {
           />
         );
       case 6:
-        console.log("Final form data:", formData);
         return <StartEnd isEnd={true} onClick={() => router.push("/user/dashboard")} />;
     }
   };

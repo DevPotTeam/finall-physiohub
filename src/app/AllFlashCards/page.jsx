@@ -53,7 +53,6 @@ function AllFlashcards() {
   const [flashCards, setFlashCards] = useState([]);
   const fetchFlashCardsData = async() => {
     const { data, error, status } = await useGet(`/flashcards/getAllFlashcards`);
-    console.log(data)
     if (status == 200) {
       setFlashCards(data);
     }
