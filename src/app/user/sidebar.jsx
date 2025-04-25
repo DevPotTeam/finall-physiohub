@@ -22,7 +22,7 @@ const Sidebar = ({onClose}) => {
     },[])
 
     return (
-        <div className="flex h-[100%] w-[inherit]">
+        <div className="flex min-h-[100%] w-[inherit]">
             <div className="flex flex-col w-64 bg-white shadow-xl sm:w-[100%] md:w-[fit-content]">
                 <div className="flex flex-col w-[100%] justify-center items-center">
                     <div className="flex flex-col justify-center w-[100%] border-b h-[80px] pl-6 pr-6">
@@ -42,7 +42,7 @@ const Sidebar = ({onClose}) => {
                     </div>
                 </div>
 
-                <div className="mt-10 pl-5 pr-5">
+                <div className="mt-10 pl-5 pr-5 h-full overflow-auto">
                     <button
                         onClick={() => handleSelect('dashboard')}
                         className={`mb-4 flex items-center lg:space-x-2 md:space-x-0 space-x-2 cursor-pointer text-sm font-semibold p-4 rounded-lg w-full ${pathname === '/user/dashboard' ? 'bg-[#F6F9FC] text-[#7240FD]' : 'hover:bg-[#F6F9FC] hover:text-[#7240FD] text-[#687494]'}`}
@@ -89,6 +89,13 @@ const Sidebar = ({onClose}) => {
                         <Settings size={24} /> {/* Increased size for the icon */}
                         <span className="md:hidden lg:block">Settings</span>
                     </button>
+                    <Link 
+                href={"/auth/login"}
+                        className={`mb-4 flex items-center justify-center md:space-x-0 lg:space-x-2 space-x-2 text-sm cursor-pointer font-semibold p-4 rounded-lg w-full bg-[#F6F9FC] text-red-400 hover:text-red-500`}
+                    >
+                        <LogOut size={24} /> {/* Increased size for the icon */}
+                        <span className="md:hidden lg:block">Logout</span>
+                    </Link>
                 </div>
 
                 {/* User Info */}
@@ -119,13 +126,7 @@ const Sidebar = ({onClose}) => {
                         </div> */}
                     </div>
                 </div>
-                <Link 
-                href={"/auth/login"}
-                        className={`mb-4 flex items-center justify-center md:space-x-0 lg:space-x-2 space-x-2 text-sm cursor-pointer font-semibold p-4 rounded-lg w-full bg-[#F6F9FC] text-red-400 hover:text-red-500`}
-                    >
-                        <LogOut size={24} /> {/* Increased size for the icon */}
-                        <span className="md:hidden lg:block">Logout</span>
-                    </Link>
+                
             </div>
         </div>
     );

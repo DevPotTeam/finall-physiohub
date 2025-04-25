@@ -7,11 +7,13 @@ import { AiFillFacebook } from "react-icons/ai";
 import { FaLinkedin } from "react-icons/fa";
 import { FaTwitterSquare } from "react-icons/fa";
 
-export default function Footer() {
+export default function Footer({scrollToSection}) {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [role, setRole] = useState("")
 
   useEffect(()=>{
     const token = Cookies.get("token")
+    const role = Cookies.get("role")
     if(token){
       setIsLoggedIn(true)
     }
@@ -44,24 +46,13 @@ export default function Footer() {
                 <h4 className="font-semibold text-gray-900">Features</h4>
                 <ul className="mt-2 space-y-1">
                   <li>
-                    <Link href={`${isLoggedIn ? "/user/quizs" : "/auth/login"}`} className="hover:text-gray-500">Quiz</Link>
+                    <Link href={`${isLoggedIn ? role == "user" ? "/user/quizs" : "/teacher/quiz" :"/auth/login"}`} className="hover:text-gray-500">Quiz</Link>
                   </li>
                   <li>
-                    <Link href={`${isLoggedIn ? "/user/flashcards" : "/auth/login"}`} className="hover:text-gray-500">Flash Card</Link>
+                    <Link href={`${isLoggedIn ? role == "user" ? "/user/flashcards" : "/teacher/flashcard" :"/auth/login"}`} className="hover:text-gray-500">Flash Card</Link>
                   </li>
                   <li>
-                    <a href="#" className="hover:text-gray-500">Mock Test</a>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900">Articles</h4>
-                <ul className="mt-2 space-y-1">
-                  <li>
-                    <a href="#" className="hover:text-gray-500">Our Blogs</a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-gray-500">Rehab Protocols</a>
+                    <Link href={`${isLoggedIn ? role == "user" ? "/user/courses" : "/teacher/course" :"/auth/login"}`} className="hover:text-gray-500">Courses</Link>
                   </li>
                 </ul>
               </div>
@@ -69,11 +60,11 @@ export default function Footer() {
                 <h4 className="font-semibold text-gray-900">Resources</h4>
                 <ul className="mt-2 space-y-1">
                   <li>
-                    <a href="#" className="hover:text-gray-500">About Us</a>
+                    <button onClick={()=>{scrollToSection("about")}} className="hover:text-gray-500 cursor-pointer">About Us</button>
                   </li>
-                  <li>
+                  {/* <li>
                     <a href="#" className="hover:text-gray-500">Contact</a>
-                  </li>
+                  </li> */}
                 </ul>
               </div>
               <div>

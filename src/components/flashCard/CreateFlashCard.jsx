@@ -12,7 +12,7 @@ import useGet from "@/hooks/useGet";
 
 export default function CreateFlashCard({ setShowInFlashCard }) {
   const fileInputRef = useRef(null);
-  const [error, setError] = useState("");
+  const [notification, setNotification] = useState(null);
   const [imageLoading, setImageLoading] = useState(false);
   const [frontCardImageLoading, setFrontCardImageLoading] = useState(false);
   const [backCardImageLoading, setBackCardImageLoading] = useState(false);
@@ -31,6 +31,11 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
     backImage: "",
     topic: "",
   });
+
+  const showToast = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000);
+  };
 
   const fetchTopics = async () => {
     const { data, error, status } = await useGet(`/main-topics/`);
@@ -119,17 +124,17 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
     });
     if (status == 201) {
       setShowInFlashCard("FlashCards");
+      showToast("FlashCard Created Successfully", "success")
     }
     if (error) {
       console.log(error);
-      setError(error);
+      showToast(error[0], "error")
     }
   };
 
   return (
     <>
       <PublishFlashCardHeader handleCreateFlashCard={handleCreateFlashCard} />
-      {error && <p className="text-red-500 mb-3">{error}</p>}
       <div className=" p-6 bg-white rounded-lg shadow-md w-full mx-auto md:max-w-[80%] max-w-[95%]">
         {/* Cover Image Upload */}
         <div className="mb-4 ">
@@ -420,6 +425,18 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
             </div>
           </div>
         </div>
+        {notification && (
+          <div
+            className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${
+              notification.type === "error" ? "bg-red-500" : "bg-green-500"
+            } text-white`}
+          >
+            {notification.message}
+            <button onClick={() => setNotification(null)} className="ml-4 text-xl">
+              ×
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

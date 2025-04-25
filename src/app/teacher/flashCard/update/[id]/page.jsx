@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import {  Upload, X } from "lucide-react";
 import { Select } from "@/components/ui/select.jsx";
 import { Input } from "@/components/ui/input.jsx";
-import PublishFlashCardHeader from "@/components/flashCard/PublishFlashCardHeader";
+import UpdateFlashCardHeader from "@/components/flashCard/UpdateFlashCardHeader"
 import useImagePost from "@/hooks/useImagePost";
 import useGet from "@/hooks/useGet";
 import { useRouter } from "next/navigation";
@@ -12,9 +12,9 @@ import Image from "next/image";
 export default function UpdateFlashCard({params}) {
   const router = useRouter()
   const {id} = React.use(params)
+  const [notification, setNotification] = useState(null);
   const [data, setData] = useState({})
   const fileInputRef = useRef(null);
-  const [error, setError] = useState("");
   const [imageLoading, setImageLoading] = useState(false);
   const [frontCardImageLoading, setFrontCardImageLoading] = useState(false);
   const [backCardImageLoading, setBackCardImageLoading] = useState(false);
@@ -34,6 +34,10 @@ export default function UpdateFlashCard({params}) {
     topic: "",
   });
 
+  const showToast = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000);
+  };
 
   const fetch = async() =>{
     const {data, status} = await useGet(`/flashcards/getFlashcardById/${id}`)
@@ -140,23 +144,25 @@ useEffect(() => {
   };
 
   const handleUpdateFlashCard = async () => {
-    console.log(flashcard);
+    console.log("inside")
     const { data, error, status } = await usePatch(`/flashcards/updateFlashcardById/${id}`, {
       ...flashcard,
     });
     if (status == 200) {
-      router.push(`/teacher/flashCard`)
+      showToast("Flashcard Updated Successfully", "success")
+      setTimeout(() => {
+        router.push(`/teacher/flashCard`)
+      }, 2000);
     }
+    
     if (error) {
-      console.log(error);
-      setError(error);
+      showToast(error[0], "error")
     }
   };
 
   return (
     <>
-      <PublishFlashCardHeader handleUpdateFlashCard={handleUpdateFlashCard} />
-      {error && <p className="text-red-500 mb-3">{error}</p>}
+      <UpdateFlashCardHeader handleUpdateFlashCard={handleUpdateFlashCard} />
       <div className=" p-6 bg-white rounded-lg shadow-md w-full mx-auto md:max-w-[80%] max-w-[95%]">
         {/* Cover Image Upload */}
         <div className="mb-4 ">
@@ -447,6 +453,18 @@ useEffect(() => {
             </div>
           </div>
         </div>
+        {notification && (
+          <div
+            className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${
+              notification.type === "error" ? "bg-red-500" : "bg-green-500"
+            } text-white`}
+          >
+            {notification.message}
+            <button onClick={() => setNotification(null)} className="ml-4 text-xl">
+              ×
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

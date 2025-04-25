@@ -10,7 +10,6 @@ import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import usePost from "@/hooks/usePost";
 import Cookies from "js-cookie";
 
 export default function LoginPage() {
@@ -92,6 +91,49 @@ export default function LoginPage() {
 
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+    const role = params.get("role");
+  
+    if (token) {
+      Cookies.set("token", token)
+      Cookies.set("role", role)
+      router.push("/"); // or wherever you want
+    }
+  }, []);
+
+  const handleGoogleAuth = async()=>{
+    try {
+      // const response = await axios.get("http://localhost:8000/api/v1/auth/google",{
+      //   withCredentials: true
+      // });
+      window.location.href = "http://localhost:8000/api/v1/auth/google";
+      const { token, user, message } = response.data;
+      console.log(response)
+      // Store in localStorage (or cookies, or context)
+      // console.log(user)
+      // localStorage.setItem("user", JSON.stringify(user));
+      // if(!user.isEmailVerified){
+      //   router.push("/auth/verify-email")
+      // }
+      // const firstVisit = localStorage.getItem("firstVisit")
+      // if(firstVisit == true){
+      //   router.push("/onboarding");
+      // } else {
+      //   router.push("/")
+      // }
+
+
+    } catch (error) {
+      const errMsg =
+        error.response?.data?.message;
+      setApiError(errMsg);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <CardContent>
       <img className="md:flex lg:hidden hidden sm:w-[160px] w-full mb-10" src={'/logo-on-light.png'} />
@@ -147,10 +189,10 @@ export default function LoginPage() {
 
         {/* Google */}
         <Separator className="my-2" />
-        <Button variant="outline" className="w-full flex items-center justify-center gap-2">
+      </form>
+        <Button onClick={handleGoogleAuth} variant="outline" className="w-full flex items-center justify-center gap-2">
           <FcGoogle className="text-lg" /> Continue with Google
         </Button>
-      </form>
 
       {/* Sign Up */}
       <p className="text-sm text-center text-gray-600 mt-4">

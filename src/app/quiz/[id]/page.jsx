@@ -96,13 +96,16 @@ export default function QuizCard({params}) {
   const [userAnswers, setUserAnswers] = useState([]);
   const [startTime, setStartTime] = useState(null);
   const [elapsed, setElapsed] = useState(0);
-  const [result, setResult] = useState([])
+  const [result, setResult] = useState([]);
+  // const [mainTopic, setMainTopic] = useState("")
 
   const fetchQuizData = async ()=>{
     const {data, error, status} = await useGet(`/quizzes/${id}`)
     
     if(status == 200){
       setQuestions(data.questions)
+      // setMainTopic(data.mainTopic.name)
+      // console.log(data.mainTopic)
     }
   }
   useEffect(()=>{
@@ -182,10 +185,18 @@ export default function QuizCard({params}) {
 
   const handleCheckAnswer = () => {
     if (isAnswered) return;
-  
+
+    console.log(`${((currentQuestion + 1) / questions.length) * 100} %` )
+    console.log(`currentQuestion ${currentQuestion+1}`)
+    console.log(`length ${questions.length}`)
+
     const current = questions[currentQuestion];
     let correct = false;
-  
+   
+    const correctAnswer = questions[currentQuestion].options.filter(option=> option.correctAnswer)
+    if(correctAnswer){
+      setCorrectAnswer(correctAnswer[0].value)
+    }
     if (current.type === "checkbox") {
       const correctAnswers = current.options
         .filter((opt) => opt.correctAnswer)
@@ -263,14 +274,16 @@ export default function QuizCard({params}) {
       answers: userAnswers,
       completionTime: completionTimeInSeconds,
     };
-    const {data, error, status} = usePost(`/quizzes/join/${id}`)
-    if(status == 201){
+    
       const {data, error, status} = await usePost(`/quizzes/submit-quiz/${id}`, finalPayload)
       console.log(data);
       if(status == 201){
-        fetchResult()
+        const {data, error, status} = usePost("/users/attendance")
+        if(status == 201){
+          fetchResult()
+        }
       }
-    }
+    
   
   };
 
@@ -302,7 +315,7 @@ export default function QuizCard({params}) {
         <div className="w-full h-2 bg-gray-200 rounded-full mx-4">
           <div className=" h-full bg-[#6c4ce6] rounded-full"
             style={{
-              width : `${(currentQuestion + 1 / questions.length) *100 }%`
+              width : `${((currentQuestion + 1) / questions.length) * 100 }%`
             }}
           ></div>
         </div>
@@ -335,8 +348,9 @@ export default function QuizCard({params}) {
 
           <div className="my-10 relative">
             <h3 className="text-xs border-s-2 border-blue-600 ps-2 mb-3 text-gray-400 uppercase font-semibold">
-              Question {currentQuestion + 1} of {questions.length} • Chapter
-              Anatomy
+              Question {currentQuestion + 1} of {questions.length}
+               {/* • Topic
+              {mainTopic} */}
             </h3>
             {questions[currentQuestion]?.image && (
               <div className="md:w-52 w-38 md:h-52 h-38 rounded-md justify-self-center">

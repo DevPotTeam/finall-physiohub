@@ -6,7 +6,7 @@ import logo from "../../../public/logo-on-light.png";
 import { IoMdPerson } from "react-icons/io";
 import Cookies from "js-cookie";
 
-function Header() {
+function Header({scrollToSection}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("")
@@ -42,18 +42,18 @@ function Header() {
 
               {/* Desktop Menu */}
               <div className="hidden md:flex space-x-8">
-                <a href="#" className="text-gray-700 hover:text-purple-600">
+                <button onClick={()=>{scrollToSection("about")}} className="text-gray-700 hover:text-purple-600">
+                  About
+                </button>
+                <button onClick={()=>{scrollToSection("features")}}  className="text-gray-700 hover:text-purple-600">
                   Features{" "}
-                </a>
-                <a href="#" className="text-gray-700 hover:text-purple-600">
-                  Articles
-                </a>
-                <a href="#" className="text-gray-700 hover:text-purple-600">
-                  About Us
-                </a>
-                <a href="#" className="text-gray-700 hover:text-purple-600">
-                  Contact
-                </a>
+                </button>
+                <button onClick={()=>{scrollToSection("faq")}} className="text-gray-700 hover:text-purple-600">
+                  FAQ
+                </button>
+                <button onClick={()=>{scrollToSection("course")}} className="text-gray-700 hover:text-purple-600">
+                  Courses
+                </button>
               </div>
 
               {/* Buttons */}
@@ -104,18 +104,18 @@ function Header() {
           {/* Mobile Menu */}
           {isOpen && (
             <div className="md:hidden bg-white shadow-md p-4 space-y-4 flex flex-col">
-              <a href="#" className="block text-gray-700 hover:text-purple-600">
+              <button onClick={()=>{scrollToSection("about")}} className="block text-gray-700 hover:text-purple-600">
+                About
+              </button>
+              <button onClick={()=>{scrollToSection("features")}} className="block text-gray-700 hover:text-purple-600">
                 Features
-              </a>
-              <a href="#" className="block text-gray-700 hover:text-purple-600">
-                Articles
-              </a>
-              <a href="#" className="block text-gray-700 hover:text-purple-600">
-                About Us
-              </a>
-              <a href="#" className="block text-gray-700 hover:text-purple-600">
-                Contact
-              </a>
+              </button>
+              <button onClick={()=>{scrollToSection("faq")}} className="block text-gray-700 hover:text-purple-600">
+                FAQ
+              </button>
+              <button onClick={()=>{scrollToSection("course")}} className="block text-gray-700 hover:text-purple-600">
+                Courses
+              </button>
               {/* <Link href={"/user/dashboard"} className="w-full border border-purple-600 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-100">
                 Student
               </Link>
