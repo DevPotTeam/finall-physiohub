@@ -59,7 +59,7 @@ export default function Courses({ setShowInCourse, data }) {
                       <h3 className="text-sm text-gray-900 leading-relaxed">
                         Instructor :{" "}
                         <span className="font-semibold">
-                          {course.instructor}
+                          {course.instructor.name}
                         </span>
                       </h3>
                       <p className="text-sm text-gray-400 mt-2 flex items-center">

@@ -20,6 +20,7 @@ export default function LoginPage() {
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState("")
   const router = useRouter();
 
  const handleForgotClick = () => {
@@ -78,7 +79,7 @@ export default function LoginPage() {
       if(firstVisit == true){
         router.push("/onboarding");
       } else {
-        router.push("/")
+        router.push(user.role == "user" ? "/user/dashboard" : user.role == "teacher" ||user.role == "instructor" ?"/teacher/course" : "/")
       }
 
     } catch (error) {
