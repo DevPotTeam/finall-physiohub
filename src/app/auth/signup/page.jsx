@@ -58,17 +58,21 @@ export default function SignUpPage() {
       const res = await axios.post(`${api_url}/auth/register`, formData);
 
       setResponseMessage({ type: 'success', text: res?.data?.message || 'Registration successful!' });
-
-      const {data, error, status} = await usePost(`/auth/send-email-otp`, {"email": formData.email})
-      if(data){
-        localStorage.setItem("otptype" , "varify")
-        router.push("/auth/verify-otp")
+      console.log(res.data)
+      if(res.status){
+        const {data, error, status} = await usePost(`/auth/send-email-otp`, {"email": formData.email})
+        if(status == 201){
+          localStorage.setItem("otptype" , "varify")
+          localStorage.setItem("firstVisit", true)
+          router.push("/auth/verify-otp")
+        }
       }
       // Redirect to onboarding after a short delay
       // setTimeout(() => router.push('/onboarding'), 1500);
     } catch (error) {
+      console.log(error)
       const errorMsg =
-        error.response?.data?.message || "Registration failed. Please try again.";
+        error.response?.data?.errorMessage?.message || "Registration failed. Please try again.";
       setResponseMessage({ type: 'error', text: errorMsg });
     } finally {
       setLoading(false);

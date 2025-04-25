@@ -33,8 +33,9 @@ const QuizCard = ({ imageSrc, title, questions, cards, time, id }) => {
   const router = useRouter()
   const hanleQuizJoin = async() =>{
     setLoading(true)
-    const {data, error, status} = await usePost(`/quizzes/join/${id}`)
-    if(status == 200){
+    const {data, error, status} = await usePost(`/users/attendance`)
+    if(status == 201){
+      setLoading(false)
       router.push(`/quiz/${id}`)
     }
     if(error){
@@ -89,15 +90,13 @@ export default function Quizs() {
             <Input className="max-w-96"placeholder="Search"/>
           <div className="grid xl:grid-cols-3 sm:grid-cols-2 gap-4 mt-4 ">
 
-          {articles?.map((flashcard) => (
+          {articles?.map((quiz) => (
             <QuizCard
-            key={flashcard._id}
+            key={quiz._id}
             imageSrc={"/auth-activity.png"}
-            title={flashcard.title}
-            questions={flashcard.questions.length}
-            cards="120"
-            time="20"
-            id={flashcard._id}
+            title={quiz.title}
+            questions={quiz.questions.length}
+            id={quiz._id}
             />
           ))}
           </div>

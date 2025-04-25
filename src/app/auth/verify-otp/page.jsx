@@ -36,7 +36,10 @@ function VerifyOTP() {
   const handleResendOtp = () => {
     
     setIsResendEnabled(false);
-    const {} = usePost(`/auth/reset-password`)
+    const {data, error, status} = usePost(`/auth/send-email-otp`)
+    if(status == 200){
+      
+    }
   };
 
   useEffect(() => {

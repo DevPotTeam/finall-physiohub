@@ -9,7 +9,7 @@ import React, { useEffect, useState } from "react";
 
 const Course = ({ imageSrc, title, description, rating, totalRating, id, verified }) => {
   return (
-    <Link href={`/flashcard/${id}`} className="flex flex-col justify-between bg-white rounded-xl border overflow-hidden p-4 w-[320px] relative cursor-pointer">
+    <Link href={`/course/${id}`} className="flex flex-col justify-between bg-white rounded-xl border overflow-hidden p-4 w-[320px] relative cursor-pointer">
       <div className="h-[180px] w-[100%]">
         {imageSrc ? (
           <Image

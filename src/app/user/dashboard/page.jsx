@@ -14,6 +14,7 @@ import useGet from "@/hooks/useGet";
 import useGetForDash from "@/hooks/useGetForDash";
 import axios from 'axios';
 import { responsiveFontSizes } from '@mui/material';
+// import Cookies from "js-cookie"
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement);
 
@@ -89,6 +90,8 @@ const PerformanceChart = ({ userData }) => {
         end: new Date()
     });
     const [dateLabels, setDateLabels] = useState([]);
+
+    
 
     useEffect(() => {
         let labels = [];

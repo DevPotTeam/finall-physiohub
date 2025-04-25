@@ -71,7 +71,7 @@ export default function AuthLayout({ children }) {
     }, []);
 
     return (
-        <div className="h-screen w-full flex flex-col lg:flex-row p-10" >
+        <div className="h-screen w-full flex flex-col lg:flex-row sm:p-10 sm:pt-0 pt-10" >
             <div className="hidden lg:flex lg:w-1/2 xl:w-2/5  flex-col bg-[#9333EA] rounded-3xl pt-5 pl-8 pr-8 pb-10 relative">
                 <img src={'/logo-on-dark.png'} className="w-45 h-10 mb-10" />
 
@@ -201,7 +201,7 @@ export default function AuthLayout({ children }) {
                 </div>
             </div>
 
-            <div className="w-full lg:w-3/5 flex items-center justify-center p-6">
+            <div className="w-full sm:lg:w-3/5 max-w-full flex items-center justify-center sm:p-6 p-3 sm:pt-0 pt-10">
                 {children}
             </div>
         </div>

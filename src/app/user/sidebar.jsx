@@ -1,5 +1,5 @@
 'use client'
-import { Home, User, Compass, ChevronDown, X, MessageSquareText, BookCopy, Settings, BookOpen } from "lucide-react";
+import { Home, User, Compass, ChevronDown, X, MessageSquareText, BookCopy, Settings, BookOpen, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -113,12 +113,19 @@ const Sidebar = ({onClose}) => {
                         </div>
 
                         {/* Icon */}
-                        <div className="flex flex-col md:hidden lg:block">
+                        {/* <div className="flex flex-col md:hidden lg:block">
                             <ChevronDown className="text-gray-400 cursor-pointer transform rotate-180" size={20} />
                             <ChevronDown className="text-gray-400 cursor-pointer" size={20} />
-                        </div>
+                        </div> */}
                     </div>
                 </div>
+                <Link 
+                href={"/auth/login"}
+                        className={`mb-4 flex items-center justify-center md:space-x-0 lg:space-x-2 space-x-2 text-sm cursor-pointer font-semibold p-4 rounded-lg w-full bg-[#F6F9FC] text-red-400 hover:text-red-500`}
+                    >
+                        <LogOut size={24} /> {/* Increased size for the icon */}
+                        <span className="md:hidden lg:block">Logout</span>
+                    </Link>
             </div>
         </div>
     );
