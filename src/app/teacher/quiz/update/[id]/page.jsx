@@ -6,15 +6,16 @@ import {
   PlusCircle,
   Trash2,
   Upload,
+  X,
 } from "lucide-react";
 import { Select } from "@/components/ui/select.jsx";
 import { Input } from "@/components/ui/input.jsx";
 import { Textarea } from "@/components/ui/textArea.jsx";
 import { Switch } from "@/components/ui/switch.jsx";
 import { Button } from "@/components/ui/button.jsx";
-import UpdateQuizHeader from "@/components/quiz/UpadateQuizHeader"
+import UpdateQuizHeader from "@/components/quiz/UpadateQuizHeader";
 import { useRouter } from "next/navigation";
-import usePut from "@/hooks/usePut"
+import usePut from "@/hooks/usePut";
 import useImagePost from "@/hooks/useImagePost";
 import Image from "next/image";
 import useGet from "@/hooks/useGet";
@@ -26,13 +27,11 @@ const QuestionType = {
   Dropdown: "dropdown",
 };
 
-export default function UpdateQuiz({params}) {
-  const{id} = React.use(params)
-  const [data, setData] = useState({})
-
- 
-
+export default function UpdateQuiz({ params }) {
+  const { id } = React.use(params);
   const fileInputRef = useRef(null);
+  const [data, setData] = useState({});
+  const [notification, setNotification] = useState(null);
   const [error, setError] = useState("");
   const router = useRouter();
   const [quizData, setQuizData] = useState({
@@ -44,22 +43,26 @@ export default function UpdateQuiz({params}) {
     quizStatus: "",
     coverImage: "",
     thumbnail: "",
-    questions: []
+    questions: [],
   });
 
-  const fetch = async() =>{
-    const {data, status} = await useGet(`/quizzes/${id}`)
-    if(status == 200){
-      setData(data)
-    }
-  }
-  
-  useEffect(()=>{
-    fetch()
-  },[])
+  const showToast = (message, type = "success") => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000);
+  };
 
-  
-useEffect(() => {
+  const fetch = async () => {
+    const { data, status } = await useGet(`/quizzes/${id}`);
+    if (status == 200) {
+      setData(data);
+    }
+  };
+
+  useEffect(() => {
+    fetch();
+  }, []);
+
+  useEffect(() => {
     setQuizData({
       title: data.title || "",
       startTime: data.startTime || "",
@@ -68,9 +71,8 @@ useEffect(() => {
       subTopics: data.subTopics || [],
       quizStatus: data.quizStatus || "",
     });
-  
-}, [data]);
-  
+  }, [data]);
+
   const [questions, setQuestions] = useState([
     {
       id: 1,
@@ -95,15 +97,16 @@ useEffect(() => {
         question: q.question || "",
         image: q.image || null,
         type: q.type || "radio",
-        options: q.options?.map((opt) => ({
-          type: opt.type || "text",
-          value: opt.value || "",
-          correctAnswer: !!opt.correctAnswer, // Ensures it's a boolean
-        })) || [],
+        options:
+          q.options?.map((opt) => ({
+            type: opt.type || "text",
+            value: opt.value || "",
+            correctAnswer: !!opt.correctAnswer, // Ensures it's a boolean
+          })) || [],
         description: q.description || "",
         open: true,
       }));
-  
+
       setQuestions(formattedQuestions);
     }
   }, [data]);
@@ -113,7 +116,6 @@ useEffect(() => {
   const [questionImageLoading, setQuestionImageLoading] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  
 
   const handleQuizChange = (e) => {
     const { name, value } = e.target;
@@ -245,8 +247,16 @@ useEffect(() => {
     }
 
     setQuestionImageLoading(false);
-    
   };
+
+  
+  const handleRemoveQuestionImage = (name, index) => {
+    setFlashcard((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
+  };
+  
 
   const handleQuestionImageDrop = (event, index) => {
     event.preventDefault();
@@ -261,37 +271,49 @@ useEffect(() => {
     event.preventDefault();
   };
 
-  const handleQuizUpdate = async() =>{
-   const quizPayload = {
-     title: quizData.title,
-     startTime: quizData.startTime,
-     endTime: quizData.endTime,
-     mainTopic: quizData.mainTopic,
-     subTopics: quizData.subTopics,
-     status: quizData.quizStatus,
-     coverImage: quizData.coverImage,
-     thumbnail: quizData.thumbnail,
-     questions : questions.map((q)=>({
-       question : q.question,
-       image : q.image,
-       type : q.type,
-       describe : q.description,
-       options : q.options
-     }))
-   };
+  const handleQuizUpdate = async () => {
+    const quizPayload = {
+      title: quizData.title,
+      startTime: quizData.startTime,
+      endTime: quizData.endTime,
+      mainTopic: quizData.mainTopic,
+      subTopics: quizData.subTopics,
+      status: quizData.quizStatus,
+      coverImage: quizData.coverImage,
+      thumbnail: quizData.thumbnail,
+      questions: questions.map((q) => ({
+        question: q.question,
+        image: q.image,
+        type: q.type,
+        describe: q.description,
+        options: q.options,
+      })),
+    };
 
-   const {data, error , status} = await usePut(`/quizzes/${id}`, {...quizPayload, status : "published"});
-   if(status == 200){
-    router.push(`/teacher/quiz`)
-   }
-   if(error){
-    setError(error)
-   }
- }
+    const { data, error, status } = await usePut(`/quizzes/${id}`, {
+      ...quizPayload,
+      status: "published",
+    });
+    if (status == 200) {
+      setTimeout(() => {
+        router.push(`/teacher/quiz`);
+      }, 2000);
+
+      showToast("Quiz Updated Successfully", "success");
+    }
+    if (error) {
+      console.log(error);
+      showToast(error[0], "error");
+    }
+  };
 
   return (
     <>
-      <UpdateQuizHeader handleQuizUpdate={handleQuizUpdate} loading={loading} id={id}/>
+      <UpdateQuizHeader
+        handleQuizUpdate={handleQuizUpdate}
+        loading={loading}
+        id={id}
+      />
       {error && <p className="text-red-500 mb-3">{error[0]}</p>}
       <div className="p-6 bg-white rounded-lg shadow-md w-full mx-auto md:max-w-[80%] max-w-[95%]">
         {/* Quiz Title */}
@@ -330,42 +352,6 @@ useEffect(() => {
           </div>
         </div>
 
-
-
-        {/* Quiz and Card Topic Selection */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label className="block text-gray-700">Main Topic</label>
-            <Select
-              name="mainTopic"
-              value={quizData.mainTopic}
-              onChange={handleQuizChange}
-              className="w-full"
-            >
-              <option value="">Choose category</option>
-              <option value="67e83532d7db5610a12b895b">History</option>
-              <option value="67e83532d7db5610a12b895c">Geography</option>
-              <option value="67e83532d7db5610a12b895d">Science</option>
-            </Select>
-          </div>
-          <div>
-            <label className="block text-gray-700">Sub Topics</label>
-            <Select
-              name="subTopics"
-              value={quizData?.subTopics[0] || ""}
-              onChange={(e) =>
-                setQuizData({ ...quizData, subTopics: [e.target.value] })
-              }
-              className="w-full"
-            >
-              <option value="">Choose sub-category</option>
-              <option value="67e8354fd7db5610a12b895d">World History</option>
-              <option value="67e8354fd7db5610a12b895e">Countries</option>
-              <option value="67e8354fd7db5610a12b895f">Biology</option>
-            </Select>
-          </div>
-        </div> */}
-
         {/* Questions Section */}
         <div className="mb-4 space-y-4">
           {questions?.map((q, index) => (
@@ -400,8 +386,12 @@ useEffect(() => {
                     {!q?.image ? (
                       <div
                         className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500 "
-                        onDrop={(e)=>{handleQuestionImageDrop(e, index)}}
-                        onDragOver={(e)=>{handleQuestionImageDragOver(e, index)}}
+                        onDrop={(e) => {
+                          handleQuestionImageDrop(e, index);
+                        }}
+                        onDragOver={(e) => {
+                          handleQuestionImageDragOver(e, index);
+                        }}
                       >
                         {questionImageLoading ? (
                           <div className="w-12 h-12 border-4 border-t-purple-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div>
@@ -432,13 +422,23 @@ useEffect(() => {
                       </div>
                     ) : (
                       <div>
-                        <Image
-                          src={q.image}
-                          height={400}
-                          width={200}
-                          alt="cover-image"
-                        />
-                      </div>
+                        {/* <button
+                          className="justify-self-end cursor-pointer"
+                          onClick={() => {
+                            handleRemoveQuestionImage("image", index);
+                          }}
+                        >
+                          <X />
+                        </button> */}
+                        <div className="md:w-[150px] w-[100px] md:h-[150px] h-[100px]">
+                          <Image
+                            src={q.image}
+                            height={400}
+                            width={200}
+                            alt="cover-image"
+                          />
+                        </div>
+                      </div> 
                     )}
                   </div>
 
@@ -529,24 +529,21 @@ useEffect(() => {
           </Button>
         </div>
 
-        {/* Submit Buttons */}
-        {/* <div className="flex justify-end gap-4 mt-6">
-          <Button 
-            type="button" 
-            onClick={(e) => handleSubmit(e, 'draft')} 
-            disabled={loading}
-            variant="outline"
+        {notification && (
+          <div
+            className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${
+              notification.type === "error" ? "bg-red-500" : "bg-green-500"
+            } text-white`}
           >
-            {loading ? 'Saving...' : 'Save as Draft'}
-          </Button>
-          <Button 
-            type="button" 
-            onClick={(e) => handleSubmit(e, 'published')} 
-            disabled={loading}
-          >
-            {loading ? 'Publishing...' : 'Publish Quiz'}
-          </Button>
-        </div> */}
+            {notification.message}
+            <button
+              onClick={() => setNotification(null)}
+              className="ml-4 text-xl"
+            >
+              ×
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

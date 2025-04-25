@@ -1,6 +1,7 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import useGet from "@/hooks/useGet";
+import usePost from "@/hooks/usePost";
 import { Rating } from "@mui/material";
 import { AlarmClock, BadgeCheck, FileText } from "lucide-react";
 import Image from "next/image";
@@ -8,8 +9,30 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 const Flashcard = ({ imageSrc, title, description, rating, totalRating, id, verified }) => {
+  const [notification, setNotification] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const showToast = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000);
+  };
+
+  const handleFlashCardJoin = async() =>{
+    console.log(id)
+    setLoading(true)
+    const {data, error, status} = await usePost(`/flashcards/join`,{courseId : id})
+    if(status == 201){
+      setLoading(false)
+      router.push(`/course/${id}`)
+    }
+    if(error){
+      setLoading(false)
+      showToast("Failed to Enroll in FlashCard. Try Again", "error")
+    }
+  }
+
   return (
-    <Link href={`/flashcard/${id}`} className="flex flex-col justify-between bg-white rounded-xl border overflow-hidden p-4 w-[320px] relative cursor-pointer">
+    <div className="flex flex-col justify-between bg-white rounded-xl border overflow-hidden p-4 sm:max-w-[320px] max-w-[300px] relative cursor-pointer">
       <div className="h-[180px] w-[100%]">
         {imageSrc ? (
           <Image
@@ -39,7 +62,22 @@ const Flashcard = ({ imageSrc, title, description, rating, totalRating, id, veri
         </div>
         <p className="text-sm text-gray-600">Rating {totalRating}+</p>
       </div>
-    </Link>
+      <div className="flex justify-between items-center mt-4 text-gray-500 text-sm">
+          <button className="border border-purple-600 w-full text-purple-600 rounded-sm py-1 flex items-center justify-center font-semibold" onClick={()=>{handleFlashCardJoin()}}>{loading?<div className="w-5 h-5 border-4 border-t-purple-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div> : "View FlashCards"}</button>
+        </div>
+      {notification && (
+          <div
+            className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${
+              notification.type === "error" ? "bg-red-500" : "bg-green-500"
+            } text-white`}
+          >
+            {notification.message}
+            <button onClick={() => setNotification(null)} className="ml-4 text-xl">
+              ×
+            </button>
+          </div>
+        )}
+    </div>
   );
 };
 
@@ -57,7 +95,7 @@ useEffect(()=>{
 },[])
   return (
     <>
-      <div className="mt-4 w-full mx-auto max-w-[80%] ">
+      <div className="mt-4 w-full mx-auto md:max-w-[80%] max-w-[95%] ">
         <div className="flex flex-col">
           <h6 className="font-semibold text-3xl">All Flashcards</h6>
           <p className="my-2">A perfect tool for quick revisions and reinforcing your learning, making complex information easy to remember.</p>

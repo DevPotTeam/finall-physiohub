@@ -32,9 +32,10 @@ const Settings = () => {
   };
 
   useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"))
     const fetchUserData = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/v1/users/fetchUserById/680538fb67ba1fb79faf35d0");
+        const response = await axios.get(`http://localhost:8000/api/v1/users/fetchUserById/${user.id}`);
         console.log(response)
         setUserData(response.data.data);
         setFormData({

@@ -1,9 +1,25 @@
-import React from "react";
+"use client"
+import React, { useEffect, useState } from "react";
 import LottiePlayer from "../animations/LottiePlayer";
 import happy from "../animations/data/Happy.json"
 import Link from "next/link";
+import Cookies from "js-cookie";
 
-const HeroSection = () => {
+const HeroSection = (href) => {
+    const [token, setToken] = useState(false)
+    const [role, setRole] = useState("")
+  
+    useEffect(()=>{
+      const token = Cookies.get("token")
+      const role = Cookies.get("role")
+      if(role){
+        setRole(role)
+      }
+      if(token){
+        setToken(true)
+      }
+    },[])
+  
   return (
     <div className="bg-gradient-to-r from-purple-500 to-purple-700 text-white rounded-xl px-10 md:py-24 py-24 text-center relative overflow-hidden w-full ">
       <svg
@@ -48,12 +64,9 @@ const HeroSection = () => {
           tailored resources.
         </p>
         <div className="mt-6 flex md:flex-row flex-col gap-2 justify-center space-x-4">
-          <Link href={"/user/dashboard"} className="bg-white text-purple-700 md:px-5 px-2 py-2 rounded-full md:text-base text-xs font-medium shadow-md">
+          <Link href={`${token ? role == "user" ? "/user/dashboard" : "/teacher/course" :"/auth/login"}`} className="bg-white text-purple-700 md:px-5 px-2 py-2 rounded-full md:text-base text-xs font-medium shadow-md">
             Get Started
           </Link>
-          <button className="bg-purple-400 text-white md:px-5 px-2 py-2 rounded-full md:text-base text-xs font-medium shadow-md">
-            Complete Quiz
-          </button>
         </div>
       </div>
        <div className="absolute right-20 md:bottom-5 -bottom-15 md:w-[150px] w-[80px] h-[150px]">

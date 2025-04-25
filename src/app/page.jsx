@@ -13,6 +13,8 @@ import LottiePlayer from "../components/animations/LottiePlayer";
 import happy from "../components/animations/data/Happy.json";
 import run from "../components/animations/data/Run.json";
 import Link from "next/link";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation.js";
 
 const testimonials = [
   {
@@ -24,7 +26,7 @@ const testimonials = [
     position: "Data Engineer at Tailwind",
   },
   {
-    logo: "https://upload.wikimedia.org/wikipedia/commons/6/62/HubSpot_Logo.svg",
+    logo: "https://www.hubspot.com/hubfs/tools/hubspot-tools.svg",
     company: "HubSpot",
     quote:
       "We experienced a significant reduction in support tickets thanks to the intuitive AI features. Support was prompt to assist us.",
@@ -43,9 +45,11 @@ const testimonials = [
 
 const TestimonialCard = ({ logo, company, quote, name, position }) => (
   <div className="bg-gray-50 p-6 rounded-lg max-w-sm text-center border md:min-h-[300px]">
-    <img src={logo} alt={company} className="h-6  mb-4" />
+    <img src={logo} alt={company} className="h-6  mb-4  fill-current text-black" 
+      style={{filter: 'invert(1) grayscale(100%) contrast(100%)'}}
+    />
     <p className="text-gray-700 mt-10">“{quote}”</p>
-    <div className="mt-10 flex sm:flex-row flex-col items-center justify-center gap-3">
+    <div className="mt-10 flex sm:flex-row flex-col items-center justify-start gap-3">
       <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
       <div>
         <p className="font-semibold">{name}</p>
@@ -56,9 +60,27 @@ const TestimonialCard = ({ logo, company, quote, name, position }) => (
 );
 
 function Home() {
+  const featuresRef = useRef(null);
+  const faqRef = useRef(null);
+  const courseRef = useRef(null);
+  const aboutRef = useRef(null);
+
   const [animated, setAnimated] = useState(false);
   const [percent, setPercent] = useState(0);
   const directionRef = useRef(1);
+  const [token, setToken] = useState(false)
+  const [role, setRole] = useState("")
+
+  useEffect(()=>{
+    const token = Cookies.get("token")
+    const role = Cookies.get("role")
+    if(role){
+      setRole(role)
+    }
+    if(token){
+      setToken(true)
+    }
+  },[])
 
   const data = [
     { label: "Jan", value: 40 },
@@ -92,10 +114,22 @@ function Home() {
     const timeout = setTimeout(() => setAnimated(true), 4000);
     return () => clearTimeout(timeout);
   }, []);
+  
+
+  const scrollToSection = (key) => {
+    const refs = {
+      features: featuresRef,
+      faq: faqRef,
+      course: courseRef,
+      about: aboutRef,
+    };
+
+    refs[key]?.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <>
-      <Header />
+      <Header scrollToSection={scrollToSection} />
       <div className="h-full w-full mt-10 relative overflow-hidden">
         <section className="relative bg-gradient-to-r from-gray-100 to-purple-100 py-16 px-6 md:px-12 lg:px-24 flex flex-col md:flex-row items-center">
           {/* Left Content */}
@@ -114,14 +148,11 @@ function Home() {
             </p>
             <div className="mt-6 flex gap-4 justify-center md:justify-start">
               <Link
-                href={"/auth/login"}
+                href={`${token ? role == "user" ? "/user/dashboard" : "/teacher/course" :"/auth/login"}`}
                 className="bg-purple-600 text-white sm:px-6 px-3 py-3 rounded-lg font-medium hover:bg-purple-700"
               >
                 Get Started
               </Link>
-              <button className="border border-gray-400 sm:text-base texet-sm sm:px-6 px-3 py-3 rounded-lg font-medium text-gray-800 hover:bg-gray-200">
-                Complete Quiz
-              </button>
             </div>
           </div>
 
@@ -281,7 +312,7 @@ function Home() {
           </svg>
         </section>
 
-        <section className="py-16 px-6 md:px-12 lg:px-24 flex flex-col items-center gap-12">
+        <section  ref={aboutRef} className="py-16 px-6 md:px-12 lg:px-24 flex flex-col items-center gap-12">
           <div className="text-center">
             <p className="text-sm text-purple-600 font-semibold">
               OVER 200+ RESOURCES
@@ -298,9 +329,7 @@ function Home() {
           <div className=" grid md:grid-cols-2 grid-cols-1 items-center gap-20">
             {/* Left Image Card */}
             <div className=" text-center md:text-left">
-              <p className="text-xs font-semibold text-purple-600">
-                NO SIGN UP REQUIRED
-              </p>
+
               <h2 className="text-3xl font-bold text-gray-900 mt-2">
                 Learn with Flash Cards
               </h2>
@@ -506,29 +535,25 @@ function Home() {
             {/* Right Text Section */}
             <div className=" text-center md:text-left">
               <p className="text-xs font-semibold text-[#2CCFB9]">
-                INFORMATIVE ARTICLES
+                
               </p>
               <h2 className="text-3xl font-bold text-gray-900 mt-2">
-                Informative Blogs
+                Courses
               </h2>
               <p className="text-gray-600 mt-4">
-                Stay updated with the latest trends, research, and best
-                practices in physiotherapy. Our blogs are written by experienced
-                professionals, providing valuable insights and continuous
-                learning opportunities.
+                Stay ahead with the latest techniques, evidence-based practices, and advancements in physiotherapy. Our courses are designed by experienced professionals to provide in-depth knowledge and practical skills for continuous professional growth.
               </p>
               <div className="mt-6 mb-10 space-y-2">
                 <p className="flex items-center text-start gap-2 text-gray-700">
                   <span className="sm:w-3 w-2 sm:h-3 h-2 bg-[#2CCFB9] rounded-full"></span>{" "}
-                  75+ informative articles and <br className="sm:hidden block"/> rehab protocols
+                  Explore detailed lessons.
                 </p>
                 <p className="flex items-center text-start gap-2 text-gray-700">
-                  <span className="sm:w-3 w-2 sm:h-3 h-2 bg-[#2CCFB9] rounded-full"></span> No
-                  sign up required, access our <br className="sm:hidden block"/> blog completely free
+                  <span className="sm:w-3 w-2 sm:h-3 h-2 bg-[#2CCFB9] rounded-full"></span> Access courses anytime, anywhere,<br className="sm:hidden block"/> and progress through lessons as you go.
                 </p>
                 <p className="flex items-center text-start gap-2 text-gray-700">
                   <span className="sm:w-3 w-2 sm:h-3 h-2 bg-[#2CCFB9] rounded-full"></span>{" "}
-                  Complete guide to physio
+                  Gain in-detpth knowledge that for <br className="sm:hidden block"/> personal growth or professional development.
                 </p>
               </div>
             </div>
@@ -851,7 +876,7 @@ function Home() {
           </div>
         </section>
 
-        <section className="py-16 px-6 md:px-12 lg:px-24 flex flex-col items-center gap-12 bg-[#F6F9FC]">
+        <section  ref={featuresRef} className="py-16 px-6 md:px-12 lg:px-24 flex flex-col items-center gap-12 bg-[#F6F9FC]">
           <div className="text-center">
             <p className="text-sm text-purple-600 font-semibold">
               YOUR OWN DASHBOARD
@@ -900,11 +925,11 @@ function Home() {
           </div>
         </section>
 
-        <section className="py-16 px-6 md:px-12 lg:px-24 flex flex-col items-center gap-12 bg-[#F6F9FC]">
+        <section ref={faqRef} className="py-16 px-6 md:px-12 lg:px-24 flex flex-col items-center gap-12 bg-[#F6F9FC]">
               <Accordion/>
         </section>
 
-        <section className="py-16 px-6 md:px-12 lg:px-24 flex flex-col items-center gap-12 bg-[#F6F9FC]">
+        <section ref={courseRef} className="scroll-mt-20 py-16 px-6 md:px-12 lg:px-24 flex flex-col items-center gap-12 bg-[#F6F9FC]">
               <BlogCard/>
         </section>
 
@@ -912,7 +937,7 @@ function Home() {
               <HeroSection/>
         </section>
       </div>
-      <Footer />
+      <Footer scrollToSection={scrollToSection}/>
     </>
   );
 }

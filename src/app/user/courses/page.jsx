@@ -1,15 +1,42 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import useGet from "@/hooks/useGet";
+import usePost from "@/hooks/usePost";
 import { Rating } from "@mui/material";
 import { AlarmClock, BadgeCheck, FileText } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const Course = ({ imageSrc, title, description, rating, totalRating, id, verified }) => {
+  const [notification, setNotification] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const showToast = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000);
+  };
+
+
+  const handleCourseJoin = async(id) =>{
+    setLoading(true)
+    const {data, error, status} = await usePost(`/courses/enroll`,{courseId : id})
+    if(status == 201){
+      setLoading(false)
+      router.push(`/course/${id}`)
+    }
+    if(error){
+      setError(error[0])
+      setLoading(false)
+      showToast("Failed to Enroll in Course. Try Again", "error")
+    }
+  }
+
+
   return (
-    <Link href={`/course/${id}`} className="flex flex-col justify-between bg-white rounded-xl border overflow-hidden p-4 w-[320px] relative cursor-pointer">
+    <div className="flex flex-col justify-between bg-white rounded-xl border overflow-hidden p-4 sm:max-w-[320px] max-w-[300px] relative cursor-pointer">
       <div className="h-[180px] w-[100%]">
         {imageSrc ? (
           <Image
@@ -39,7 +66,22 @@ const Course = ({ imageSrc, title, description, rating, totalRating, id, verifie
         </div>
         <p className="text-sm text-gray-600">Rating {totalRating}+</p>
       </div>
-    </Link>
+      <div className="flex justify-between items-center mt-4 text-gray-500 text-sm">
+          <button className="border border-purple-600 w-full text-purple-600 rounded-sm py-1 flex items-center justify-center font-semibold" onClick={()=>{handleCourseJoin(id)}}>{loading?<div className="w-5 h-5 border-4 border-t-purple-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div> : "Enroll Course"}</button>
+        </div>
+        {notification && (
+          <div
+            className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${
+              notification.type === "error" ? "bg-red-500" : "bg-green-500"
+            } text-white`}
+          >
+            {notification.message}
+            <button onClick={() => setNotification(null)} className="ml-4 text-xl">
+              ×
+            </button>
+          </div>
+        )}
+    </div>
   );
 };
 
@@ -57,7 +99,7 @@ useEffect(()=>{
 },[])
   return (
     <>
-      <div className="mt-4 w-full mx-auto max-w-[80%] ">
+      <div className="mt-4 w-full mx-auto md:max-w-[80%] max-w-[95%] ">
         <div className="flex flex-col">
           <h6 className="font-semibold text-3xl">All Courses</h6>
           <p className="my-2">A perfect tool for quick revisions and reinforcing your learning, making complex information easy to remember.</p>
