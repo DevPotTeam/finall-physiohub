@@ -7,9 +7,9 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 
 function VerifyOTP() {
-  const email = localStorage.getItem("email")
+  
   const [otp, setOtp] = useState(new Array(6).fill(""));
-  // const [email, setEmail] = useState("")
+  const [email, setEmail] = useState("")
   const [resendOtp, setResendOtp] = useState(false)
   const [isVerified, setIsVerified] = useState(false);
   const [timeLeft, setTimeLeft] = useState(180);
@@ -22,6 +22,7 @@ function VerifyOTP() {
 
   useEffect(()=>{
     setOt(localStorage.getItem("otptype"))
+    setEmail(localStorage.getItem("email"))
   },[])
 
   useEffect(()=>{
