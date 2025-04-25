@@ -52,27 +52,24 @@ export default function SignUpPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-    console.log('EMAIL:', formData.email, typeof formData.email);
     setLoading(true);
     try {
       const res = await axios.post(`${api_url}/auth/register`, formData);
 
       setResponseMessage({ type: 'success', text: res?.data?.message || 'Registration successful!' });
-      console.log(res.data)
       if(res.status){
         const {data, error, status} = await usePost(`/auth/send-email-otp`, {"email": formData.email})
         if(status == 201){
           localStorage.setItem("otptype" , "varify")
           localStorage.setItem("firstVisit", true)
           router.push("/auth/verify-otp")
+          localStorage.setItem("email" , formData.email)
         }
       }
       // Redirect to onboarding after a short delay
       // setTimeout(() => router.push('/onboarding'), 1500);
     } catch (error) {
-      console.log(error)
-      const errorMsg =
-        error.response?.data?.errorMessage?.message || "Registration failed. Please try again.";
+      const errorMsg = error.response?.data?.errorMessage?.message;
       setResponseMessage({ type: 'error', text: errorMsg });
     } finally {
       setLoading(false);
@@ -95,11 +92,9 @@ export default function SignUpPage() {
         // const response = await axios.get("http://localhost:8000/api/v1/auth/google",{
         //   withCredentials: true
         // });
-        window.location.href = "http://localhost:8000/api/v1/auth/google";
+        window.location.href = `${api_url}/auth/google`;
         const { token, user, message } = response.data;
-        console.log(response)
         // Store in localStorage (or cookies, or context)
-        // console.log(user)
         // localStorage.setItem("user", JSON.stringify(user));
         // if(!user.isEmailVerified){
         //   router.push("/auth/verify-email")
@@ -114,7 +109,7 @@ export default function SignUpPage() {
   
       } catch (error) {
         const errMsg =
-          error.response?.data?.message || "Something went wrong. Please try again.";
+          error.response?.data?.message;
         setApiError(errMsg);
       } finally {
         setLoading(false);

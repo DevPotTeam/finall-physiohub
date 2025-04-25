@@ -12,7 +12,6 @@ export default function Courses({ setShowInCourse, data }) {
 
   const handleCourseDelete = async (id) => {
     const { data, error, status } = await useDelete(`/courses/delete/${id}`);
-    console.log(status);
     if (status === 200) {
       window.location.reload();
     }

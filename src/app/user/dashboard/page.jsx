@@ -658,7 +658,6 @@ export default function Dashboard() {
         const fetchLeaderboard = async () => {
             try {
                 const response = await axios.get('http://localhost:8000/api/v1/leaderboard/get');
-                console.log(response.data.data);
                 setLeaderboardData(response.data.data); // Assuming your API returns data in the format shown
             } catch (error) {
                 console.error('Error fetching leaderboard:', error);

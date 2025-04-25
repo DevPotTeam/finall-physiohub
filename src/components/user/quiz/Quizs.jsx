@@ -22,7 +22,6 @@ const articles = [
 export default function Quizs() {
   const handleQuizDelete = async (id) => {
     const { data, error, status } = await useDelete(`/courses/delete/${id}`);
-    console.log(status);
     if (status === 200) {
       window.location.reload();
     }

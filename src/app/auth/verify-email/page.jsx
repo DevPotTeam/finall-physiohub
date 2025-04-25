@@ -22,10 +22,8 @@ export default function VerifyEmail() {
 
   const handleVerify = async(e) => {
     e.preventDefault();
-    console.log(email)
       const {data, error, status} = await usePost(`/auth/forgot-password`, {"email" : email} )
       if(data){
-        console.log(data)
         router.push(`/auth/verify-otp`)
       }
   };

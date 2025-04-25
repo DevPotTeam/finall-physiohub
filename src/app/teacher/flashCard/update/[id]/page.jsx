@@ -144,7 +144,6 @@ useEffect(() => {
   };
 
   const handleUpdateFlashCard = async () => {
-    console.log("inside")
     const { data, error, status } = await usePatch(`/flashcards/updateFlashcardById/${id}`, {
       ...flashcard,
     });

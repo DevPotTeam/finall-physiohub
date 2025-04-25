@@ -36,7 +36,6 @@ const Settings = () => {
     const fetchUserData = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/api/v1/users/fetchUserById/${user.id}`);
-        console.log(response)
         setUserData(response.data.data);
         setFormData({
           name: response.data.data.name || "",
@@ -72,7 +71,6 @@ const Settings = () => {
           "Content-Type": "multipart/form-data",
         },
       });
-      console.log(uploadResponse);
 
       setUserData(prev => prev ? { ...prev, profilePic: uploadResponse.data } : null);
       showToast("Profile picture updated successfully");

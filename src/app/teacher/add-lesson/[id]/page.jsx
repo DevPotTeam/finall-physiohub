@@ -51,7 +51,6 @@ export default function AddLessons({params}) {
 
   const handleTypeSelect = (e) => {
     setType(e.target.value);
-    console.log(e.target.value);
   };
 
   const addQuestion = () => {
@@ -111,7 +110,6 @@ export default function AddLessons({params}) {
     
     if (status == 201) {
       setLoading(false)
-      console.log(data)
       handleCardChange(index, "url", data);
     }
   };
@@ -132,7 +130,6 @@ export default function AddLessons({params}) {
 
   const handleLessonsAdd = async () => {
     const {data, error, status} = await usePost(`/courses/add-to-course/${id}`, formData)
-    console.log(data)
     if(status == 201){
       router.push("/teacher/course")
     }

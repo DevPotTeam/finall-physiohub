@@ -302,7 +302,6 @@ export default function UpdateQuiz({ params }) {
       showToast("Quiz Updated Successfully", "success");
     }
     if (error) {
-      console.log(error);
       showToast(error[0], "error");
     }
   };
