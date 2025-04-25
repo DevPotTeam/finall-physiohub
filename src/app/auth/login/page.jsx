@@ -11,6 +11,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import usePost from "@/hooks/usePost";
+import Cookies from "js-cookie";
 
 export default function LoginPage() {
   const [firstVisit, setFirstVisit] = useState(true)
@@ -27,7 +28,8 @@ export default function LoginPage() {
  }
 
   useEffect(()=>{
-    localStorage.removeItem("accessToken")
+    Cookies.remove("token")
+    Cookies.remove("role")
   },[])
 
   const validate = () => {
@@ -68,11 +70,18 @@ export default function LoginPage() {
       const { token, user, message } = response.data;
 
       // Store in localStorage (or cookies, or context)
-      localStorage.setItem("accessToken", token);
+      console.log(user)
       localStorage.setItem("user", JSON.stringify(user));
+      if(!user.isEmailVerified){
+        router.push("/auth/verify-email")
+      }
+      const firstVisit = localStorage.getItem("firstVisit")
+      if(firstVisit == true){
+        router.push("/onboarding");
+      } else {
+        router.push("/")
+      }
 
-      console.log(message);
-      router.push("/onboarding");
     } catch (error) {
       const errMsg =
         error.response?.data?.message || "Something went wrong. Please try again.";
@@ -85,7 +94,7 @@ export default function LoginPage() {
 
   return (
     <CardContent>
-      <img className="md:flex lg:hidden hidden w-[160px] mb-10" src={'/logo-on-light.png'} />
+      <img className="md:flex lg:hidden hidden sm:w-[160px] w-full mb-10" src={'/logo-on-light.png'} />
       <h2 className="text-xl font-bold text-gray-900 mb-4">Login to Your Account</h2>
       <p className="text-sm text-gray-500 mb-4">Access your personalized dashboard by logging into your account.</p>
 

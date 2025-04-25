@@ -263,12 +263,15 @@ export default function QuizCard({params}) {
       answers: userAnswers,
       completionTime: completionTimeInSeconds,
     };
-  
-    const {data, error, status} = await usePost(`/quizzes/submit-quiz/${id}`, finalPayload)
-    console.log(data);
+    const {data, error, status} = usePost(`/quizzes/join/${id}`)
     if(status == 201){
-      fetchResult()
+      const {data, error, status} = await usePost(`/quizzes/submit-quiz/${id}`, finalPayload)
+      console.log(data);
+      if(status == 201){
+        fetchResult()
+      }
     }
+  
   };
 
 
@@ -285,7 +288,7 @@ export default function QuizCard({params}) {
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg">
       <Link
-        href={"/user/dashboard"}
+        href={"/user/quizs"}
         className="px-2 py-1 bg-gray-100 flex items-center w-fit rounded-md"
       >
         <ArrowLeft className="text-gray-600" size={18} /> &nbsp; Go to Dashbaord

@@ -1,13 +1,26 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import logo from "../../../public/logo-on-light.png";
 import { IoMdPerson } from "react-icons/io";
+import Cookies from "js-cookie";
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [role, setRole] = useState("")
+
+  useEffect(() => {
+    const token = Cookies.get("token");
+    if (token) {
+      setIsLoggedIn(true);
+    }
+    const role = Cookies.get("role")
+    if(role){
+      setRole(role)
+    }
+  });
 
   return (
     <>
@@ -19,7 +32,10 @@ function Header() {
               <div className="flex items-center">
                 <span className="text-xl font-bold text-gray-800 flex items-center">
                   <Link href={"/"}>
-                    <img className=" md:w-[160px] w-[130px]" src={"/logo-on-light.png"} />
+                    <img
+                      className=" md:w-[160px] w-[130px]"
+                      src={"/logo-on-light.png"}
+                    />
                   </Link>
                 </span>
               </div>
@@ -42,7 +58,7 @@ function Header() {
 
               {/* Buttons */}
               <div className="hidden md:flex space-x-4 items-center">
-                <Link href={"/user/dashboard"}>
+                {/* <Link href={"/user/dashboard"}>
                   <button className="border border-purple-600 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-100">
                     Student
                   </button>
@@ -51,26 +67,25 @@ function Header() {
                   <button className="border border-purple-600 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-100">
                    Teacher
                   </button>
-                </Link>
-                {isLoggedIn?(
-                  <>
-                  <Link href={"/user/dashboard"}>
-                  <IoMdPerson className="text-purple-600 text-3xl"/>
-                  </Link>
-                  </>
-                ):(
+                </Link> */}
+                {isLoggedIn ? (
+
+                  <Link href={`${role == "user" ? "/user/dashboard" : role == "teacher" || role == "instructor" &&"/teacher/course"} `}>
+                    <IoMdPerson className="text-purple-600 text-3xl" />
+                  </Link> 
+                ) : (
                   <>
                     <Link href={"/auth/login"}>
-                  <button className="border border-purple-600 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-100">
-                    Login
-                  </button>
-                </Link>
-                <Link
-                  href={"/auth/signup"}
-                  className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
-                >
-                  Sign In
-                </Link>
+                      <button className="border border-purple-600 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-100">
+                        Login
+                      </button>
+                    </Link>
+                    <Link
+                      href={"/auth/signup"}
+                      className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
+                    >
+                      Sign Up
+                    </Link>
                   </>
                 )}
               </div>
@@ -101,23 +116,39 @@ function Header() {
               <a href="#" className="block text-gray-700 hover:text-purple-600">
                 Contact
               </a>
-              <Link href={"/user/dashboard"} className="w-full border border-purple-600 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-100">
+              {/* <Link href={"/user/dashboard"} className="w-full border border-purple-600 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-100">
                 Student
               </Link>
               <Link href={"/teacher/quiz"} className="w-full border border-purple-600 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-100">
                 Teacher
+              </Link> */}
+              {isLoggedIn ? (
+                <Link
+                href={`${role == "user" ? "/user/dashboard" : role == "teacher" || role == "instructor"&&"/teacher/course"}`}
+                className="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
+              >
+                Profile
               </Link>
-              <Link href={"/auth/login"} className="w-full border border-purple-600 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-100">
-                Login
-              </Link>
-              <Link href={"/auth/signup"} className="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
-                Sign In
-              </Link>
+              ) : (
+                <>
+                  <Link
+                    href={"/auth/login"}
+                    className="w-full border border-purple-600 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-100"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href={"/auth/signup"}
+                    className="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
           )}
         </nav>
       </div>
-
     </>
   );
 }

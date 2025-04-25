@@ -1,19 +1,53 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import Cookies from "js-cookie";
 
-const ProtectedRoute = ({ user, children }) => {
+const ProtectedRoute = ({ children }) => {
+
   const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
-    const isTeacherRoute = pathname.includes("teacher");
+  const protectedPaths = [
+    "/user/dashboard", "/user/discover", "/user/courses", "/user/quizs",
+    "/user/flashcards", "/user/settings", "/teacher/course",
+    "/teacher/course/update", "/teacher/quiz", "/teacher/quiz/update",
+    "/teacher/flashCard", "/teacher/flashCard/update", "/teacher/setting",
+    "/teacher/add-lesson", "/quiz", "/flashcard", "/AllFlashCards", "/AllQuizs"
+  ];
 
-    if (isTeacherRoute && user?.role !== "teacher") {
-      router.replace("/");
+
+  useEffect(() => {
+    const token = Cookies.get("token");
+    const role = Cookies.get("role")
+    const isProtectedRoute = protectedPaths.some((path) =>
+      pathname.startsWith(path)
+    );
+
+    const isAuthRoute = pathname.startsWith("/auth");
+    const isTeacherRoute = pathname.startsWith("/teacher");
+    const isUserRoute = pathname.startsWith("/user");
+
+    // ✅ Skip protection for any /auth route
+    if (isAuthRoute) return;
+
+    // 🔐 Redirect to login if no token and accessing a protected route
+    if (isProtectedRoute && !token) {
+      router.replace("/auth/login");
+      return;
     }
-  }, [pathname, user, router]);
+
+    // 🔒 Role-based protection
+    if (isTeacherRoute && role !== "teacher" && role !== "instructor") {
+      router.push("/");
+      return;
+    }
+    if (isUserRoute && role !== "user") {
+      router.replace("/");
+      return;
+    }
+  }, [pathname, router]);
 
   return children;
 };

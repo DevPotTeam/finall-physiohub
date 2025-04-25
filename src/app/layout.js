@@ -17,9 +17,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        {/* <ProtectedRoutes user={user}> */}
+        <ProtectedRoutes user={user}>
         {children}
-        {/* </ProtectedRoutes> */}
+        </ProtectedRoutes>
         
       </body>
     </html>

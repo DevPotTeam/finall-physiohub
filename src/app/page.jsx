@@ -45,7 +45,7 @@ const TestimonialCard = ({ logo, company, quote, name, position }) => (
   <div className="bg-gray-50 p-6 rounded-lg max-w-sm text-center border md:min-h-[300px]">
     <img src={logo} alt={company} className="h-6  mb-4" />
     <p className="text-gray-700 mt-10">“{quote}”</p>
-    <div className="mt-10 flex items-center justify-center gap-3">
+    <div className="mt-10 flex sm:flex-row flex-col items-center justify-center gap-3">
       <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
       <div>
         <p className="font-semibold">{name}</p>
@@ -103,30 +103,30 @@ function Home() {
             <p className="text-sm text-purple-600 font-semibold">
               OVER 200+ RESOURCES
             </p>
-            <h1 className="text-6xl font-bold text-gray-900 leading-tight mt-2">
+            <h1 className="sm:text-6xl text-4xl font-bold text-gray-900 leading-tight mt-2">
               Master Your <br />{" "}
               <span className="text-purple-600">Physiotherapy</span> <br />{" "}
               Skills Now!
             </h1>
             <p className="text-gray-600 mt-4 max-w-md">
-              Maximize your physiotherapy skills with our expert-led courses and
+              Maximize your physiotherapy skills with <br /> our expert-led courses and
               tailored resources.
             </p>
             <div className="mt-6 flex gap-4 justify-center md:justify-start">
               <Link
                 href={"/auth/login"}
-                className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700"
+                className="bg-purple-600 text-white sm:px-6 px-3 py-3 rounded-lg font-medium hover:bg-purple-700"
               >
                 Get Started
               </Link>
-              <button className="border border-gray-400 px-6 py-3 rounded-lg font-medium text-gray-800 hover:bg-gray-200">
+              <button className="border border-gray-400 sm:text-base texet-sm sm:px-6 px-3 py-3 rounded-lg font-medium text-gray-800 hover:bg-gray-200">
                 Complete Quiz
               </button>
             </div>
           </div>
 
           {/* Right Content */}
-          <div className="flex justify-end gap-3 md:w-[50%] w-full md:mt-0 mt-10">
+          <div className="flex sm:flex-row flex-col justify-end gap-3 md:w-[50%] w-full md:mt-0 mt-10">
             {/* First Column (takes max space) */}
             <div className="flex-1 flex flex-col justify-between items-end">
               <Card className="  md:max-w-[14rem] w-[11rem] rounded-[20px] shadow-md overflow-hidden mb-5 self-end">
@@ -187,7 +187,7 @@ function Home() {
             </div>
 
             {/* Second Column (fits content) */}
-            <div className="flex-none flex mt-38 justify-center text-center md:w-1/2 ">
+            <div className="flex-none flex sm:mt-38 mt-10 justify-center text-center md:w-1/2 ">
               {/* Your content here */}
               <Card className="md:w-[11rem] w-[10rem] rounded-[20px] shadow-md relative overflow-visible h-fit">
                 <div className="absolute -top-17 -right-10 -translate-x-1/2 z-10">
@@ -310,16 +310,16 @@ function Home() {
                 making complex information easy to remember.
               </p>
               <div className="mt-6 mb-10 space-y-2">
-                <p className="flex items-center gap-2 text-gray-700">
-                  <span className="w-3 h-3 bg-purple-600 rounded-full"></span>{" "}
+                <p className="flex items-center gap-2 text-start text-gray-700">
+                  <span className="sm:w-3 w-2 sm:h-3 h-2 bg-purple-600 rounded-full"></span>{" "}
                   1000+ pre-made flashcards
                 </p>
-                <p className="flex items-center gap-2 text-gray-700">
-                  <span className="w-3 h-3 bg-purple-600 rounded-full"></span>{" "}
-                  Effortless Memorization with spaced repetition
+                <p className="flex items-center gap-2 text-start text-gray-700">
+                  <span className="sm:w-3 w-2 sm:h-3 h-2 bg-purple-600 rounded-full"></span>{" "}
+                  Effortless Memorization with <br className="sm:hidden block"/> spaced repetition
                 </p>
-                <p className="flex items-center gap-2 text-gray-700">
-                  <span className="w-3 h-3 bg-purple-600 rounded-full"></span>{" "}
+                <p className="flex items-center gap-2 text-start text-gray-700">
+                  <span className="sm:w-3 w-2 sm:h-3 h-2 bg-purple-600 rounded-full"></span>{" "}
                   Spaced repetition
                 </p>
               </div>
@@ -406,17 +406,17 @@ function Home() {
                 your knowledge, skills, and confidence.
               </p>
               <div className="mt-6 mb-10 space-y-2">
-                <p className="flex items-center gap-2 text-gray-700">
-                  <span className="w-3 h-3 bg-[#FF7F04] rounded-full"></span>{" "}
-                  Time-based quizzes to improve your quick thinking and
+                <p className="flex items-center gap-2 text-start text-gray-700">
+                  <span className="sm:w-3 w-2 sm:h-3 h-2 bg-[#FF7F04] rounded-full"></span>{" "}
+                  Time-based quizzes to improve<br className="sm:hidden block"/> your quick thinking and
                   diagnostics
                 </p>
-                <p className="flex items-center gap-2 text-gray-700">
-                  <span className="w-3 h-3 bg-[#FF7F04] rounded-full"></span>{" "}
+                <p className="flex items-center gap-2 text-start text-gray-700">
+                  <span className="sm:w-3 w-2 sm:h-3 h-2 bg-[#FF7F04] rounded-full"></span>{" "}
                   Personalized Dashboard
                 </p>
-                <p className="flex items-center gap-2 text-gray-700">
-                  <span className="w-3 h-3 bg-[#FF7F04] rounded-full"></span>{" "}
+                <p className="flex items-center gap-2 text-start text-gray-700">
+                  <span className="sm:w-3 w-2 sm:h-3 h-2 bg-[#FF7F04] rounded-full"></span>{" "}
                   Accessible anywhere anytime
                 </p>
               </div>
@@ -518,16 +518,16 @@ function Home() {
                 learning opportunities.
               </p>
               <div className="mt-6 mb-10 space-y-2">
-                <p className="flex items-center gap-2 text-gray-700">
-                  <span className="w-3 h-3 bg-[#2CCFB9] rounded-full"></span>{" "}
-                  75+ informative articles and rehab protocols
+                <p className="flex items-center text-start gap-2 text-gray-700">
+                  <span className="sm:w-3 w-2 sm:h-3 h-2 bg-[#2CCFB9] rounded-full"></span>{" "}
+                  75+ informative articles and <br className="sm:hidden block"/> rehab protocols
                 </p>
-                <p className="flex items-center gap-2 text-gray-700">
-                  <span className="w-3 h-3 bg-[#2CCFB9] rounded-full"></span> No
-                  sign up required, access our blog completely free
+                <p className="flex items-center text-start gap-2 text-gray-700">
+                  <span className="sm:w-3 w-2 sm:h-3 h-2 bg-[#2CCFB9] rounded-full"></span> No
+                  sign up required, access our <br className="sm:hidden block"/> blog completely free
                 </p>
-                <p className="flex items-center gap-2 text-gray-700">
-                  <span className="w-3 h-3 bg-[#2CCFB9] rounded-full"></span>{" "}
+                <p className="flex items-center text-start gap-2 text-gray-700">
+                  <span className="sm:w-3 w-2 sm:h-3 h-2 bg-[#2CCFB9] rounded-full"></span>{" "}
                   Complete guide to physio
                 </p>
               </div>

@@ -1,10 +1,22 @@
+"use client"
+import Cookies from "js-cookie";
 import { Mail } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { AiFillFacebook } from "react-icons/ai";
 import { FaLinkedin } from "react-icons/fa";
 import { FaTwitterSquare } from "react-icons/fa";
 
 export default function Footer() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(()=>{
+    const token = Cookies.get("token")
+    if(token){
+      setIsLoggedIn(true)
+    }
+  },[])
+
     return (
       <footer className="bg-white text-gray-700 px-6 py-8 md:px-16 lg:px-32">
         <div className="max-w-7xl mx-auto">
@@ -32,10 +44,10 @@ export default function Footer() {
                 <h4 className="font-semibold text-gray-900">Features</h4>
                 <ul className="mt-2 space-y-1">
                   <li>
-                    <a href="#" className="hover:text-gray-500">Quiz</a>
+                    <Link href={`${isLoggedIn ? "/user/quizs" : "/auth/login"}`} className="hover:text-gray-500">Quiz</Link>
                   </li>
                   <li>
-                    <a href="#" className="hover:text-gray-500">Flash Card</a>
+                    <Link href={`${isLoggedIn ? "/user/flashcards" : "/auth/login"}`} className="hover:text-gray-500">Flash Card</Link>
                   </li>
                   <li>
                     <a href="#" className="hover:text-gray-500">Mock Test</a>

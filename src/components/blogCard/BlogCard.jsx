@@ -37,13 +37,13 @@ const BlogCard = ({ category, title, author, readTime }) => (
 const BlogSection = () => {
   return (
     <div className=" p-6 w-full">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex sm:flex-row flex-col sm:gap-0 gap-2 justify-between items-center mb-6">
         <div>
           <h2 className="text-purple-600 text-sm font-semibold uppercase">
             BLOGS
           </h2>
           <h1 className="text-4xl font-bold mt-1">Explore all our insight</h1>
-        </div>
+        </div >
         <button className="bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-medium">
           Read More
         </button>
