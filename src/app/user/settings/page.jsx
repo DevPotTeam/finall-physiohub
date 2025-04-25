@@ -6,6 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Lock, Upload, Loader2 } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
+const api_url = process.env.NEXT_PUBLIC_API_BASE_URL
 
 const Settings = () => {
   const [notification, setNotification] = useState(null);
@@ -35,7 +36,7 @@ const Settings = () => {
     const user = JSON.parse(localStorage.getItem("user"))
     const fetchUserData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/v1/users/fetchUserById/${user.id}`);
+        const response = await axios.get(`${api_url}/users/fetchUserById/${user.id}`);
         setUserData(response.data.data);
         setFormData({
           name: response.data.data.name || "",
@@ -66,7 +67,7 @@ const Settings = () => {
 
     try {
       setUploading(true);
-      const uploadResponse = await axios.post("http://localhost:8000/api/v1/courses/upload-image", formData, {
+      const uploadResponse = await axios.post(`${api_url}/courses/upload-image`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -90,7 +91,7 @@ const Settings = () => {
     e.preventDefault();
     try {
       setSaving(true);
-      await axios.patch("http://localhost:8000/api/v1/users/updateUserById/680538fb67ba1fb79faf35d0", {
+      await axios.patch(`${api_url}/users/updateUserById/${user.id}`, {
         name: formData.name,
         mobileNumber: formData.mobileNumber,
         level: formData.level,

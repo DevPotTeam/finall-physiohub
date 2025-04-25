@@ -15,7 +15,7 @@ import useGetForDash from "@/hooks/useGetForDash";
 import axios from 'axios';
 import { responsiveFontSizes } from '@mui/material';
 // import Cookies from "js-cookie"
-
+const api_url = process.env.NEXT_PUBLIC_API_BASE_URL
 ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement);
 
 // RecentActivity component
@@ -657,7 +657,7 @@ export default function Dashboard() {
         // Fetch your API data here
         const fetchLeaderboard = async () => {
             try {
-                const response = await axios.get('http://localhost:8000/api/v1/leaderboard/get');
+                const response = await axios.get(`${api_url}/leaderboard/get`);
                 setLeaderboardData(response.data.data); // Assuming your API returns data in the format shown
             } catch (error) {
                 console.error('Error fetching leaderboard:', error);
