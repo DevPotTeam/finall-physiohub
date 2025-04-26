@@ -10,20 +10,26 @@ import usePost from "@/hooks/usePost"
 import Image from "next/image";
 
 export default function CreateCourse({setShowInCourse}) {
+  const [notification, setNotification] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    instructor: "",
     categories: "",
     prerequisites: "",
     isFree: true, // note: values from select are always strings
     price: "",
     estimatedDuration: "",
-    coverImage :null
+    coverImageUrl :null
   });
-  const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const fileInputRef = useRef(null);
+
+    
+  const showToast = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000);
+  };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,7 +57,7 @@ export default function CreateCourse({setShowInCourse}) {
 
     const {data, error, status} = await useImagePost(`/courses/upload-image`, formData)
     if(data){
-      setFormData((prev)=>({...prev, coverImage : data}))
+      setFormData((prev)=>({...prev, coverImageUrl : data}))
       setLoading(false)
     }
   };
@@ -68,17 +74,19 @@ export default function CreateCourse({setShowInCourse}) {
   const handleCoursePublish = async () => {
     const {data, error, status} = await usePost(`/courses/create`, formData)
     if(status == 201){
-      setShowInCourse("Course")
+      showToast("Course Created Successfully", "success")
+      setTimeout(() => {
+        setShowInCourse("Course")
+      }, 2000);
     }
     if(error){
-      setError(error)
+      showToast(error[0], "error")
     }
   };
 
   return (
     <>
       <PublishCourseHeader handleCoursePublish={handleCoursePublish} />
-      {error&&<p className="text-red-500 mb-3">{error}</p>}
       <div className=" p-6 bg-white rounded-lg shadow-md w-full mx-auto md:max-w-[80%] max-w-[95%]">
         {/*  Title */}
         <div className="mb-4 ">
@@ -107,7 +115,7 @@ export default function CreateCourse({setShowInCourse}) {
         </div>
 
         {/* Instructor  */}
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label className="block text-gray-700 font-semibold">
             Instructor Name
           </label>
@@ -118,7 +126,7 @@ export default function CreateCourse({setShowInCourse}) {
             onChange={handleChange}
             value={formData.instructor}
           />
-        </div>
+        </div> */}
 
         {/* Categories  */}
         <div className="mb-4">
@@ -156,7 +164,7 @@ export default function CreateCourse({setShowInCourse}) {
 
         {/* Cover Image  */}
         <div className="mb-4 flex gap-2 items-start">
-          <div>
+          {/* <div>
             <label className="block text-gray-700 font-semibold">Course</label>
             <select
               name="isFree"
@@ -168,7 +176,7 @@ export default function CreateCourse({setShowInCourse}) {
               <option value={true}>Free</option>
               <option value={false}>Paid</option>
             </select>
-          </div>
+          </div> */}
           {!formData.isFree && (
             <div className="mb-4 ">
               <Input
@@ -202,7 +210,7 @@ export default function CreateCourse({setShowInCourse}) {
           <label className="block text-gray-700 font-semibold">
             Cover Image
           </label>
-          {!formData.coverImage?<div
+          {!formData.coverImageUrl?<div
             className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500 "
             onDrop={handleDrop}
             onDragOver={handleDragOver}
@@ -232,7 +240,7 @@ export default function CreateCourse({setShowInCourse}) {
               />
             </label>}
           </div> : <div>
-            <Image src={formData.coverImage} height={400} width={200} alt="cover-image"/>
+            <Image src={formData.coverImageUrl} height={400} width={200} alt="cover-image"/>
             </div>}
           
         </div>
@@ -247,6 +255,18 @@ export default function CreateCourse({setShowInCourse}) {
             <option>Choose category</option>
           </Select>
         </div> */}
+        {notification && (
+          <div
+            className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${
+              notification.type === "error" ? "bg-red-500" : "bg-green-500"
+            } text-white`}
+          >
+            {notification.message}
+            <button onClick={() => setNotification(null)} className="ml-4 text-xl">
+              ×
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

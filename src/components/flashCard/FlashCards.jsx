@@ -37,8 +37,8 @@ export default function FlashCards({ setShowInFlashCard }) {
               key={index}
               className="border-t pt-4 first:border-t-0 first:pt-0"
             >
-              <div className="flex justify-between items-center ">
-                <div className="flex items-center gap-5 w-full">
+              <div className="flex md:flex-row flex-col justify-between items-center ">
+                <div className="flex md:flex-row flex-col items-center gap-5 w-full">
                   <div className="h-[180px] w-[230px]">
                     {article.imageUrl ? (
                       <Image
@@ -52,7 +52,7 @@ export default function FlashCards({ setShowInFlashCard }) {
                       <div className="bg-gray-300 h-full w-full rounded animate-pulse"></div>
                     )}
                   </div>
-                  <div className="w-[44%] text-start">
+                  <div className="md:w-[44%] w-full text-start">
                     <p className="text-sm text-blue-600 font-medium mb-2">
                       {article.subject}
                     </p>
