@@ -16,11 +16,11 @@ export default function UpdateCourseHeader({handleCourseUpdate, id}) {
         <Link
         href={`/teacher/course/updateLessons/${id}`}
         >
-        <Button className=" border bg-transparent border-purple-600 hover:bg-transparent text-purple-600 px-5 py-2 rounded-lg">
+        <Button className=" border bg-transparent border-purple-600 hover:bg-transparent text-purple-600 px-5 py-2 rounded-lg  md:text-base text-xs">
            Update Lessons
         </Button>
         </Link>
-        <Button className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg" onClick={handleCourseUpdate}>
+        <Button className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg  md:text-base text-xs" onClick={handleCourseUpdate}>
           <Upload/> Update Course
         </Button>
       </div>

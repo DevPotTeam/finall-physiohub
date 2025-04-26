@@ -89,7 +89,7 @@ const Flashcard = () => {
           
         </div>
         
-        <div className="w-full h-2 bg-gray-200 rounded-full mx-4">
+        <div className="w-full h-2 bg-gray-200 rounded-full">
           <div
             className={`h-full bg-[#6c4ce6] rounded-full transition-all duration-300`}
             style={{

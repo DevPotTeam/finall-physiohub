@@ -14,10 +14,10 @@ export default function PublishFlashCardHeader({handleUpdateFlashCard}) {
         >
         <ArrowLeft className="w-5 h-5 text-gray-700 cursor-pointer" />
         </Link>
-        <h2 className="text-lg font-semibold">Update Flash Card</h2>
+        <h2 className=" font-semibold  md:text-base text-xs">Update Flash Card</h2>
       </div>
       <div className="flex items-center gap-4">
-        <Button className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg" onClick={handleUpdateFlashCard}>
+        <Button className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg  md:text-base text-xs" onClick={handleUpdateFlashCard}>
           <Upload/> Update
         </Button>
       </div>

@@ -72,7 +72,7 @@ export default function AuthLayout({ children }) {
 
     return (
         <div className="h-screen w-full flex flex-col lg:flex-row sm:p-10 sm:pt-0 pt-10" >
-            <div className="hidden lg:flex lg:w-1/2 xl:w-2/5  flex-col bg-[#9333EA] rounded-3xl pt-5 pl-8 pr-8 pb-10 relative">
+            <div className="hidden lg:flex lg:w-1/2 xl:w-2/5 mt-10 flex-col bg-[#9333EA] rounded-3xl pt-5 pl-8 pr-8 pb-10 relative">
                 <img src={'/logo-on-dark.png'} className="w-45 h-10 mb-10" />
 
                 <div className="text-white w-full flex flex-col justify-between  p-2">

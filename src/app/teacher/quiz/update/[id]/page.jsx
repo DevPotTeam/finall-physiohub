@@ -495,6 +495,7 @@ export default function UpdateQuiz({ params }) {
                           />
                           <label className="text-sm">Correct</label>
                           <Switch
+                            inQuiz={true}
                             checked={option.correctAnswer}
                             onCheckedChange={() =>
                               handleCorrectAnswerChange(index, idx)

@@ -75,20 +75,20 @@ const Course = ({ imageSrc, title, description, rating, totalRating, id, verifie
           <span className="text-[#7240FD]"> Admin Verified</span>
         </div>} */}
         <h3 className="text-lg font-semibold mt-4">{title}</h3>
-        <p className="text-sm text-gray-600">{description}</p>
-        <p className="text-sm text-gray-600">Instructor <span className="font-semibold">{instructor.name}</span></p>
+        <p className="text-sm text-gray-600 mb-5 overflow-hidden">{description}</p>
+        <p className="text-sm text-gray-600">Instructor <span className="font-semibold ">{instructor.name}</span></p>
         <p className="text-sm text-gray-600">Lessons <span className="font-semibold">{lessons}</span></p>
-        <div className="mt-2">
+        {/* <div className="mt-2">
           <Rating
             name="simple-controlled"
             value={rating}
             readOnly
           />
-        </div>
+        </div> */}
         {totalRating > 0&&<p className="text-sm text-gray-600">Rating {totalRating}+</p>}
       </div>
       {!isEnrolled?<div className="flex justify-between items-center mt-4 text-gray-500 text-sm">
-          <button className="border border-purple-600 w-full text-purple-600 rounded-sm py-1 flex items-center justify-center font-semibold" onClick={()=>{handleCourseJoin(id)}}>{loading?<div className="w-5 h-5 border-4 border-t-purple-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div> : "Enroll Course"}</button>
+          <button className="border border-purple-600 w-full text-purple-600 rounded-sm py-1 flex items-center justify-center font-semibold" onClick={()=>{handleCourseJoin(id)}}>{loading?<div className="w-5 h-5 border-4  border-t-purple-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div> : "Enroll Course"}</button>
         </div> : <Link href={`/course/${id}`} className="flex justify-between items-center mt-4 text-gray-500 text-sm">
           <button className="border border-purple-600 w-full text-purple-600 rounded-sm py-1 flex items-center justify-center font-semibold">View</button>
         </Link>}
@@ -110,40 +110,74 @@ const Course = ({ imageSrc, title, description, rating, totalRating, id, verifie
 
 function Courses() {
   const [flashCards, setFlashCards] = useState([]);
+  const [filteredCourses, setFilteredCourses] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  
   const fetchFlashCardsData = async() => {
     const { data, error, status } = await useGet(`/courses/getAllCourses`);
     if (status == 200) {
       setFlashCards(data);
     }
-};
-useEffect(()=>{
-    fetchFlashCardsData()
-},[])
+  };
+
+  useEffect(() => {
+    fetchFlashCardsData();
+  }, []);
+
+  // Filter courses based on search query
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setIsSearching(false);
+    } else {
+      setIsSearching(true);
+      const filtered = flashCards.filter(course => {
+        const courseTitleMatch = course.title.toLowerCase().includes(searchQuery.toLowerCase());
+        const instructorNameMatch = course.instructor?.name?.toLowerCase().includes(searchQuery.toLowerCase());
+        return courseTitleMatch || instructorNameMatch;
+      });
+      setFilteredCourses(filtered);
+    }
+  }, [searchQuery, flashCards]);
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
   return (
     <>
       <div className="mt-4 w-full mx-auto md:max-w-[80%] max-w-[95%] ">
         <div className="flex flex-col">
           <h6 className="font-semibold text-3xl">All Courses</h6>
           <p className="my-2">A perfect tool for quick revisions and reinforcing your learning, making complex information easy to remember.</p>
-            <Input className="max-w-96"placeholder="Search"/>
+          <Input 
+            className="max-w-96" 
+            placeholder="Search by course or instructor name"
+            value={searchQuery}
+            onChange={handleSearchChange}
+          />
           <div className="w-full grid xl:grid-cols-3 sm:grid-cols-2 gap-2 mt-4">
-
-          {...flashCards?.map((flashcard) => (
-            <Course  
-            key={flashcard._id}
-            imageSrc={flashcard.coverImageUrl}
-            title={flashcard.title}
-            verified={flashcard.verifiedByAdmin}
-            description={flashcard.description}
-            rating={flashcard.rating}
-            totalRating={flashcard.ratingCount}
-            id={flashcard._id}
-            instructor = {flashcard.instructor}
-            enrolled = {flashcard.enrolledStudents}
-            lessons={flashcard.lessons.length}
-            />
-          ))}
+            {(isSearching ? filteredCourses : flashCards)?.map((flashcard) => (
+              <Course  
+                key={flashcard._id}
+                imageSrc={flashcard.coverImageUrl}
+                title={flashcard.title}
+                verified={flashcard.verifiedByAdmin}
+                description={flashcard.description}
+                rating={flashcard.rating}
+                totalRating={flashcard.ratingCount}
+                id={flashcard._id}
+                instructor={flashcard.instructor}
+                enrolled={flashcard.enrolledStudents}
+                lessons={flashcard.lessons.length}
+              />
+            ))}
           </div>
+          {isSearching && filteredCourses.length === 0 && (
+            <div className="text-center py-8">
+              <p className="text-gray-500">No courses found matching your search.</p>
+            </div>
+          )}
         </div>
       </div>
     </>

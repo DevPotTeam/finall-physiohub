@@ -310,14 +310,15 @@ export default function AddLessons({ params }) {
                                   )}
                                 </div>
                               ) : (
-                                <div className="h-[200px] w-[100px]">
+                                <div className="h-[200px] w-full">
                                   <video
                                     src={formdata.contents[i].url}
-                                    height={300}
-                                    width={200}
+                                    height={100}
+                                    width={100}
                                     alt="cover-image"
                                     muted
                                     autoPlay
+                                    className="object-center h-full w-full"
                                   />
                                 </div>
                               )}

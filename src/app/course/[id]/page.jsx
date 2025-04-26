@@ -3,6 +3,7 @@ import useGet from '@/hooks/useGet';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 
 export default function CourseDetail({params}) {
     const {id} = React.use(params);
@@ -111,7 +112,13 @@ export default function CourseDetail({params}) {
             className="md:max-w-[70%] max-w-[95%] mx-auto p-4"
         >
             {/* Course Header */}
-            <motion.div variants={itemVariants} className="bg-white rounded-lg shadow-md overflow-hidden mb-6 p-5">
+            <div className="flex items-center gap-2">
+                <Link href={"/user/courses"} className="flex items-center gap-2">
+                    <ArrowLeft className="w-5 h-5 text-gray-700 cursor-pointer"/>
+                    <h2 className="text-lg font-semibold md:block hidden">Back</h2>
+                </Link>
+      </div>
+            <motion.div variants={itemVariants} className="bg-white rounded-lg shadow-md overflow-hidden mb-6 md:p-5 ">
                 <div className="md:flex">
                     <motion.div 
                         initial={{ opacity: 0, x: -20 }}
@@ -131,8 +138,8 @@ export default function CourseDetail({params}) {
                         transition={{ delay: 0.3 }}
                         className="p-6 md:w-2/3"
                     >
-                        <h1 className="text-2xl font-bold text-gray-800 mb-2">{course.title}</h1>
-                        <p className="text-gray-600 mb-4">{course.description}</p>
+                        <h1 className="md:text-2xl text-lg font-bold text-gray-800 mb-2">{course.title}</h1>
+                        <p className="text-gray-600 md:text-base text-sm mb-4">{course.description}</p>
                         <div className="flex items-center justify-between">
                             <div className="flex items-center">
                                 <div className="bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center">
@@ -184,7 +191,6 @@ export default function CourseDetail({params}) {
                             <button
                                 onClick={() => isAccessible && toggleLesson(lesson._id)}
                                 className={`w-full p-4 text-left flex justify-between items-center ${isCompleted ? 'bg-purple-50' : 'bg-white'}`}
-                                disabled={!isAccessible}
                             >
                                 <div className="flex items-center">
                                     <span className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 ${isCompleted ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
@@ -239,6 +245,7 @@ export default function CourseDetail({params}) {
                                               <div className="mt-3 bg-black rounded-lg overflow-hidden">
                                                 <video 
                                                   controls 
+                                                  
                                                   className="w-full"
                                                   poster="https://via.placeholder.com/800x450?text=Video+Thumbnail"
                                                   src={content.url}
@@ -254,10 +261,9 @@ export default function CourseDetail({params}) {
                                               <div className="mt-3 p-4 bg-gray-50 rounded-lg">
                                                 <div className="prose max-w-none">
                                                   <h5 className="text-gray-700 mb-2">Article Content Preview:</h5>
-                                                  <p className="text-gray-600">
-                                                    This would display the article content fetched from {content.url}.
-                                                    In a real implementation, you would fetch and render the article HTML here.
-                                                  </p>
+                                                  <a href={content.url} className="text-blue-600" target='_blank'>
+                                                    open link
+                                                  </a>
                                                 </div>
                                               </div>
                                             )}
@@ -271,16 +277,16 @@ export default function CourseDetail({params}) {
                                         ))}
                                       </div>
                                       
-                                      {!isCompleted && (
+                                      {/* {!isCompleted && (
                                         <motion.button
                                           whileHover={{ scale: 1.02 }}
                                           whileTap={{ scale: 0.98 }}
                                           onClick={() => completeLesson(lesson._id)}
-                                          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                          className="mt-4 bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors"
                                         >
                                           Mark as Complete
                                         </motion.button>
-                                      )}
+                                      )} */}
                                     </div>
                                   </motion.div>
                                 )}

@@ -1,5 +1,5 @@
 "use client";
-import { ArrowLeft, Flag } from "lucide-react";
+import { ArrowLeft, ArrowRight, Flag } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { FaCircleCheck } from "react-icons/fa6";
 import { RxCrossCircled } from "react-icons/rx";
@@ -191,6 +191,7 @@ export default function QuizCard({params}) {
     const correctAnswer = questions[currentQuestion].options.filter(option=> option.correctAnswer)
     if(correctAnswer){
       setCorrectAnswer(correctAnswer[0].value)
+      console.log(correctAnswer)
     }
     if (current.type === "checkbox") {
       const correctAnswers = current.options
@@ -269,27 +270,28 @@ export default function QuizCard({params}) {
       answers: userAnswers,
       completionTime: completionTimeInSeconds,
     };
+
+    const fetchResult =  async() => {
+      const { data, error, status } = await usePost(`/quizzes/generate-results/${id}`);
+      
+      if (status === 201 && Array.isArray(data)) {
+        const lastResult = data[0]; // get last object
+        setResult(lastResult);
+      }
+    }
     
       const {data, error, status} = await usePost(`/quizzes/submit-quiz/${id}`, finalPayload)
       if(status == 201){
-        const {data, error, status} = usePost("/users/attendance")
+        const {data, error, status} = await usePost("/users/attendance")
+        console.log(status) 
         if(status == 201){
           fetchResult()
         }
       }
-    
-  
   };
 
 
- const fetchResult =  async() => {
-    const { data, error, status } = await usePost(`/quizzes/generate-results/${id}`);
-    
-    if (status === 201 && Array.isArray(data)) {
-      const lastResult = data[data.length - 1]; // get last object
-      setResult(lastResult);
-    }
-  }
+ 
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg">
@@ -425,7 +427,7 @@ export default function QuizCard({params}) {
                     </label>
                   );
                 })}
-              {questions[currentQuestion]?.type == "text" && (
+              {questions[currentQuestion]?.type == "short-answer" && (
                 <div className="w-full">
                   <textarea
                     name=""
@@ -439,12 +441,12 @@ export default function QuizCard({params}) {
                   ></textarea>
                 </div>
               )}
-              {questions[currentQuestion]?.type == "checbox" &&
+              {questions[currentQuestion]?.type == "checkbox" &&
                 questions[currentQuestion]?.options.map((option) => (
                   <label
-                    key={option.id}
+                    key={option._id}
                     className={`flex items-center p-2 border rounded-lg cursor-pointer gap-2 ${
-                      multipleOptions.includes(option.id)
+                      multipleOptions.includes(option._id)
                         ? "bg-purple-50 border-[#6C4CE6]"
                         : "border-gray-300"
                     }`}
@@ -453,30 +455,30 @@ export default function QuizCard({params}) {
                       type="checkbox"
                       className="hidden"
                       onChange={() => {
-                        if (multipleOptions.includes(option.id)) {
+                        if (multipleOptions.includes(option._id)) {
                           setMultipleOptions(
-                            multipleOptions.filter((id) => id !== option.id)
+                            multipleOptions.filter((id) => id !== option._id)
                           );
                         } else {
-                          setMultipleOptions([...multipleOptions, option.id]);
+                          setMultipleOptions([...multipleOptions, option._id]);
                         }
                       }}
-                      checked={multipleOptions.includes(option.id)}
+                      checked={multipleOptions.includes(option._id)}
                       disabled={isAnswered}
                     />
                     <div
                       className={`py-1 px-3 rounded ${
-                        multipleOptions.includes(option.id)
+                        multipleOptions.includes(option._id)
                           ? "bg-[#6C4CE6] text-white"
                           : "bg-gray-100"
                       }`}
                     >
-                      {option.id}
+                      {option.value}
                     </div>
                     <div className="w-full flex justify-between">
                       <p className="text-sm font-semibold">{option.text}</p>
                       <span className="w-6 h-6 border-2 rounded flex items-center justify-center mr-3">
-                        {multipleOptions.includes(option.id) && (
+                        {multipleOptions.includes(option._id) && (
                           <span className="w-6 h-6 bg-[#6C4CE6] flex items-center justify-center rounded    ">
                             <IoIosCheckmark className="text-white text-2xl" />
                           </span>
@@ -669,37 +671,91 @@ export default function QuizCard({params}) {
         </>
       ) : (
         <>
-          <div className="flex justify-center items-center min-h-[80vh]">
-            <div className="w-full flex flex-col items-center">
-              <div className="sm:w-[150px] w-[100px] sm:h-[150px] h-[100px]">
-                <LottiePlayer animationFile={run} width="100%" height="100%" />
-              </div>
-              <h1 className="text-xl font-bold">Quiz complete!</h1>
-              <p>Here's a detailed report of your performance.</p>
-              <div className="md:w-[60%] w-[80%] gap-4 mt-10">
-                <div className="bg-[#EEF2F6] p-4 rounded-md">
-                  <img src="/CompletionBadge.png" alt="" className="justify-self-center"/>
-                  <h1 className="text-center">Completed Quiz</h1>
-                  <h3>Score : {result.score}</h3>
-                  <h3>Rank : {result.rank}</h3>
-                  <h3>Completed in : {result.completionTime}</h3>
-                  <h3>Correct answer : {result.correctAnswers}</h3>
-                  <h3>Incorrect answer : {result.incorrectAnswers}</h3>
-                </div>
-              </div>
-              <div className="flex justify-between items-center w-full mt-10">
-                <button className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100 flex items-center">
-                  Back <span className="sm:block hidden">&nbsp; to Dashboard</span>
-                </button>
-                <Link
-                  href={"/user/quizs"}
-                  className="px-4 py-2 sm:text-base text-sm cursor-pointer rounded-lg bg-[#6C4CE6] text-white flex items-center"
-                >
-                  Continue <span className="sm:block hidden">&nbsp; to next quiz</span>
-                </Link>
-              </div>
-            </div>
-          </div>
+          <div className="flex justify-center items-center min-h-[80vh] bg-gradient-to-br rounded-lg from-purple-50 to-blue-50">
+  <div className="w-full max-w-2xl flex flex-col items-center px-4 py-8">
+    {/* Celebration Animation */}
+    <div className="sm:w-[180px] w-[120px] sm:h-[180px] h-[120px] mb-6 animate-bounce">
+      <LottiePlayer animationFile={run} width="100%" height="100%" />
+    </div>
+
+    {/* Header */}
+    <h1 className="text-3xl font-bold text-purple-800 mb-2">Quiz Completed!</h1>
+    <p className="text-gray-600 mb-8">Your performance breakdown</p>
+
+    {/* Score Card */}
+    <div className="w-full bg-white rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-xl">
+      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4 text-center">
+        <img 
+          src="/CompletionBadge.png" 
+          alt="Achievement Badge" 
+          className="w-24 h-24 mx-auto mb-2 animate-pulse"
+        />
+        <h2 className="text-2xl font-bold text-white">Great Job!</h2>
+      </div>
+
+      <div className="p-6 grid grid-cols-2 gap-4">
+        <div className="bg-purple-50 p-4 rounded-lg">
+          <p className="text-sm text-purple-600 font-medium">Score</p>
+          <p className="text-3xl font-bold text-purple-800">{result.score}</p>
+        </div>
+        
+        <div className="bg-blue-50 p-4 rounded-lg">
+          <p className="text-sm text-blue-600 font-medium">Rank</p>
+          <p className="text-3xl font-bold text-blue-800">Top {result.rank}</p>
+        </div>
+        
+        <div className="bg-green-50 p-4 rounded-lg">
+          <p className="text-sm text-green-600 font-medium">Time</p>
+          <p className="text-xl font-bold text-green-800">{result.completionTime}</p>
+        </div>
+        
+        <div className="bg-yellow-50 p-4 rounded-lg">
+          <p className="text-sm text-yellow-600 font-medium">Accuracy</p>
+          <p className="text-xl font-bold text-yellow-800">
+            {Math.round((result.correctAnswers / (result.correctAnswers + result.incorrectAnswers)) * 100)}%
+          </p>
+        </div>
+      </div>
+    </div>
+
+    {/* Action Buttons */}
+    <div className="flex flex-col sm:flex-row gap-4 w-full mt-10 px-4">
+      <button 
+        className="px-6 py-3 border-2 border-purple-200 rounded-xl text-purple-700 hover:bg-purple-50 transition-all flex items-center justify-center gap-2 font-medium"
+      >
+        <ArrowLeft className="w-5 h-5" />
+        Back to Dashboard
+      </button>
+      
+      <Link
+        href={"/user/quizs"}
+        className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg transition-all flex items-center justify-center gap-2 font-medium"
+      >
+        Next Quiz
+        <ArrowRight className="w-5 h-5" />
+      </Link>
+    </div>
+
+    {/* Progress Visualization (Optional) */}
+    <div className="w-full mt-8 bg-white p-4 rounded-xl shadow">
+      <h3 className="font-medium text-gray-700 mb-3">Question Analysis</h3>
+      <div className="flex items-center gap-2">
+        <div 
+          className="h-4 bg-green-200 rounded-full" 
+          style={{ width: `${(result.correctAnswers / (result.correctAnswers + result.incorrectAnswers)) * 100}%` }}
+        ></div>
+        <div 
+          className="h-4 bg-red-200 rounded-full" 
+          style={{ width: `${(result.incorrectAnswers / (result.correctAnswers + result.incorrectAnswers)) * 100}%` }}
+        ></div>
+      </div>
+      <div className="flex justify-between mt-2 text-sm">
+        <span className="text-green-600">{result.correctAnswers} Correct</span>
+        <span className="text-red-600">{result.incorrectAnswers} Incorrect</span>
+      </div>
+    </div>
+  </div>
+</div>
         </>
       )}
     </div>

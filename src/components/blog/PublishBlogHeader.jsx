@@ -16,9 +16,9 @@ export default function PublishBlogHeader() {
         <h2 className="text-lg font-semibold">Blogs</h2>
       </div>
       <div className="flex items-center gap-4">
-        <Button className=" border-2 border-purple-600 bg-transparent hover:bg-purple-700 text-purple-600 hover:text-white px-4 py-2 rounded-lg">
+        {/* <Button className=" border-2 border-purple-600 bg-transparent hover:bg-purple-700 text-purple-600 hover:text-white px-4 py-2 rounded-lg">
           Save as Draft
-        </Button>
+        </Button> */}
         <Button className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg">
           <Upload/> Publish
         </Button>

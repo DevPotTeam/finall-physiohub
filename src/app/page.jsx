@@ -157,7 +157,7 @@ function Home() {
           </div>
 
           {/* Right Content */}
-          <div className="flex sm:flex-row flex-col justify-end gap-3 md:w-[50%] w-full md:mt-0 mt-10">
+          <div className="flex flex-row justify-end gap-3 md:w-[50%] w-full md:mt-0 mt-10">
             {/* First Column (takes max space) */}
             <div className="flex-1 flex flex-col justify-between items-end">
               <Card className="  md:max-w-[14rem] w-[11rem] rounded-[20px] shadow-md overflow-hidden mb-5 self-end">
@@ -190,7 +190,7 @@ function Home() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="md:w-[18rem] w-[15rem] rounded-[20px] bg-white shadow-md">
+              <Card className="md:w-[18rem] w-[12rem] rounded-[20px] bg-white shadow-md">
                 <CardContent className="flex flex-col justify-between">
                   <h3 className="text-[#1F1F1F] text-[16px] font-semibold mb-6">
                     Performance over time
@@ -220,7 +220,7 @@ function Home() {
             {/* Second Column (fits content) */}
             <div className="flex-none flex sm:mt-38 mt-10 justify-center text-center md:w-1/2 ">
               {/* Your content here */}
-              <Card className="md:w-[11rem] w-[10rem] rounded-[20px] shadow-md relative overflow-visible h-fit">
+              <Card className="md:w-[11rem] w-[7rem] rounded-[20px] shadow-md relative overflow-visible h-fit">
                 <div className="absolute -top-17 -right-10 -translate-x-1/2 z-10">
                   {/* <img
 
@@ -238,8 +238,8 @@ function Home() {
                   />
                 </div>
 
-                <CardContent className="flex flex-col items-center justify-center mt-4">
-                  <h3 className="text-[22px] font-semibold text-gray-800 mb-4 w-full">
+                <CardContent className="flex flex-col items-center justify-center md:mt-4 mt-2">
+                  <h3 className="md:text-[22px] text-[18px] font-semibold text-gray-800 mb-4 w-full">
                     Quiz Score
                   </h3>
 

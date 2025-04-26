@@ -9,11 +9,11 @@ export default function UpdateQuizHeader({ handleQuizUpdate, loading, id }) {
     <div className="  w-full mx-auto md:max-w-[80%] max-w-[95%] flex justify-between items-center p-4 rounded-lg">
       <div className="flex items-center gap-2">
         <Link href={`/teacher/quiz`}> <ArrowLeft className="w-5 h-5 text-gray-700 cursor-pointer" /></Link>
-        <h2 className="text-lg font-semibold">Update Quiz</h2>
+        <h2 className="font-semibold  md:text-base text-xs">Update Quiz</h2>
       </div>
       <div className="flex items-center gap-4">
         <Button
-          className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg"
+          className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg  md:text-base text-xs"
           onClick={(e) => handleQuizUpdate()}
         >
               <Upload /> Update

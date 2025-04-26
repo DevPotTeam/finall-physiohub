@@ -1,6 +1,6 @@
 'use client'
 
-import { LayoutGrid, MessageSquareText, FileText, BookCopy, ChevronDown, X, Settings, User } from "lucide-react";
+import { LayoutGrid, MessageSquareText, FileText, BookCopy, ChevronDown, X, Settings, User, Book, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -26,14 +26,14 @@ const Sidebar = ({onClose}) => {
             <div className="flex flex-col w-64 bg-white shadow-xl sm:w-[100%] md:w-[fit-content]">
                 <div className="flex flex-col w-[100%] justify-center items-center">
                     <div className="flex flex-col justify-center w-[100%] border-b h-[80px] pl-6 pr-6">
-                        <div className="flex justify-between h-[fit-content] ">
+                        <div className="flex items-center justify-between h-[fit-content] ">
                             <div className="flex flex-col justify-cente items-center">
                                 <Link href={"/"}>
-                                <img src={"/logo-on-light.png"} className="md:hidden lg:block w-50 sm:w-50" />
+                                <img src={"/logo-on-light.png"} className="md:hidden lg:block w-30 sm:w-50" />
                                 </Link>
                             </div>
                             <div className="sm:block lg:hidden md:hidden flex flex-col justify-cente items-center">
-                                <X size={30} onClick={onClose}/>
+                                <X size={25} onClick={onClose}/>
                             </div>
                         </div>
                         <Link href={"/"}>
@@ -45,15 +45,15 @@ const Sidebar = ({onClose}) => {
                 <div className="mt-10 pl-5 pr-5">
 
                     <button
-                        onClick={() => handleSelect('course')}
+                        onClick={() =>{ handleSelect('course'); onClose()}}
                         className={`mb-4 flex items-center md:space-x-0 lg:space-x-2 space-x-2 text-sm cursor-pointer font-semibold p-4 rounded-lg w-full ${pathname === '/teacher/course' ? 'bg-[#F6F9FC] text-[#7240FD]' : 'hover:bg-[#F6F9FC] hover:text-[#7240FD] text-[#687494]'}`}
                     >
-                        <MessageSquareText size={24} /> {/* Increased size for the icon */}
+                        <BookOpen size={24} /> {/* Increased size for the icon */}
                         <span className="md:hidden lg:block">Course</span>
                     </button>
 
                     <button
-                        onClick={() => handleSelect('quiz')}
+                        onClick={() =>{ handleSelect('quiz'); onClose()}}
                         className={`mb-4 flex items-center md:space-x-0 lg:space-x-2 space-x-2 text-sm cursor-pointer font-semibold p-4 rounded-lg w-full ${pathname === '/teacher/quiz' ? 'bg-[#F6F9FC] text-[#7240FD]' : 'hover:bg-[#F6F9FC] hover:text-[#7240FD] text-[#687494]'}`}
                     >
                         <MessageSquareText size={24} /> {/* Increased size for the icon */}
@@ -61,7 +61,7 @@ const Sidebar = ({onClose}) => {
                     </button>
 
                     <button
-                        onClick={() => handleSelect('flashCard')}
+                        onClick={() =>{ handleSelect('flashCard'); onClose()}}
                         className={`mb-4 flex items-center md:space-x-0 lg:space-x-2 space-x-2 text-sm cursor-pointer font-semibold p-4 rounded-lg w-full ${pathname === '/teacher/flashCard' ? 'bg-[#F6F9FC] text-[#7240FD]' : 'hover:bg-[#F6F9FC] hover:text-[#7240FD] text-[#687494]'}`}
                     >
                         <BookCopy size={24} /> {/* Increased size for the icon */}

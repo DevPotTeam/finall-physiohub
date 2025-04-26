@@ -9,8 +9,18 @@ import { useEffect, useState } from "react";
 
 export default function VerifyEmail() {
   const [email, setEmail] = useState("");
+  const [otpType, setOtpType] = useState("verify")
   const [isValid, setIsValid] = useState("");
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
   const router = useRouter();
+  useEffect(()=>{
+    const otptype = localStorage.getItem("otptype")
+    
+    if(otptype){
+      setOtpType(otptype)
+    }
+  },[])
 
   const handleInputChange = (e) => {
     const newEmail = e.target.value;
@@ -21,17 +31,37 @@ export default function VerifyEmail() {
   };
 
   const handleVerify = async(e) => {
+    setLoading(true)
     e.preventDefault();
-      const {data, error, status} = await usePost(`/auth/forgot-password`, {"email" : email} )
-      if(data){
+    console.log(otpType)
+    if(otpType == "varify"){
+      console.log("called")
+      const {data, error, status} = await usePost(`/auth/send-email-otp`, {"email" : email} )
+      if(status == 201){
         router.push(`/auth/verify-otp`)
       }
+      if(error){
+        setLoading(false)
+        setError(error)
+      }
+    }
+
+    if(otpType == "forgot"){
+      const {data, error, status} = await usePost(`/auth/forgot-password`, {"email" : email} )
+      if(status == 201){
+        router.push(`/auth/verify-otp`)
+      }
+      if(error){
+        setError(error)
+        setLoading(false)
+      }
+    }
   };
 
 
   return (
     <>
-      <section className="relative bg-white py-12 md:py-16">
+      <section className="relative bg-white sm:py-12 md:py-16">
         <div className="container mx-auto relative z-10">
           <div
             className="flex justify-center"
@@ -87,18 +117,18 @@ export default function VerifyEmail() {
                     OTP will be sent to this email
                   </p>
                 </div>
-
+                    {error&&<p className="text-red-500 my-5">{error}</p>}
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  disabled={!isValid}
+                  disabled={!isValid||loading}
                   className={`w-full py-2 px-4 rounded-md text-white font-medium transition duration-200 ${
-                    isValid
+                    isValid || loading
                       ? "bg-[#7041FA] hover:bg-[#5c3ed2da] cursor-pointer"
                       : "bg-[#a385ff] cursor-not-allowed"
                   }`}
                 >
-                  Send OTP
+                  {loading ? "Sending...":"Send OTP"}
                 </button>
               </form>
             </div>

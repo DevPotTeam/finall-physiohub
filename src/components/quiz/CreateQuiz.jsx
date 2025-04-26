@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import {
   ChevronDown,
   ChevronUp,
@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import usePost from "@/hooks/usePost";
 import useImagePost from "@/hooks/useImagePost";
 import Image from "next/image";
+import useGet from "@/hooks/useGet";
 
 const QuestionType = {
   ShortAnswer: "short-answer",
@@ -28,17 +29,18 @@ const QuestionType = {
 
 export default function CreateQuiz({ setShowInQuiz }) {
   const fileInputRef = useRef(null);
+  const [notification, setNotification] = useState(null);
   const [error, setError] = useState("");
   const router = useRouter();
+  const [topics, setTopics] = useState([]);
   const [quizData, setQuizData] = useState({
     title: "",
     startTime: "",
     endTime: "",
     mainTopic: "",
-    subTopics: [],
+    // subTopics: [],
     quizStatus: "draft",
-    coverImage: null,
-    thumbnail: null,
+    banner: null,
   });
 
   const [questions, setQuestions] = useState([
@@ -62,6 +64,21 @@ export default function CreateQuiz({ setShowInQuiz }) {
   const [thumbnailImageLoading, setThumbnialImageLoading] = useState(false);
   const [questionImageLoading, setQuestionImageLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const showToast = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000);
+  };
+
+  const fetchTopics = async () => {
+    const { data, error, status } = await useGet(`/main-topics/`);
+    if (status === 200) {
+      setTopics(data);
+    }
+  };
+  useEffect(()=>{
+    fetchTopics()
+  },[])
 
   const handleQuizChange = (e) => {
     const { name, value } = e.target;
@@ -111,6 +128,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
   };
 
   const handleQuestionChange = (index, field, value) => {
+    console.log(value)
     const updatedQuestions = [...questions];
     updatedQuestions[index][field] = value;
     setQuestions(updatedQuestions);
@@ -122,18 +140,45 @@ export default function CreateQuiz({ setShowInQuiz }) {
     setQuestions(updatedQuestions);
   };
 
+  const handleTextAnswerChange = (questionIndex, value) => {
+    setQuestions(prevQuestions => {
+      return prevQuestions.map((q, idx) => {
+        if (idx === questionIndex) {
+          return {
+            ...q,
+            options: [
+              { 
+                type: "text", 
+                value: value, 
+                correctAnswer: true // Assuming short answer is always correct
+              },
+              // Keep other options if needed, or empty them
+              ...q.options.slice(1).map(opt => ({ ...opt, correctAnswer: false }))
+            ],
+          };
+        }
+        return q;
+      });
+    });
+  };
+
   const handleCorrectAnswerChange = (questionIndex, optionIndex) => {
     const updatedQuestions = [...questions];
-    // For radio type, only one correct answer allowed
-    if (updatedQuestions[questionIndex].type === QuestionType.Radio) {
-      updatedQuestions[questionIndex].options.forEach((opt, idx) => {
-        opt.correctAnswer = idx === optionIndex;
+    const currentQuestion = updatedQuestions[questionIndex];
+    
+    if (currentQuestion.type === QuestionType.Radio) {
+      // For radio type, only one correct answer allowed
+      currentQuestion.options.forEach((option, idx) => {
+        option.correctAnswer = idx === optionIndex;
       });
-    } else {
-      // For checkbox type, multiple correct answers allowed
-      updatedQuestions[questionIndex].options[optionIndex].correctAnswer =
-        !updatedQuestions[questionIndex].options[optionIndex].correctAnswer;
+    } else if (currentQuestion.type === QuestionType.Checkbox) {
+      // For checkbox type, toggle the selected option
+      currentQuestion.options[optionIndex].correctAnswer = 
+        !currentQuestion.options[optionIndex].correctAnswer;
     }
+    // For other types (short answer, dropdown), no correct answer needed
+    // or implement specific logic if required
+
     setQuestions(updatedQuestions);
   };
 
@@ -141,7 +186,6 @@ export default function CreateQuiz({ setShowInQuiz }) {
     if (name === "thumbnail") setThumbnialImageLoading(true);
     if (name === "coverImage") setCoverImageLoading(true);
 
-    // Support both input events and FileList directly
     const file = eOrFiles.target?.files?.[0] || eOrFiles[0];
     if (!file) return;
 
@@ -165,8 +209,6 @@ export default function CreateQuiz({ setShowInQuiz }) {
     event.preventDefault();
     if (event.dataTransfer && event.dataTransfer.files) {
       handleUpload(event.dataTransfer.files, name);
-    } else {
-      console.warn("No files found in drop event");
     }
   };
 
@@ -176,8 +218,6 @@ export default function CreateQuiz({ setShowInQuiz }) {
 
   const handleQuestionImageUpload = async (eOrFiles, index) => {
     setQuestionImageLoading(true);
-
-    // Support both input events and FileList directly
     const file = eOrFiles.target?.files?.[0] || eOrFiles[0];
     if (!file) return;
 
@@ -190,7 +230,6 @@ export default function CreateQuiz({ setShowInQuiz }) {
     );
 
     if (data) {
-      // Update the specific question's image URL
       setQuestions((prevQuestions) => {
         const updatedQuestions = [...prevQuestions];
         updatedQuestions[index] = {
@@ -200,17 +239,13 @@ export default function CreateQuiz({ setShowInQuiz }) {
         return updatedQuestions;
       });
     }
-
     setQuestionImageLoading(false);
-    
   };
 
   const handleQuestionImageDrop = (event, index) => {
     event.preventDefault();
     if (event.dataTransfer && event.dataTransfer.files) {
-      handleUpload(event.dataTransfer.files, name);
-    } else {
-      console.warn("No files found in drop event");
+      handleQuestionImageUpload(event.dataTransfer.files, index);
     }
   };
 
@@ -223,9 +258,6 @@ export default function CreateQuiz({ setShowInQuiz }) {
     setLoading(true);
 
     try {
-
-
-      // Prepare quiz data for API
       const quizPayload = {
         title: quizData.title,
         startTime: quizData.startTime,
@@ -235,37 +267,38 @@ export default function CreateQuiz({ setShowInQuiz }) {
         status: quizData.quizStatus,
         coverImage: quizData.coverImage,
         thumbnail: quizData.thumbnail,
-        questions : questions.map((q)=>({
-          question : q.question,
-          image : q.image,
-          type : q.type,
-          describe : q.description,
-          options : q.options
+        questions: questions.map((q) => ({
+          question: q.question,
+          image: q.image,
+          type: q.type,
+          description: q.description,
+          options: q.options
         }))
       };
+      console.log(quizPayload)
 
-      // Send to API
-      const { data, error, status } = await usePost(
-        "/quizzes/create",
-        quizPayload
-      );
+      const { data, error, status } = await usePost("/quizzes/create", quizPayload);
       if (status == 201) {
-        setShowInQuiz("Quizs");
+        setTimeout(() => {
+          setShowInQuiz("Quizs");
+        }, 2000);
+        showToast("Quiz Created Successfully", "success")
       }
       if (error) {
-        setError(error[0]);
+        showToast(error[0], "error")
       }
     } catch (error) {
-      console.error("Error creating quiz:", error);
+      showToast(error[0], "error")
     } finally {
       setLoading(false);
     }
   };
 
+
+
   return (
     <>
-      <PublishQuizHeader handleSubmit={handleSubmit} loading={loading} />
-      {error && <p className="text-red-500 mb-3">{error}</p>}
+      <PublishQuizHeader handleSubmit={handleSubmit} loading={loading} setShowInQuiz={setShowInQuiz}/>
       <div className="p-6 bg-white rounded-lg shadow-md w-full mx-auto md:max-w-[80%] max-w-[95%]">
         {/* Quiz Title */}
         <div className="mb-4">
@@ -305,13 +338,11 @@ export default function CreateQuiz({ setShowInQuiz }) {
 
         {/* Cover Image Upload */}
         <div className="mb-4">
-          <label className="block text-gray-700 font-semibold">
-            Cover Image
-          </label>
+          <label className="block text-gray-700 font-semibold">Cover Image</label>
           {!quizData.coverImage ? (
             <div
-              className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500 "
-              onDrop={handleDrop}
+              className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500"
+              onDrop={(e) => handleDrop(e, "banner")}
               onDragOver={handleDragOver}
             >
               {coverImageLoading ? (
@@ -319,7 +350,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
               ) : (
                 <label className="ud-btn btn-white text-center cursor-pointer">
                   <div className="icon mb5">
-                    <Upload className="w-6 h-6 mb-2 text-purple-600 justify-self-center " />
+                    <Upload className="w-6 h-6 mb-2 text-purple-600 justify-self-center" />
                   </div>
                   <h4 className="title fz17 mb1">
                     Upload/Drag photos of your Quiz Cover Image
@@ -330,14 +361,9 @@ export default function CreateQuiz({ setShowInQuiz }) {
                   Browse Files
                   <input
                     ref={fileInputRef}
-                    id="fileInput"
                     type="file"
-                    name="images"
-                    multiple
                     className="ud-btn btn-white"
-                    onChange={(e) => {
-                      handleUpload(e, "coverImage");
-                    }}
+                    onChange={(e) => handleUpload(e, "banner")}
                     style={{ display: "none" }}
                     required
                   />
@@ -356,56 +382,6 @@ export default function CreateQuiz({ setShowInQuiz }) {
           )}
         </div>
 
-        {/* Thumbnail Upload */}
-        <div className="mb-4">
-          <label className="block text-gray-700 font-semibold">Thumbnail</label>
-          {!quizData.thumbnail ? (
-            <div
-              className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500 "
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-            >
-              {thumbnailImageLoading ? (
-                <div className="w-12 h-12 border-4 border-t-purple-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div>
-              ) : (
-                <label className="ud-btn btn-white text-center cursor-pointer">
-                  <div className="icon mb5">
-                    <Upload className="w-6 h-6 mb-2 text-purple-600 justify-self-center " />
-                  </div>
-                  <h4 className="title fz17 mb1">
-                    Upload/Drag photos of your Quiz Thumbnail
-                  </h4>
-                  <p className="text fz-10 mb10">
-                    Photos must be JPEG or PNG format and at least 2048x768
-                  </p>
-                  Browse Files
-                  <input
-                    ref={fileInputRef}
-                    id="fileInput"
-                    type="file"
-                    name="images"
-                    multiple
-                    className="ud-btn btn-white"
-                    onChange={(e) => {
-                      handleUpload(e, "thumbnail");
-                    }}
-                    style={{ display: "none" }}
-                    required
-                  />
-                </label>
-              )}
-            </div>
-          ) : (
-            <div>
-              <Image
-                src={quizData.thumbnail}
-                height={400}
-                width={200}
-                alt="cover-image"
-              />
-            </div>
-          )}
-        </div>
 
         {/* Quiz and Card Topic Selection */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -418,12 +394,12 @@ export default function CreateQuiz({ setShowInQuiz }) {
               className="w-full"
             >
               <option value="">Choose category</option>
-              <option value="67e83532d7db5610a12b895b">History</option>
-              <option value="67e83532d7db5610a12b895c">Geography</option>
-              <option value="67e83532d7db5610a12b895d">Science</option>
+              {topics.map((topic) => (
+                <option value={topic._id}>{topic.name}</option>
+              ))}
             </Select>
           </div>
-          <div>
+          {/* <div>
             <label className="block text-gray-700">Sub Topics</label>
             <Select
               name="subTopics"
@@ -438,7 +414,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
               <option value="67e8354fd7db5610a12b895e">Countries</option>
               <option value="67e8354fd7db5610a12b895f">Biology</option>
             </Select>
-          </div>
+          </div> */}
         </div>
 
         {/* Questions Section */}
@@ -474,16 +450,16 @@ export default function CreateQuiz({ setShowInQuiz }) {
                     </label>
                     {!q?.image ? (
                       <div
-                        className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500 "
-                        onDrop={(e)=>{handleQuestionImageDrop(e, index)}}
-                        onDragOver={(e)=>{handleQuestionImageDragOver(e, index)}}
+                        className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500"
+                        onDrop={(e) => handleQuestionImageDrop(e, index)}
+                        onDragOver={handleQuestionImageDragOver}
                       >
                         {questionImageLoading ? (
                           <div className="w-12 h-12 border-4 border-t-purple-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div>
                         ) : (
                           <label className="ud-btn btn-white text-center cursor-pointer">
                             <div className="icon mb5">
-                              <Upload className="w-6 h-6 mb-2 text-purple-600 justify-self-center " />
+                              <Upload className="w-6 h-6 mb-2 text-purple-600 justify-self-center" />
                             </div>
                             <h4 className="title fz17 mb1">
                               Upload/Drag photos of your Question
@@ -491,14 +467,9 @@ export default function CreateQuiz({ setShowInQuiz }) {
                             Browse Files
                             <input
                               ref={fileInputRef}
-                              id="fileInput"
                               type="file"
-                              name="images"
-                              multiple
                               className="ud-btn btn-white"
-                              onChange={(e) => {
-                                handleQuestionImageUpload(e, index);
-                              }}
+                              onChange={(e) => handleQuestionImageUpload(e, index)}
                               style={{ display: "none" }}
                               required
                             />
@@ -511,7 +482,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
                           src={q.image}
                           height={400}
                           width={200}
-                          alt="cover-image"
+                          alt="question-image"
                         />
                       </div>
                     )}
@@ -572,14 +543,22 @@ export default function CreateQuiz({ setShowInQuiz }) {
                           <label className="text-sm">Correct</label>
                           <Switch
                             checked={option.correctAnswer}
-                            onCheckedChange={() =>
+                            onChange={() =>
                               handleCorrectAnswerChange(index, idx)
                             }
                           />
                         </div>
                       ))}
-                    </div>
-                  )}
+                    </div>)
+                  }
+                  {q.type == "short-answer"&&<Textarea
+                      placeholder="Write Answer here..."
+                      value={q[index]?.options[0]?.value} 
+                      onChange={(e) =>
+                        handleTextAnswerChange(index, e.target.value)
+                      }
+                      className="mt-4"
+                    />}
 
                   {/* Explanation */}
                   <Textarea
@@ -604,24 +583,18 @@ export default function CreateQuiz({ setShowInQuiz }) {
           </Button>
         </div>
 
-        {/* Submit Buttons */}
-        {/* <div className="flex justify-end gap-4 mt-6">
-          <Button 
-            type="button" 
-            onClick={(e) => handleSubmit(e, 'draft')} 
-            disabled={loading}
-            variant="outline"
+        {notification && (
+          <div
+            className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${
+              notification.type === "error" ? "bg-red-500" : "bg-green-500"
+            } text-white`}
           >
-            {loading ? 'Saving...' : 'Save as Draft'}
-          </Button>
-          <Button 
-            type="button" 
-            onClick={(e) => handleSubmit(e, 'published')} 
-            disabled={loading}
-          >
-            {loading ? 'Publishing...' : 'Publish Quiz'}
-          </Button>
-        </div> */}
+            {notification.message}
+            <button onClick={() => setNotification(null)} className="ml-4 text-xl">
+              ×
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

@@ -36,7 +36,6 @@ import { useRouter } from "next/navigation";
 const QuizCard = ({ imageSrc, title, questions, cards, time, id }) => {
   const [notification, setNotification] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const router = useRouter();
 
   const showToast = (message, type = 'success') => {
@@ -52,7 +51,6 @@ const QuizCard = ({ imageSrc, title, questions, cards, time, id }) => {
       router.push(`/quiz/${id}`);
     }
     if (error) {
-      setError(error);
       showToast(error, "error")
       setLoading(false);
     }
@@ -93,7 +91,7 @@ const QuizCard = ({ imageSrc, title, questions, cards, time, id }) => {
       </div>
       {notification && (
           <div
-            className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${
+            className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg z-50 ${
               notification.type === "error" ? "bg-red-500" : "bg-green-500"
             } text-white`}
           >
@@ -108,36 +106,73 @@ const QuizCard = ({ imageSrc, title, questions, cards, time, id }) => {
 };
 
 export default function Quizs() {
-  
-  const [articles, setArticles] = useState([]);
+  const [quizzes, setQuizzes] = useState([]);
+  const [filteredQuizzes, setFilteredQuizzes] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+
   const fetchQuizs = async () => {
     const { data, error, status } = await useGet(`/quizzes`);
-    setArticles(data);
+    if (status === 200) {
+      setQuizzes(data || []);
+      setFilteredQuizzes(data || []);
+    }
   };
+
   useEffect(() => {
     fetchQuizs();
   }, []);
+
+  // Filter quizzes based on search term
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setIsSearching(false);
+      setFilteredQuizzes(quizzes);
+    } else {
+      setIsSearching(true);
+      const filtered = quizzes.filter(quiz => {
+        const quizTitle = quiz.title?.toLowerCase() || '';
+        const quizDescription = quiz.description?.toLowerCase() || '';
+        const search = searchTerm.toLowerCase();
+        
+        return (
+          quizTitle.includes(search) || 
+          quizDescription.includes(search)
+        );
+      });
+      setFilteredQuizzes(filtered);
+    }
+  }, [searchTerm, quizzes]);
+
   return (
-    <>
-      <div className="mt-4 w-full mx-auto md:max-w-[80%] max-w-[95%]">
-        <div className="flex flex-col">
-          <h6 className="font-semibold text-3xl">All Quiz</h6>
-          <p className="my-2">Checkout our quiz, and test your skills.</p>
-          <Input className="max-w-96" placeholder="Search" />
-          <div className="grid xl:grid-cols-3 sm:grid-cols-2 gap-4 mt-4 ">
-            {articles?.map((quiz) => (
-              <QuizCard
-                key={quiz._id}
-                imageSrc={"/auth-activity.png"}
-                title={quiz.title}
-                questions={quiz.questions.length}
-                id={quiz._id}
-              />
-            ))}
-          </div>
+    <div className="mt-4 w-full mx-auto md:max-w-[80%] max-w-[95%]">
+      <div className="flex flex-col">
+        <h6 className="font-semibold text-3xl">All Quizzes</h6>
+        <p className="my-2">Checkout our quizzes, and test your skills.</p>
+        <Input 
+          className="max-w-96" 
+          placeholder="Search by quiz title or description"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <div className="grid xl:grid-cols-3 sm:grid-cols-2 gap-4 mt-4">
+          {(isSearching ? filteredQuizzes : quizzes)?.map((quiz) => (
+            <QuizCard
+              key={quiz._id}
+              imageSrc={quiz.banner}
+              title={quiz.title}
+              questions={quiz.questions?.length || 0}
+              id={quiz._id}
+            />
+          ))}
         </div>
         
+        {isSearching && filteredQuizzes.length === 0 && (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No quizzes found matching your search.</p>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }
