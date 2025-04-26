@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Rating } from "@mui/material";
 
-function Flashcard({flashCardData, length, currentCard}) {
+function Flashcard({ flashCardData, length, currentCard }) {
   const [showHint, setShowHint] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -27,16 +27,18 @@ function Flashcard({flashCardData, length, currentCard}) {
   };
   return (
     <>
-      <div className=" bg-white rounded-xl shadow border border-gray-200 p-4 space-y-3">
+      <div className=" bg-white rounded-xl shadow border border-gray-200 p-4 space-y-3" >
         {/* Top Label */}
         <div className="flex items-center justify-baseline gap-5 w-full">
-        <p className="text-sm text-gray-500 font-medium uppercase">Card {currentCard + 1} of {length}</p>
-        <p className="text-sm text-gray-500 font-medium uppercase">
-          Topic :{" "}
-          <span className="text-gray-600 font-semibold ">
-            {flashCardData?.subject}
-          </span>
-        </p>
+          <p className="text-sm text-gray-500 font-medium uppercase">
+            Card {currentCard + 1} of {length}
+          </p>
+          <p className="text-sm text-gray-500 font-medium uppercase">
+            Topic :{" "}
+            <span className="text-gray-600 font-semibold ">
+              {flashCardData?.subject}
+            </span>
+          </p>
         </div>
 
         <div
@@ -46,12 +48,15 @@ function Flashcard({flashCardData, length, currentCard}) {
           <div className="flashcard-inner">
             <div className="flashcard-front relative">
               {/* Your existing front content */}
-              <div className="bg-indigo-50 rounded-lg p-6 min-h-[350px] ">
+              <div className="bg-black-50 rounded-lg" style={{backgroundImage : flashCardData.frontImage}}>
                 <div className="absolute top-3 left-3 flex items-center gap-2">
-                  <Volume2 className="w-5 h-5 text-gray-500 cursor-pointer"  onClick={(e) => {
-    e.stopPropagation(); // prevent flip
-    speakText(flashCardData?.frontContent); // or backContent
-  }}/>
+                  <Volume2
+                    className="w-5 h-5 text-gray-500 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation(); // prevent flip
+                      speakText(flashCardData?.frontContent); // or backContent
+                    }}
+                  />
                   <div
                     className="relative inline-block"
                     onMouseEnter={() => setShowHint(true)}
@@ -81,12 +86,15 @@ function Flashcard({flashCardData, length, currentCard}) {
             </div>
             <div className="flashcard-back relative">
               {/* Back side content */}
-              <div className="bg-indigo-50 rounded-lg p-6 min-h-[350px] ">
+              <div className="bg-indigo-50 rounded-lg min-h-[350px] ">
                 <div className="absolute top-3 left-3 flex items-center gap-2">
-                  <Volume2 className="w-5 h-5 text-gray-500 cursor-pointer"  onClick={(e) => {
-    e.stopPropagation(); // prevent flip
-    speakText(flashCardData?.backContent); // or backContent
-  }}/>
+                  <Volume2
+                    className="w-5 h-5 text-gray-500 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation(); // prevent flip
+                      speakText(flashCardData?.backContent); // or backContent
+                    }}
+                  />
                   <div
                     className="relative inline-block"
                     onMouseEnter={() => setShowHint(true)}
@@ -146,51 +154,53 @@ function Flashcard({flashCardData, length, currentCard}) {
 
       {/* {confidence level} */}
       <div className=" bg-white rounded-xl shadow border border-gray-200 p-4 space-y-4 flex md:flex-row flex-col items-center justify-between">
-          <p className="text-lg font-medium text-gray-700">Confidence Level</p>
-          <div className="flex gap-3">
-            {[
-              { text: "Low", bg: "bg-[#FF4D4D]" },
-              { text: "Medium", bg: "bg-[#FFBF1B]" },
-              { text: "High", bg: "bg-[#4CDBC8]" },
-            ].map((level, index) => (
-              <button
-                key={index}
-                className={`px-4 py-1.5 rounded-lg border text-sm font-medium  ${
-                  flashCardData?.confidenceLevel == level.text.toLowerCase()
-                    ? `${level.bg} text-white`
-                    : "bg-transparent text-black"
-                }`}
-              >
-                {level.text}
-              </button>
-            ))}
-          </div>
+        <p className="text-lg font-medium text-gray-700">Confidence Level</p>
+        <div className="flex gap-3">
+          {[
+            { text: "Low", bg: "bg-[#FF4D4D]" },
+            { text: "Medium", bg: "bg-[#FFBF1B]" },
+            { text: "High", bg: "bg-[#4CDBC8]" },
+          ].map((level, index) => (
+            <button
+              key={index}
+              className={`px-4 py-1.5 rounded-lg border text-sm font-medium  ${
+                flashCardData?.confidenceLevel == level.text.toLowerCase()
+                  ? `${level.bg} text-white`
+                  : "bg-transparent text-black"
+              }`}
+            >
+              {level.text}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* {rating card} */}
+      <div className="bg-white rounded-xl shadow border border-gray-200 p-4 space-y-4 flex md:flex-row flex-col items-center justify-between   ">
+        {/* Left: Verified */}
+        <div className="flex items-center gap-2 text-sm text-gray-700 font-medium">
+          <Verified className="text-blue-500" />
+          Verified by Admin
         </div>
 
-        {/* {rating card} */}
-        <div className="bg-white rounded-xl shadow border border-gray-200 p-4 space-y-4 flex md:flex-row flex-col items-center justify-between   ">
-          {/* Left: Verified */}
-          <div className="flex items-center gap-2 text-sm text-gray-700 font-medium">
-            <Verified className="text-blue-500" />
-            Verified by Admin
+        {/* Right: Rating */}
+        <div className="flex items-center gap-2">
+          <span className="text-2xl font-semibold text-gray-900">
+            {flashCardData.rating}
+          </span>
+          <div className="flex text-orange-400">
+            <Rating
+              name="simple-controlled"
+              value={flashCardData.rating ?? 0}
+              readOnly
+            />
           </div>
-
-          {/* Right: Rating */}
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-semibold text-gray-900">{flashCardData.rating}</span>
-            <div className="flex text-orange-400">
-              <Rating
-                name="simple-controlled"
-                value={flashCardData.rating ?? 0}
-                readOnly
-              />
-            </div>
-            <span className="text-sm text-gray-500">
-              {flashCardData?.ratingCount} Ratings
-            </span>
-            <span className="text-gray-400 text-sm ml-2">›</span>
-          </div>
+          <span className="text-sm text-gray-500">
+            {flashCardData?.ratingCount} Ratings
+          </span>
+          <span className="text-gray-400 text-sm ml-2">›</span>
         </div>
+      </div>
     </>
   );
 }

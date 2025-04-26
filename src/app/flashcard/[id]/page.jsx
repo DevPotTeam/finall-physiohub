@@ -112,16 +112,16 @@ const Flashcard = () => {
             <Flag size={16} />
             Report
           </button>
-          <div className="space-x-4 flex sm:justify-end justify-between md:w-auto w-full">
+          <div className="md:space-x-4 space-x-2 flex justify-end md:w-auto w-full">
             <button
-              className={`px-4 py-2 rounded-lg text-white bg-gray-400 ${currentCard === 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              className={`md:px-4 px-2 md:text-base text-sm py-2 rounded-lg text-white bg-gray-400 ${currentCard === 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               onClick={handleBack}
               disabled={currentCard === 0}
             >
               Previous Card
             </button>
             <button
-              className={`px-4 py-2 rounded-lg text-white bg-[#6C4CE6] ${currentCard === filteredFlashcards.length - 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              className={`md:px-4 px-2 md:text-base text-sm py-2 rounded-lg text-white bg-[#6C4CE6] ${currentCard === filteredFlashcards.length - 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               onClick={handleNext}
               disabled={currentCard === filteredFlashcards.length - 1}
             >

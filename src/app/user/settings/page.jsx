@@ -16,6 +16,7 @@ const Settings = () => {
   const [uploading, setUploading] = useState(false);
   const [marketingEmails, setMarketingEmails] = useState(true);
   const [reminders, setReminders] = useState(true);
+  const [userId, setUserId] = useState("")
   const [formData, setFormData] = useState({
     name: "",
     mobileNumber: "",
@@ -33,8 +34,9 @@ const Settings = () => {
   };
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"))
     const fetchUserData = async () => {
+      const user = JSON.parse(localStorage.getItem("user"))
+      setUserId(user.id)
       try {
         const response = await axios.get(`${api_url}/users/fetchUserById/${user.id}`);
         setUserData(response.data.data);
@@ -88,6 +90,7 @@ const Settings = () => {
   };
 
   const handleSubmit = async (e) => {
+    const user = JSON.parse(localStorage.getItem("user"))
     e.preventDefault();
     try {
       setSaving(true);
@@ -102,7 +105,14 @@ const Settings = () => {
         state: formData.state
       });
       showToast("Profile updated successfully");
+      const localUser = JSON.parse(localStorage.getItem("user"))
+      localStorage.removeItem("user")
+      localStorage.setItem("user", JSON.stringify({email : formData.email, name : formData.name, role : localUser.role, id: localUser.id, isEmailVerified : localUser.isEmailVerified}))
+      setTimeout(() => {
+        window.location.reload()
+      }, 2000);
     } catch (error) {
+      console.log(error)
       showToast("Failed to update profile", 'error');
     } finally {
       setSaving(false);
@@ -122,7 +132,7 @@ const Settings = () => {
   }
 
   return (
-    <div className="md:w-[80%] w-[95%] mx-auto p-6 bg-white shadow-md rounded-lg mt-6">
+    <div className="md:w-[80%] w-[95%] mx-auto md:p-6 p-4 bg-white shadow-md rounded-lg mt-6">
       <h1 className="text-2xl font-semibold mb-6 border-b pb-4">Settings</h1>
 
       <form onSubmit={handleSubmit}>
@@ -255,23 +265,27 @@ const Settings = () => {
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Marketing Emails</p>
-              <p className="text-sm text-gray-500">Notifications about product updates, company notes, etc.</p>
+              <p className="text-sm text-gray-500">Notifications about <br className="md:hidden block"/> product updates, company notes, etc.</p>
             </div>
+            <div className="">
             <Switch 
               checked={marketingEmails}
               onCheckedChange={setMarketingEmails}
             />
+            </div>
           </div>
 
           <div className="flex items-center justify-between py-3 border-b">
             <div>
               <p className="font-medium">Reminders / General</p>
-              <p className="text-sm text-gray-500">Reminders to encourage you to keep studying</p>
+              <p className="text-sm text-gray-500">Reminders to encourage you <br className="md:hidden block"/> to keep studying</p>
             </div>
+            <div className="">
             <Switch 
               checked={reminders}
               onCheckedChange={setReminders}
             />
+            </div>
           </div>
         </div>
 

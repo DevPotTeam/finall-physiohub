@@ -85,8 +85,9 @@ export default function LoginPage() {
     } catch (error) {
       const errMsg = error.response?.data?.errorMessage?.message;
       setApiError(errMsg);
-    } finally {
       setLoading(false);
+    } finally {
+      // setLoading(false);
     }
 
   };

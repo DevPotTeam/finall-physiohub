@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button.jsx";
 import { ArrowLeft, Search, Upload } from "lucide-react";
+import Link from "next/link";
 
 
 
@@ -8,7 +9,9 @@ export default function PublishLessonHeader({handleLessonsAdd}) {
   return (
     <div className="  w-full mx-auto max-w-[80%] flex justify-between items-center p-4 rounded-lg">
       <div className="md:flex hidden items-center gap-2 ">
+        <Link href={"/teacher/course"}>
         <ArrowLeft className="w-5 h-5 text-gray-700 cursor-pointer" />
+        </Link>
         <h2 className="text-lg font-semibold">Add Lessons</h2>
       </div>
       <div className="flex items-center gap-4">
