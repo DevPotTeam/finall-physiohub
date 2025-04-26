@@ -84,7 +84,7 @@ function VerifyOTP() {
     const otp_number = otp.join("");
     if(ot === "varify"){
       const {data, error, status} = await usePost(`/auth/verify-email`, {"otp": otp_number, "email" : email})
-      if(data){
+      if(status == 201){
         router.push("/auth/login")
       }
       if(error){

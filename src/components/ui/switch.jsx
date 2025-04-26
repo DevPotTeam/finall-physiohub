@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export function Switch({ checked = false, onChange, w = "w-14" }) {
+export function Switch({inQuiz = false, checked = false, onChange, w = "w-11" }) {
   const [isOn, setIsOn] = useState(checked);
 
   const toggleSwitch = () => {
@@ -19,7 +19,7 @@ export function Switch({ checked = false, onChange, w = "w-14" }) {
     >
       <span
         className={`md:w-5 w-4 md:h-5 h-4 bg-white rounded-full shadow-md transform transition-transform ${
-          isOn ? "md:translate-x-7 translate-x-8" : "translate-x-0"
+          isOn ? inQuiz? "translate-x-4 " :"md:translate-x-5 translate-x-5" : "translate-x-0"
         }`}
       ></span>
     </button>

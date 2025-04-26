@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Plus } from "lucide-react";
 import { Select } from "@/components/ui/select.jsx";
 import { Input } from "@/components/ui/input.jsx";
 import PublishFlashCardHeader from "@/components/flashCard/PublishFlashCardHeader";
@@ -9,6 +9,7 @@ import useImagePost from "@/hooks/useImagePost";
 import { FaTimesCircle } from "react-icons/fa";
 import Image from "next/image";
 import useGet from "@/hooks/useGet";
+import { Button } from "@/components/ui/button";
 
 export default function CreateFlashCard({ setShowInFlashCard }) {
   const fileInputRef = useRef(null);
@@ -17,9 +18,11 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
   const [frontCardImageLoading, setFrontCardImageLoading] = useState(false);
   const [backCardImageLoading, setBackCardImageLoading] = useState(false);
   const [topics, setTopics] = useState([]);
+  const [showTopicModal, setShowTopicModal] = useState(false);
+  const [newTopicName, setNewTopicName] = useState("");
   const [flashcard, setFlashcard] = useState({
-    title : "",
-    description : "",
+    title: "",
+    description: "",
     hint: "",
     imageUrl: "",
     masteryLevel: 0,
@@ -48,9 +51,6 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
     fetchTopics();
   }, []);
 
-  useEffect(() => {
-  }, [flashcard]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name == "masteryLevel") {
@@ -67,16 +67,10 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
   };
 
   const handleUpload = async (eOrFiles, name) => {
-    if (name === "imageUrl") {
-      setImageLoading(true);
-    }
-    if (name === "frontImage") {
-      setFrontCardImageLoading(true);
-    }
-    if (name === "backImage") {
-      setBackCardImageLoading(true);
-    }
-    // Support both input events and FileList directly
+    if (name === "imageUrl") setImageLoading(true);
+    if (name === "frontImage") setFrontCardImageLoading(true);
+    if (name === "backImage") setBackCardImageLoading(true);
+
     const file = eOrFiles.target?.files?.[0] || eOrFiles[0];
     if (!file) return;
 
@@ -98,10 +92,8 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
 
   const handleDrop = (event, name) => {
     event.preventDefault();
-    if (event.dataTransfer && event.dataTransfer.files) {
+    if (event.dataTransfer?.files) {
       handleUpload(event.dataTransfer.files, name);
-    } else {
-      console.warn("No files found in drop event");
     }
   };
 
@@ -116,12 +108,34 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
     }));
   };
 
+  const handleCreateTopic = async () => {
+    if (!newTopicName.trim()) {
+      showToast("Topic name cannot be empty", "error");
+      return;
+    }
+
+    const { data, error, status } = await usePost("/main-topics", {
+      name: newTopicName
+    });
+
+    if (status === 201) {
+      showToast("Topic created successfully", "success");
+      setNewTopicName("");
+      setShowTopicModal(false);
+      fetchTopics();
+    } else {
+      showToast(error?.[0] || "Failed to create topic", "error");
+    }
+  };
+
   const handleCreateFlashCard = async () => {
     const { data, error, status } = await usePost(`/flashcards/create`, {
       ...flashcard,
     });
     if (status == 201) {
-      setShowInFlashCard("FlashCards");
+      setTimeout(() => {
+        setShowInFlashCard("FlashCards");
+      }, 2000);
       showToast("FlashCard Created Successfully", "success")
     }
     if (error) {
@@ -131,7 +145,7 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
 
   return (
     <>
-      <PublishFlashCardHeader handleCreateFlashCard={handleCreateFlashCard} />
+      <PublishFlashCardHeader handleCreateFlashCard={handleCreateFlashCard} setShowInFlashCard={setShowInFlashCard}/>
       <div className=" p-6 bg-white rounded-lg shadow-md w-full mx-auto md:max-w-[80%] max-w-[95%]">
         {/* Cover Image Upload */}
         <div className="mb-4 ">
@@ -208,6 +222,7 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
 
           <div className="mb-4">
             <label className="block font-semibold text-gray-700">Topic</label>
+            <div className="flex md:flex-row flex-col items-center gap-2">
             <Select
               name="topic"
               value={flashcard.topic}
@@ -219,6 +234,16 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
                 <option value={topic._id}>{topic.name}</option>
               ))}
             </Select>
+            <Button
+              type="button"
+              onClick={() => setShowTopicModal(true)}
+              variant="outline"
+              className="gap-2 md:w-auto w-full"
+            >
+              <Plus className="w-4 h-4" />
+             Add New Topic
+            </Button>
+            </div>
           </div>
         </div>
         {/* Thumbnail Upload */}
@@ -422,6 +447,48 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
             </div>
           </div>
         </div>
+
+        {showTopicModal && (
+          <div className="fixed inset-0 bg-black/30 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold">Create New Topic</h3>
+                <button 
+                  onClick={() => setShowTopicModal(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Topic Name
+                  </label>
+                  <Input
+                    type="text"
+                    value={newTopicName}
+                    onChange={(e) => setNewTopicName(e.target.value)}
+                    placeholder="Enter topic name"
+                  />
+                </div>
+                <div className="flex justify-end gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowTopicModal(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleCreateTopic}
+                  >
+                    Create
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {notification && (
           <div
             className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${

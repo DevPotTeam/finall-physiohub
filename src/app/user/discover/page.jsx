@@ -8,29 +8,39 @@ import Image from "next/image";
 import useGet from "@/hooks/useGet";
 import { useRouter } from "next/navigation";
 import { Rating } from "@mui/material";
+import usePost from "@/hooks/usePost";
+import LottiePlayer from "@/components/animations/LottiePlayer";
+import happy from "@/components/animations/data/Happy.json";
 
-const Flashcard = ({ imageSrc, title, description, id, rating, totalRating }) => {
-  const router = useRouter()
+const Flashcard = ({
+  imageSrc,
+  title,
+  description,
+  id,
+  rating,
+  totalRating,
+}) => {
+  const router = useRouter();
   const [notification, setNotification] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const showToast = (message, type = 'success') => {
+  const showToast = (message, type = "success") => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 5000);
   };
 
-  const handleFlashCardJoin = async() => {
-    setLoading(true)
-    const {data, error, status} = await usePost(`/flashcards/join/${id}`)
-    if(status == 201){
-      setLoading(false)
-      router.push(`/flashcard/${id}`)
+  const handleFlashCardJoin = async () => {
+    setLoading(true);
+    const { data, error, status } = await usePost(`/flashcards/join/${id}`);
+    if (status == 201) {
+      setLoading(false);
+      router.push(`/flashcard/${id}`);
     }
-    if(error){
-      setLoading(false)
-      showToast("Failed to Enroll in FlashCard. Try Again", "error")
+    if (error) {
+      setLoading(false);
+      showToast("Failed to Enroll in FlashCard. Try Again", "error");
     }
-  }
+  };
 
   return (
     <div className="flex flex-col justify-between bg-white rounded-xl border overflow-hidden p-4 sm:max-w-[320px] max-w-[300px] relative cursor-pointer">
@@ -51,22 +61,22 @@ const Flashcard = ({ imageSrc, title, description, id, rating, totalRating }) =>
         <h3 className="text-lg font-semibold mt-4">{title}</h3>
         <p className="text-sm text-gray-600">{description}</p>
         <div className="mt-2">
-          <Rating
-            name="simple-controlled"
-            value={rating}
-            readOnly
-          />
+          <Rating name="simple-controlled" value={rating} readOnly />
         </div>
         <p className="text-sm text-gray-600">Rating {totalRating}+</p>
       </div>
       <div className="flex justify-between items-center mt-4 text-gray-500 text-sm">
-        <button 
-          className="border border-purple-600 w-full text-purple-600 rounded-sm py-1 flex items-center justify-center font-semibold" 
-          onClick={() => {handleFlashCardJoin()}}
+        <button
+          className="border border-purple-600 w-full text-purple-600 rounded-sm py-1 flex items-center justify-center font-semibold"
+          onClick={() => {
+            handleFlashCardJoin();
+          }}
         >
           {loading ? (
             <div className="w-5 h-5 border-4 border-t-purple-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div>
-          ) : "View FlashCards"}
+          ) : (
+            "View FlashCards"
+          )}
         </button>
       </div>
       {notification && (
@@ -76,7 +86,10 @@ const Flashcard = ({ imageSrc, title, description, id, rating, totalRating }) =>
           } text-white`}
         >
           {notification.message}
-          <button onClick={() => setNotification(null)} className="ml-4 text-xl">
+          <button
+            onClick={() => setNotification(null)}
+            className="ml-4 text-xl"
+          >
             ×
           </button>
         </div>
@@ -128,7 +141,8 @@ const QuizCard2 = ({ quiz }) => {
           </div>
         </div>
         <p className="text-sm text-gray-600 mt-1">
-          {quiz.questions?.[0]?.description || "Test your knowledge with this quiz"}
+          {quiz.questions?.[0]?.description ||
+            "Test your knowledge with this quiz"}
         </p>
         <div className="flex items-center mt-2 text-gray-500 text-sm">
           <span>{quiz.questions?.length || 0} questions</span>
@@ -143,22 +157,26 @@ const QuizCard2 = ({ quiz }) => {
 };
 
 const CourseCard = ({ course }) => {
-  const user = localStorage.getItem("user")
+  const user = localStorage.getItem("user");
   const calculateProgress = (course) => {
     if (!course.lessonProgress || course.lessonProgress.length === 0) return 0;
-    const userProgress = course.lessonProgress.find(p => p.userId === user.id);
+    const userProgress = course.lessonProgress.find(
+      (p) => p.userId === user.id
+    );
     if (!userProgress) return 0;
-    return Math.round((userProgress.completedLessons.length / course.lessons.length) * 100);
+    return Math.round(
+      (userProgress.completedLessons.length / course.lessons.length) * 100
+    );
   };
 
   return (
     <div className="flex flex-col justify-between bg-white rounded-xl border overflow-hidden p-4 w-[inherit] md:w-[inherit] lg:w-[350px] relative cursor-pointer">
       <div className="relative h-45 w-full">
         {course.coverImageUrl ? (
-          <img 
-            src={course.coverImageUrl} 
-            alt="Course cover" 
-            className="w-full h-[180px] object-cover" 
+          <img
+            src={course.coverImageUrl}
+            alt="Course cover"
+            className="w-full h-[180px] object-cover"
           />
         ) : (
           <div className="bg-gray-300 h-[180px] w-full animate-pulse"></div>
@@ -167,15 +185,9 @@ const CourseCard = ({ course }) => {
       <h5 className="text-gray-400 mt-4 text-md font-semibold">
         {course.lessons?.length || 0} lessons
       </h5>
-      <h3 className="text-xl font-bold text-gray-800 mt-1">
-        {course.title}
-      </h3>
-      <p className="text-sm text-gray-600 mt-4">
-        {course.description}
-      </p>
-      <div className="flex justify-between items-center mt-4 text-sm">
-        
-      </div>
+      <h3 className="text-xl font-bold text-gray-800 mt-1">{course.title}</h3>
+      <p className="text-sm text-gray-600 mt-4">{course.description}</p>
+      <div className="flex justify-between items-center mt-4 text-sm"></div>
     </div>
   );
 };
@@ -185,14 +197,14 @@ export default function Discover() {
     quizzesCompleted: [],
     flashcardsCompleted: [],
     coursesEnrolled: [],
-    joinedQuizzes: []
+    joinedQuizzes: [],
   });
   const [loading, setLoading] = useState(true);
 
   const fetchUserProgress = async () => {
     try {
       setLoading(true);
-      const { data, error, status } = await useGet('/users/progress');
+      const { data, error, status } = await useGet("/users/progress");
       if (status === 200) {
         setUserData(data);
       } else {
@@ -223,29 +235,37 @@ export default function Discover() {
         <span className="text-black font-bold text-xl w-[100%]">
           Continue Learning
         </span>
-        
+
         {/* Enrolled Courses */}
         <div className="flex flex-col lg:flex-row md:flex-row gap-4 mt-4 overflow-x-auto overflow-y-hidden w-[100%]">
-          {userData?.coursesEnrolled.slice(0, 3).map(course => (
+          {userData?.coursesEnrolled.slice(0, 3).map((course) => (
             <CourseCard key={course._id} course={course} />
           ))}
         </div>
 
         {/* Suggested Quiz Banner */}
         <div className="bg-gradient-to-r from-purple-500 to-purple-700 rounded-lg p-8 flex items-center justify-between mt-4">
-          <div className="w-[100%] md:w-[45%] lg:w-[50%]">
-            <h2 className="text-xl text-white font-bold mb-2">Suggested Quiz</h2>
-            <p className="text-white">
-              We offer a personalized selection of quizzes based on your previous
-              activities and preferences. Dive in and challenge yourself with new
-              and exciting topics.
+          <div className="w-[100%] md:w-[45%] lg:w-[50%] space-y-5">
+            <h2 className="md:text-xl text-lg text-white font-bold mb-2">
+              Suggested Quiz
+            </h2>
+            <p className="text-white md:text-base text-xs">
+              We offer a personalized selection of quizzes based on your
+              previous activities and preferences. Dive in and challenge
+              yourself with new and exciting topics.
             </p>
-            <button className="mt-2 bg-white text-purple-700 font-semibold py-2 px-4 rounded-md hover:bg-purple-200 transition duration-300">
+            <Link href={"/user/quizs"} className="mt-2 bg-white text-purple-700 font-semibold py-2 px-4 rounded-md hover:bg-purple-200 transition duration-300">
               Explore
-            </button>
+            </Link>
           </div>
           <div className="hidden md:block">
-            <img src={"/bird-flying.png"} alt="Penguin" width={150} height={150} />
+            {/* <img src={"/bird-flying.png"} alt="Penguin" width={150} height={150} /> */}
+            <LottiePlayer
+              animationFile={happy}
+              width="100px"
+              height="80px"
+              className="hidden sm:block"
+            />
           </div>
         </div>
 
@@ -261,7 +281,7 @@ export default function Discover() {
             </Link>
           </div>
           <div className="grid md:grid-cols-2  gap-4 mt-4 overflow-x-auto overflow-y-hidden">
-            {userData?.joinedQuizzes.slice(0, 2).map(quiz => (
+            {userData?.joinedQuizzes.slice(0, 2).map((quiz) => (
               <QuizCard2 key={quiz._id} quiz={quiz} />
             ))}
           </div>
@@ -279,8 +299,8 @@ export default function Discover() {
             </Link>
           </div>
           <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row gap-4 mt-4 overflow-x-auto overflow-y-hidden">
-            {userData?.flashcardsCompleted.slice(0, 3).map(flashcard => (
-              <Flashcard  
+            {userData?.flashcardsCompleted.slice(0, 3).map((flashcard) => (
+              <Flashcard
                 key={flashcard._id}
                 imageSrc={flashcard.imageUrl || "/auth-activity.png"}
                 title={flashcard.title}

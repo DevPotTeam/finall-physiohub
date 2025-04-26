@@ -78,7 +78,8 @@ export default function LoginPage() {
       const firstVisit = localStorage.getItem("firstVisit")
       if(firstVisit == true){
         router.push("/onboarding");
-      } else {
+      } 
+      if(user.isEmailVerified) {
         router.push(user.role == "user" ? "/user/dashboard" : user.role == "teacher" ||user.role == "instructor" ?"/teacher/course" : "/")
       }
 

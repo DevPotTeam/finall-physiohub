@@ -3,7 +3,6 @@ import React, { useRef, useState } from "react";
 import {
   ChevronDown,
   ChevronUp,
-  Image,
   PlusCircle,
   Trash2,
   Upload,
@@ -16,9 +15,11 @@ import PublishLessonHeader from "@/components/course/PublishLessonHeader";
 import usePost from "@/hooks/usePost";
 import { useRouter } from "next/navigation";
 import useImagePost from "@/hooks/useImagePost";
+import Image from "next/image";
 
 export default function AddLessons({params}) {
   const { id } = React.use(params); 
+  const [notification, setNotification] = useState(null);
   const [loading, setLoading] = useState(false)
   const [cards, setCards] = useState([
     { id: 1, type: "", title: "", url: "", open: true },
@@ -39,15 +40,20 @@ export default function AddLessons({params}) {
       label: "Video",
       value: "video",
     },
-    {
-      label: "Image",
-      value: "image",
-    },
+    // {
+    //   label: "Image",
+    //   value: "image",
+    // },
     {
       label: "Article",
       value: "article",
     },
   ];
+
+  const showToast = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000);
+  };
 
   const handleTypeSelect = (e) => {
     setType(e.target.value);
@@ -70,7 +76,6 @@ export default function AddLessons({params}) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -84,17 +89,20 @@ export default function AddLessons({params}) {
   };
 
   const handleImageUpload = async (e, index) => {
+    setLoading(true)
     const file = e.target.files[0];
     const formImageData = new FormData();
     formImageData.append('file', file);
   
-    const { data, error, status } = await usePost(
-      `/courses/upload`,
+    const { data, error, status } = await useImagePost(
+      `/courses/upload-image`,
       formImageData
     );
-     if (data) {
+     if (status == 201) {
+      setLoading(false)
       handleCardChange(index, "url", data);
     }
+
   };
 
   const handleVideoUpload = async (e, index) => {
@@ -131,7 +139,13 @@ export default function AddLessons({params}) {
   const handleLessonsAdd = async () => {
     const {data, error, status} = await usePost(`/courses/add-to-course/${id}`, formData)
     if(status == 201){
-      router.push("/teacher/course")
+      showToast("Lesson Added Successfully", "success")
+      setTimeout(() => {
+        router.push("/teacher/course")
+      }, 2000);
+    }
+    if(error){
+      showToast(error[0], "error")
     }
   };
 
@@ -244,7 +258,7 @@ export default function AddLessons({params}) {
                           ) : (
                             <div className="h-[200px] w-[100px]">
                               <video
-                                src={formData.contents[index].url}
+                                src={formData.contents[index]?.url}
                                 height={300}
                                 width={200}
                                 alt="cover-image"
@@ -255,28 +269,24 @@ export default function AddLessons({params}) {
                           )}
                         </div>
                       )}
-                      {q.type == "image" && (
+                      {/* {q.type == "image" && (
                         <div className="mb-4">
                           <label className="block text-gray-700 font-semibold">
                             Image
                           </label>
-                          {!formData.coverImage ? (
+                          {!formData.contents[index]?.url ? (
                             <div
                               className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500 "
                               onDrop={(e)=>{handleDrop(e, index, q.type)}}
                               onDragOver={handleDragOver}
                             >
-                              <label className="ud-btn btn-white text-center cursor-pointer">
+                              {loading? <div className="w-12 h-12 border-4 border-t-purple-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div>:<label className="ud-btn btn-white text-center cursor-pointer">
                                 <div className="icon mb5">
                                   <Upload className="w-6 h-6 mb-2 text-purple-600 justify-self-center " />
                                 </div>
                                 <h4 className="title fz17 mb1">
                                   Upload/Drag photos of Lesson
                                 </h4>
-                                <p className="text fz-10 mb10">
-                                  Photos must be JPEG or PNG format and at least
-                                  2048x768
-                                </p>
                                 Browse Files
                                 <input
                                   ref={fileInputRef}
@@ -291,12 +301,12 @@ export default function AddLessons({params}) {
                                   style={{ display: "none" }}
                                   required
                                 />
-                              </label>
+                              </label>}
                             </div>
                           ) : (
                             <div>
                               <Image
-                                src={formData.coverImage}
+                                src={formData.contents[index].url}
                                 height={400}
                                 width={200}
                                 alt="cover-image"
@@ -304,13 +314,13 @@ export default function AddLessons({params}) {
                             </div>
                           )}
                         </div>
-                      )}
+                      )} */}
                     </div>
                   </div>
                   {q.type == "article" && (
                     <>
                       <label>Article Link</label>
-                      <Textarea placeholder="Enter Title here" />
+                      <Textarea placeholder="Enter Title here" name="url" onChange={(e)=>{handleCardChange(index,"url", e.target.value)}}/>
                     </>
                   )}
                 </div>
@@ -321,6 +331,18 @@ export default function AddLessons({params}) {
             <PlusCircle size={16} /> Add Question
           </Button>
         </div>
+        {notification && (
+          <div
+            className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${
+              notification.type === "error" ? "bg-red-500" : "bg-green-500"
+            } text-white`}
+          >
+            {notification.message}
+            <button onClick={() => setNotification(null)} className="ml-4 text-xl">
+              ×
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

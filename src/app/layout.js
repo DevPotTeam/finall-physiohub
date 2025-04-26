@@ -20,7 +20,6 @@ export default function RootLayout({ children }) {
         <ProtectedRoutes user={user}>
         {children}
         </ProtectedRoutes>
-        
       </body>
     </html>
   );

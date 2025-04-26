@@ -132,7 +132,7 @@ const Settings = () => {
   }
 
   return (
-    <div className="md:w-[80%] w-[95%] mx-auto md:p-6 p-4 bg-white shadow-md rounded-lg mt-6">
+    <div className="md:w-[80%] w-[95%] mx-auto md:p-6 p-4 bg-white shadow-md rounded-lg md:mt-6">
       <h1 className="text-2xl font-semibold mb-6 border-b pb-4">Settings</h1>
 
       <form onSubmit={handleSubmit}>

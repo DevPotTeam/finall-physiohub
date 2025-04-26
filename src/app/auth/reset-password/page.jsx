@@ -72,7 +72,7 @@ export default function ResetPassword() {
 
   return (
     <>
-      <section className="pt-0 pb-0 relative w-full">
+      <section className="relative w-full">
       
         <div className="container mx-auto px-4">
           <div

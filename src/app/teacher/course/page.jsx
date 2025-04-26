@@ -10,7 +10,7 @@ export default function Course() {
   const [courses, setCourses] = useState([])
 
   const fetchData = async() =>{
-    const {data, error, status} = await useGet(`/courses/getAllCourses`)
+    const {data, error, status} = await useGet(`/courses/my-courses`)
     if(status == 200){
       setCourses(data)
     }
@@ -25,7 +25,7 @@ export default function Course() {
       <div className="flex flex-col md:flex-col sm:flex-col lg:flex-row">
         <div className="w-full">
           <div className="flex flex-col items-center justify-center min-h-[80vh]">
-            {showInCourse == "Course"&&<Courses setShowInCourse={setShowInCourse} data={courses}/>}
+            {showInCourse == "Course"&&<Courses setShowInCourse={setShowInCourse} initialData={courses}/>}
             {showInCourse == "CreateCourse"&&<CreateCourse setShowInCourse={setShowInCourse}/>}  
           </div>
         </div>

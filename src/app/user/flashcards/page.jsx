@@ -101,8 +101,10 @@ const Flashcard = ({ imageSrc, title, description, rating, totalRating, id, veri
 
 function Flashcards() {
   const [topics, setTopics] = useState([]);
+  const [filteredTopics, setFilteredTopics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   const fetchFlashCardsData = async () => {
     try {
@@ -110,6 +112,7 @@ function Flashcards() {
       const { data, error, status } = await useGet(`/flashcards/grouped-by-topic`);
       if (status === 200) {
         setTopics(data || []);
+        setFilteredTopics(data || []); // Initialize filtered topics
       }
     } catch (error) {
       console.error("Error fetching flashcards:", error);
@@ -123,12 +126,27 @@ function Flashcards() {
   }, []);
 
   // Filter topics based on search term
-  const filteredTopics = topics.filter(topic => {
-    const topicName = topic.topic?.name?.toLowerCase() || '';
-    const flashcardTitle = topic.flashcards[0]?.title?.toLowerCase() || '';
-    const search = searchTerm.toLowerCase();
-    return topicName.includes(search) || flashcardTitle.includes(search);
-  });
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setIsSearching(false);
+      setFilteredTopics(topics);
+    } else {
+      setIsSearching(true);
+      const filtered = topics.filter(topic => {
+        const topicName = topic.topic?.name?.toLowerCase() || '';
+        const flashcardTitle = topic.flashcards[0]?.title?.toLowerCase() || '';
+        const flashcardDesc = topic.flashcards[0]?.description?.toLowerCase() || '';
+        const search = searchTerm.toLowerCase();
+        
+        return (
+          topicName.includes(search) || 
+          flashcardTitle.includes(search) ||
+          flashcardDesc.includes(search)
+        );
+      });
+      setFilteredTopics(filtered);
+    }
+  }, [searchTerm, topics]);
 
   return (
     <div className="mt-4 w-full mx-auto md:max-w-[80%] max-w-[95%]">
@@ -147,26 +165,34 @@ function Flashcards() {
             <div className="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : (
-          <div className="w-full grid xl:grid-cols-3 sm:grid-cols-2 mt-4 gap-4">
-            {filteredTopics.map((topicGroup) => {
-              if (topicGroup.flashcards.length === 0) return null;
-              
-              const flashcard = topicGroup.flashcards[0];
-              return (
-                <Flashcard  
-                  key={flashcard._id}
-                  imageSrc={flashcard.imageUrl || flashcard.frontImage || "/auth-activity.png"}
-                  title={flashcard.title}
-                  verified={flashcard.verifiedByAdmin}
-                  description={flashcard.description}
-                  rating={flashcard.rating}
-                  totalRating={flashcard.ratingCount}
-                  id={flashcard._id}
-                  topicName={topicGroup.topic?.name}
-                />
-              );
-            })}
-          </div>
+          <>
+            <div className="w-full grid xl:grid-cols-3 sm:grid-cols-2 mt-4 gap-4">
+              {(isSearching ? filteredTopics : topics).map((topicGroup) => {
+                if (topicGroup.flashcards.length === 0) return null;
+                
+                const flashcard = topicGroup.flashcards[0];
+                return (
+                  <Flashcard  
+                    key={flashcard._id}
+                    imageSrc={flashcard.imageUrl || flashcard.frontImage || "/auth-activity.png"}
+                    title={flashcard.title}
+                    verified={flashcard.verifiedByAdmin}
+                    description={flashcard.description}
+                    rating={flashcard.rating}
+                    totalRating={flashcard.ratingCount}
+                    id={flashcard._id}
+                    topicName={topicGroup.topic?.name}
+                  />
+                );
+              })}
+            </div>
+            
+            {isSearching && filteredTopics.length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-gray-500">No flashcards found matching your search.</p>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

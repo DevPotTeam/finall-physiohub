@@ -15,7 +15,36 @@ import { Rating } from "@mui/material";
 function Flashcard({ flashCardData, length, currentCard }) {
   const [showHint, setShowHint] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [questionFormat, setQuestionFormat] = useState("term");
+  const [studyOptions, setStudyOptions] = useState({
+    starredOnly: false,
+    shuffleTerms: false,
+  });
 
+  const handleSave = () => {
+    // Save settings logic here
+    console.log("Settings saved:", { questionFormat, studyOptions });
+    setIsOpen(false);
+  };
+  const handleCopyUrl = () => {
+    // Get the current URL
+    const currentUrl = window.location.href;
+
+    // Copy to clipboard
+    navigator.clipboard
+      .writeText(currentUrl)
+      .then(() => {
+        setIsCopied(true);
+        // Reset after 2 seconds
+        setTimeout(() => setIsCopied(false), 2000);
+      })
+      .catch((err) => {
+        console.error("Failed to copy URL: ", err);
+        // Optional: Show error message
+      });
+  };
   useEffect(() => {
     setIsFlipped(false);
   }, [flashCardData, currentCard]);
@@ -27,7 +56,7 @@ function Flashcard({ flashCardData, length, currentCard }) {
   };
   return (
     <>
-      <div className=" bg-white rounded-xl shadow border border-gray-200 p-4 space-y-3" >
+      <div className=" bg-white rounded-xl shadow border border-gray-200 p-4 space-y-3">
         {/* Top Label */}
         <div className="flex items-center justify-baseline gap-5 w-full">
           <p className="text-sm text-gray-500 font-medium uppercase">
@@ -48,7 +77,10 @@ function Flashcard({ flashCardData, length, currentCard }) {
           <div className="flashcard-inner">
             <div className="flashcard-front relative">
               {/* Your existing front content */}
-              <div className="bg-black-50 rounded-lg" style={{backgroundImage : flashCardData.frontImage}}>
+              <div
+                className="bg-black-50 rounded-lg"
+                style={{ backgroundImage: flashCardData.frontImage }}
+              >
                 <div className="absolute top-3 left-3 flex items-center gap-2">
                   <Volume2
                     className="w-5 h-5 text-gray-500 cursor-pointer"
@@ -135,16 +167,105 @@ function Flashcard({ flashCardData, length, currentCard }) {
         {/* Controls Below Text */}
         <div className="flex md:flex-row flex-col justify-between items-center gap-2 ">
           <div className="flex items-center gap-2">
-            <Repeat className=" text-gray-500 cursor-pointer" />
-            <Settings className=" text-gray-500 cursor-pointer" />
+            {/* <Repeat className=" text-gray-500 cursor-pointer" />
+            <Settings
+              className=" text-gray-500 cursor-pointer"
+              onClick={() => setIsOpen(true)}
+            />
             <Copy className=" text-gray-500 cursor-pointer" />
+            {isOpen && (
+              <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                  <h2 className="text-xl font-semibold mb-4">
+                    Flashcard Settings
+                  </h2>
+
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="font-medium mb-2">Question Format</h3>
+                      <div className="space-y-2">
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="radio"
+                            name="questionFormat"
+                            checked={questionFormat === "term"}
+                            onChange={() => setQuestionFormat("term")}
+                          />
+                          Answer with Term
+                        </label>
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="radio"
+                            name="questionFormat"
+                            checked={questionFormat === "definition"}
+                            onChange={() => setQuestionFormat("definition")}
+                          />
+                          Answer with Definition
+                        </label>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="font-medium mb-2">Study Options</h3>
+                      <div className="space-y-2">
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={studyOptions.starredOnly}
+                            onChange={(e) =>
+                              setStudyOptions({
+                                ...studyOptions,
+                                starredOnly: e.target.checked,
+                              })
+                            }
+                          />
+                          Study starred terms only
+                        </label>
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={studyOptions.shuffleTerms}
+                            onChange={(e) =>
+                              setStudyOptions({
+                                ...studyOptions,
+                                shuffleTerms: e.target.checked,
+                              })
+                            }
+                          />
+                          Shuffle terms
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end gap-3 pt-4">
+                      <button
+                        onClick={() => setIsOpen(false)}
+                        className="px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleSave}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )} */}
           </div>
           <div className="flex items-center gap-2">
             <button className="text-sm font-medium text-gray-700 border px-3 py-1 rounded-lg hover:bg-gray-50">
               Spaced Repetition
             </button>
-            <button className="text-sm font-medium text-gray-700 border px-3 py-1 rounded-lg hover:bg-gray-50 flex items-center gap-2">
-              <Share2 className="w-4 h-4 text-gray-500 cursor-pointer" /> Share
+            <button
+              onClick={handleCopyUrl}
+              className="text-sm font-medium text-gray-700 border px-3 py-1 rounded-lg hover:bg-gray-50 flex items-center gap-2"
+            >
+              <Share2 className="w-4 h-4 text-gray-500 cursor-pointer" />
+              {isCopied ? "URL Copied!" : "Share"}
             </button>
           </div>
         </div>

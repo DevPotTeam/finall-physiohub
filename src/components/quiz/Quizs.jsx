@@ -7,6 +7,9 @@ import { useEffect, useState } from "react";
 import useGet from "@/hooks/useGet";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import useDelete from "@/hooks/useDelete";
+import axios from "axios";
+const api_url = process.env.NEXT_PUBLIC_API_BASE_URL
 
 // const articles = [
 //   {
@@ -25,9 +28,10 @@ import Link from "next/link";
 
 export default function Quizs({ setShowInQuiz }) {
   const router = useRouter();
+  const [notification, setNotification] = useState(null);
   const [articles, setArticles] = useState([]);
   const fetchTeacherQuizs = async () => {
-    const { data, error, status } = await useGet(`/quizzes`);
+    const { data, error, status } = await useGet(`/quizzes/my-quizzes`);
     if (status == 200) {
       setArticles(data);
     }
@@ -36,25 +40,40 @@ export default function Quizs({ setShowInQuiz }) {
     fetchTeacherQuizs();
   }, []);
 
+  const showToast = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000);
+  };
+
+
   const handleQuizDelete = async (id) => {
-    const { data, error, status } = await useDelete(`/courses/delete/${id}`);
-    if (status === 200) {
-      window.location.reload();
+    try {
+      const { data, error, status } = await useDelete(`/quizzes/${id}`);
+      console.log(data)
+      if(status == 200){
+        showToast("Quiz Deleted Successfully", "success")
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      }
+    } catch (error) {
+      showToast("Failed to Delete Quiz", "error")
     }
+   
   };
   return (
     <>
       <QuizHeader setShowInQuiz={setShowInQuiz} />
-      <div className="p-6 bg-white rounded-lg shadow-md w-full mx-auto max-w-[80%] mt-5">
+      <div className="md:p-6 sm:p-5 bg-white rounded-lg shadow-md w-full mx-auto md:max-w-[80%] max-w-[95%] ">
         <div className="mt-4 space-y-6">
           {articles?.map((article, index) => (
             <div
               key={index}
-              className="border-t pt-4 first:border-t-0 first:pt-0"
+              className="border-t pt-4 first:border-t-0 first:pt-0 last:pb-5"
             >
-              <div className="flex justify-between items-center ">
-                <div className="flex items-center gap-5 w-full">
-                  <div className="h-[180px] w-[230px]">
+              <div className="flex md:flex-row flex-col justify-between items-center ">
+                <div className="flex sm:flex-row flex-col items-center gap-5 w-full">
+                  <div className="h-[180px] max-w-[230px]">
                     <Image
                       src={"/auth-activity.png" || article.banner}
                       alt="image"
@@ -63,11 +82,11 @@ export default function Quizs({ setShowInQuiz }) {
                       className="object-cover h-full w-full rounded-2xl"
                     />
                   </div>
-                  <div className="w-[44%] text-start">
-                    <p className="text-sm text-blue-600 font-medium mb-2">
+                  <div className="md:w-[44%]  text-start">
+                    {/* <p className="text-sm text-blue-600 font-medium mb-2">
                       {article.category}
-                    </p>
-                    <h3 className="text-lg font-semibold text-gray-900 leading-relaxed">
+                    </p> */}
+                    <h3 className="text-lg md:text-base font-semibold text-gray-900 leading-relaxed">
                       {article.title}
                     </h3>
                     <p className="text-sm text-gray-400 mt-2 flex items-center">
@@ -102,6 +121,18 @@ export default function Quizs({ setShowInQuiz }) {
             </div>
           ))}
         </div>
+        {notification && (
+          <div
+            className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${
+              notification.type === "error" ? "bg-red-500" : "bg-green-500"
+            } text-white`}
+          >
+            {notification.message}
+            <button onClick={() => setNotification(null)} className="ml-4 text-xl">
+              ×
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

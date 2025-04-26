@@ -26,14 +26,14 @@ const Sidebar = ({onClose}) => {
             <div className="flex flex-col w-64 bg-white shadow-xl sm:w-[100%] md:w-[fit-content]">
                 <div className="flex flex-col w-[100%] justify-center items-center">
                     <div className="flex flex-col justify-center w-[100%] border-b h-[80px] pl-6 pr-6">
-                        <div className="flex justify-between h-[fit-content] ">
+                        <div className="flex items-center justify-between h-[fit-content] ">
                             <div className="flex flex-col justify-cente items-center">
                                 <Link href={"/"}>
-                                <img src={"/logo-on-light.png"} className="md:hidden lg:block w-50 sm:w-50" />
+                                <img src={"/logo-on-light.png"} className="md:hidden lg:block w-30 sm:w-50" />
                                 </Link>
                             </div>
                             <div className="sm:block lg:hidden md:hidden flex flex-col justify-cente items-center">
-                                <X size={30} onClick={onClose}/>
+                                <X size={25} onClick={onClose}/>
                             </div>
                         </div>
                         <Link href={"/"}>
@@ -44,7 +44,7 @@ const Sidebar = ({onClose}) => {
 
                 <div className="mt-10 pl-5 pr-5 h-full overflow-auto">
                     <button
-                        onClick={() => handleSelect('dashboard')}
+                        onClick={() => {handleSelect('dashboard'); onClose()}}
                         className={`mb-4 flex items-center lg:space-x-2 md:space-x-0 space-x-2 cursor-pointer text-sm font-semibold p-4 rounded-lg w-full ${pathname === '/user/dashboard' ? 'bg-[#F6F9FC] text-[#7240FD]' : 'hover:bg-[#F6F9FC] hover:text-[#7240FD] text-[#687494]'}`}
                     >
                         <Home size={24} /> {/* Increased size for the icon */}
@@ -52,7 +52,7 @@ const Sidebar = ({onClose}) => {
                     </button>
 
                     <button
-                        onClick={() => handleSelect('discover')}
+                        onClick={() => {handleSelect('discover'); onClose()}}
                         className={`mb-4 flex items-center lg:space-x-2 md:space-x-0 space-x-2 text-sm cursor-pointer font-semibold p-4 rounded-lg w-full ${pathname === '/user/discover' ? 'bg-[#F6F9FC] text-[#7240FD]' : 'hover:bg-[#F6F9FC] hover:text-[#7240FD] text-[#687494]'}`}
                     >
                         <Compass size={24} /> {/* Increased size for the icon */}
@@ -60,7 +60,7 @@ const Sidebar = ({onClose}) => {
                     </button>
 
                     <button
-                        onClick={() => handleSelect('courses')}
+                        onClick={() => {handleSelect('courses'); onClose()}}
                         className={`mb-4 flex items-center md:space-x-0 lg:space-x-2 space-x-2 text-sm cursor-pointer font-semibold p-4 rounded-lg w-full ${pathname === '/user/courses' ? 'bg-[#F6F9FC] text-[#7240FD]' : 'hover:bg-[#F6F9FC] hover:text-[#7240FD] text-[#687494]'}`}
                     >
                         <BookOpen size={24} /> {/* Increased size for the icon */}
@@ -68,7 +68,7 @@ const Sidebar = ({onClose}) => {
                     </button>
 
                     <button
-                        onClick={() => handleSelect("quizs")}
+                        onClick={() => {handleSelect("quizs"); onClose()}}
                         className={`mb-4 flex items-center md:space-x-0 lg:space-x-2 space-x-2 text-sm cursor-pointer font-semibold p-4 rounded-lg w-full ${pathname === '/user/quizs' ? 'bg-[#F6F9FC] text-[#7240FD]' : 'hover:bg-[#F6F9FC] hover:text-[#7240FD] text-[#687494]'}`}
                     >
                         <MessageSquareText size={24} /> {/* Increased size for the icon */}
@@ -76,14 +76,14 @@ const Sidebar = ({onClose}) => {
                     </button>
 
                     <button
-                        onClick={() => handleSelect("flashcards")}
+                        onClick={() => {handleSelect("flashcards"); onClose()}}
                         className={`mb-4 flex items-center md:space-x-0 lg:space-x-2 space-x-2 text-sm cursor-pointer font-semibold p-4 rounded-lg w-full ${pathname === '/user/flashcards' ? 'bg-[#F6F9FC] text-[#7240FD]' : 'hover:bg-[#F6F9FC] hover:text-[#7240FD] text-[#687494]'}`}
                     >
                         <BookCopy size={24} /> {/* Increased size for the icon */}
                         <span className="md:hidden lg:block">FlashCards</span>
                     </button>
                     <button
-                        onClick={() => handleSelect('settings')}
+                        onClick={() => {handleSelect('settings'); onClose()}}
                         className={`mb-4 flex items-center md:space-x-0 lg:space-x-2 space-x-2 text-sm cursor-pointer font-semibold p-4 rounded-lg w-full ${pathname === '/user/settings' ? 'bg-[#F6F9FC] text-[#7240FD]' : 'hover:bg-[#F6F9FC] hover:text-[#7240FD] text-[#687494]'}`}
                     >
                         <Settings size={24} /> {/* Increased size for the icon */}

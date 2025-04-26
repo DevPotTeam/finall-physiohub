@@ -86,7 +86,7 @@ export default function CreateCourse({setShowInCourse}) {
 
   return (
     <>
-      <PublishCourseHeader handleCoursePublish={handleCoursePublish} />
+      <PublishCourseHeader handleCoursePublish={handleCoursePublish} setShowInCourse={setShowInCourse}/>
       <div className=" p-6 bg-white rounded-lg shadow-md w-full mx-auto md:max-w-[80%] max-w-[95%]">
         {/*  Title */}
         <div className="mb-4 ">
@@ -103,7 +103,7 @@ export default function CreateCourse({setShowInCourse}) {
         {/* Thumbnail  */}
         <div className="mb-4">
           <label className="block text-gray-700 font-semibold">
-            Description
+            Description <span className="text-sm text-gray-400 font-normal">(max 150 words)</span>
           </label>
           <Input
             placeholder="Write description here"
@@ -111,6 +111,7 @@ export default function CreateCourse({setShowInCourse}) {
             name="description"
             onChange={handleChange}
             value={formData.description}
+            maxLength={150}
           />
         </div>
 
@@ -133,11 +134,11 @@ export default function CreateCourse({setShowInCourse}) {
           <label className="block text-gray-700 font-semibold">
             Categories
           </label>
-          <p className="text-sm text-gray-600 font-semibold">
+          <p className="text-sm text-gray-400 ">
             Type Categories Saperated by coma " , "
           </p>
           <Input
-            placeholder="Categories e.g. Orthopedic, Neurological, Pediatric "
+            placeholder="e.g. Orthopedic, Neurological, Pediatric "
             className="my-5"
             name="categories"
             onChange={handleChange}
@@ -150,11 +151,11 @@ export default function CreateCourse({setShowInCourse}) {
           <label className="block text-gray-700 font-semibold">
             Prerequisites
           </label>
-          <p className="text-sm text-gray-600 font-semibold">
+          <p className="text-sm text-gray-400 ">
             Type Prerequisites Saperated by coma " , "
           </p>
           <Input
-            placeholder="Prerequisites e.g. Basic Human Anatomy, Prior Clinical Experience, Understanding of Medical Terminology"
+            placeholder="e.g. Basic Human Anatomy, Prior Clinical."
             className="my-5"
             name="prerequisites"
             onChange={handleChange}
