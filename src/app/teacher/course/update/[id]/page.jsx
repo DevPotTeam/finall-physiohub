@@ -99,7 +99,7 @@ export default function UpdateCourse({ params }) {
     formData.append("file", file);
 
     const { data, error, status } = await useImagePost(
-      `/courses/upload-image`,
+      `/quizzes/upload`,
       formData
     );
     if (data) {

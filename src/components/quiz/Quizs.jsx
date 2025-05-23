@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image.js";
 import { Button } from "@/components/ui/button.jsx";
-import { Trash2, Edit, MessageSquareText, Clock } from "lucide-react";
+import { Trash2, Edit, MessageSquareText, Clock, Sparkles } from "lucide-react";
 import QuizHeader from "@/components/quiz/QuizHeader";
 import { useEffect, useState } from "react";
 import useGet from "@/hooks/useGet";
@@ -30,10 +30,22 @@ export default function Quizs({ setShowInQuiz }) {
   const router = useRouter();
   const [notification, setNotification] = useState(null);
   const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  // const fetchTeacherQuizs = async () => {
+  //   const { data, error, status } = await useGet(`/quizzes/my-quizzes`);
+  //   if (status == 200) {
+  //     setArticles(data);
+  //   }
+  // };
   const fetchTeacherQuizs = async () => {
-    const { data, error, status } = await useGet(`/quizzes/my-quizzes`);
-    if (status == 200) {
-      setArticles(data);
+    setLoading(true);
+    try {
+      const { data } = await useGet(`/quizzes/my-quizzes`);
+      setArticles(data || []);
+    } catch (error) {
+      console.error("Error fetching flashcards:", error);
+    } finally {
+      setLoading(false);
     }
   };
   useEffect(() => {
@@ -53,8 +65,8 @@ export default function Quizs({ setShowInQuiz }) {
       if(status == 200){
         showToast("Quiz Deleted Successfully", "success")
         setTimeout(() => {
-          window.location.reload();
-        }, 2000);
+          fetchTeacherQuizs()
+        }, 1000);
       }
     } catch (error) {
       showToast("Failed to Delete Quiz", "error")
@@ -65,6 +77,23 @@ export default function Quizs({ setShowInQuiz }) {
     <>
       <QuizHeader setShowInQuiz={setShowInQuiz} />
       <div className="md:p-6 sm:p-5 bg-white rounded-lg shadow-md w-full mx-auto md:max-w-[80%] max-w-[95%] ">
+      {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : articles.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <Sparkles className="w-12 h-12 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              No Quiz Found
+            </h3>
+            <p className="text-gray-500 mb-6">
+              You haven't created any Quiz yet. Get started by creating your first one!
+            </p>  
+          </div>
+        ) : (
         <div className="mt-4 space-y-6">
           {articles?.map((article, index) => (
             <div
@@ -120,7 +149,7 @@ export default function Quizs({ setShowInQuiz }) {
               </div>
             </div>
           ))}
-        </div>
+        </div>)}
         {notification && (
           <div
             className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${

@@ -194,7 +194,7 @@ export default function UpdateQuiz({ params }) {
     formData.append("file", file);
 
     const { data, error, status } = await useImagePost(
-      `/courses/upload-image`,
+      `/quizzes/upload`,
       formData
     );
 
@@ -230,7 +230,7 @@ export default function UpdateQuiz({ params }) {
     formData.append("file", file);
 
     const { data, error, status } = await useImagePost(
-      `/courses/upload-image`,
+      `/quizzes/upload`,
       formData
     );
 

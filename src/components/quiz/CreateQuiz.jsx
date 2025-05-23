@@ -184,7 +184,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
 
   const handleUpload = async (eOrFiles, name) => {
     if (name === "thumbnail") setThumbnialImageLoading(true);
-    if (name === "coverImage") setCoverImageLoading(true);
+    if (name === "banner") setCoverImageLoading(true);
 
     const file = eOrFiles.target?.files?.[0] || eOrFiles[0];
     if (!file) return;
@@ -193,7 +193,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
     formData.append("file", file);
 
     const { data, error, status } = await useImagePost(
-      `/courses/upload-image`,
+      `/quizzes/upload`,
       formData
     );
 
@@ -225,7 +225,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
     formData.append("file", file);
 
     const { data, error, status } = await useImagePost(
-      `/courses/upload-image`,
+      `/quizzes/upload`,
       formData
     );
 
@@ -339,7 +339,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
         {/* Cover Image Upload */}
         <div className="mb-4">
           <label className="block text-gray-700 font-semibold">Cover Image</label>
-          {!quizData.coverImage ? (
+          {!quizData.banner ? (
             <div
               className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500"
               onDrop={(e) => handleDrop(e, "banner")}
@@ -373,7 +373,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
           ) : (
             <div>
               <Image
-                src={quizData.coverImage}
+                src={quizData.banner}
                 height={400}
                 width={200}
                 alt="cover-image"
@@ -395,7 +395,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
             >
               <option value="">Choose category</option>
               {topics.map((topic) => (
-                <option value={topic._id}>{topic.name}</option>
+                <option key={topic._id} value={topic._id}>{topic.name}</option>
               ))}
             </Select>
           </div>

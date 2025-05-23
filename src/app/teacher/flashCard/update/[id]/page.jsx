@@ -109,7 +109,7 @@ useEffect(() => {
     const formData = new FormData();
     formData.append("file", file);
     const { data, error, status } = await useImagePost(
-      `/courses/upload-image`,
+      `/quizzes/upload`,
       formData
     );
 

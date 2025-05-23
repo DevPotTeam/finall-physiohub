@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+
 const nextConfig = {
     env: {
         NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/api/v1",
@@ -6,9 +7,8 @@ const nextConfig = {
       images: {
         remotePatterns: [
           {
-            protocol: "https",
-            hostname: "res.cloudinary.com",
-            pathname: "/derpthkas/image/upload/**",
+            // protocol: "https",
+            hostname: "drsaun777.sirv.com",
           },
           {
             protocol: "https",

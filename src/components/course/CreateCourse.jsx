@@ -55,7 +55,7 @@ export default function CreateCourse({setShowInCourse}) {
   const formData = new FormData();
   formData.append('file', file);
 
-    const {data, error, status} = await useImagePost(`/courses/upload-image`, formData)
+    const {data, error, status} = await useImagePost(`/quizzes/upload`, formData)
     if(data){
       setFormData((prev)=>({...prev, coverImageUrl : data}))
       setLoading(false)
