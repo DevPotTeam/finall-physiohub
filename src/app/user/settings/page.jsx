@@ -69,7 +69,7 @@ const Settings = () => {
 
     try {
       setUploading(true);
-      const uploadResponse = await axios.post(`${api_url}/courses/upload-image`, formData, {
+      const uploadResponse = await axios.post(`${api_url}/quizzes/upload`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

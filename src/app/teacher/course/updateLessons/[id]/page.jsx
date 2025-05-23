@@ -131,7 +131,7 @@ export default function AddLessons({ params }) {
     formImageData.append("file", file);
 
     const { data, error, status } = await usePost(
-      `/courses/upload`,
+      `/quizzes/upload`,
       formImageData
     );
     if (data) {
@@ -146,7 +146,7 @@ export default function AddLessons({ params }) {
     formImageData.append("file", file);
 
     const { data, error, status } = await useImagePost(
-      `/courses/upload`,
+      `/quizzes/upload`,
       formImageData
     );
 

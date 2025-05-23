@@ -77,11 +77,12 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
     const formData = new FormData();
     formData.append("file", file);
     const { data, error, status } = await useImagePost(
-      `/courses/upload-image`,
+      `/quizzes/upload`,
       formData
     );
 
     if (data) {
+      console.log(data)
       setFlashcard((prev) => ({ ...prev, [name]: data }));
     }
 
@@ -231,7 +232,7 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
             >
               <option value="">Choose Topic</option>
               {topics.map((topic) => (
-                <option value={topic._id}>{topic.name}</option>
+                <option key={topic._id} value={topic._id}>{topic.name}</option>
               ))}
             </Select>
             <Button

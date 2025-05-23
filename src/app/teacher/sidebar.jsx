@@ -1,6 +1,6 @@
 'use client'
 
-import { LayoutGrid, MessageSquareText, FileText, BookCopy, ChevronDown, X, Settings, User, Book, BookOpen } from "lucide-react";
+import { LayoutGrid, MessageSquareText, FileText, BookCopy, ChevronDown, X, Settings, User, Book, BookOpen, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -74,10 +74,18 @@ const Sidebar = ({onClose}) => {
                             <Settings size={24} /> 
                             <span className="md:hidden lg:block">Settings</span>
                         </button> */}
+                        
                 </div>
 
                 {/* User Info */}
                 <div className="mt-auto pl-2 pr-2 mb-5">
+                <Link 
+                href={"/auth/login"}
+                        className={`mb-4 flex items-center justify-center md:space-x-0 lg:space-x-2 space-x-2 text-sm cursor-pointer font-semibold p-4 rounded-lg w-full bg-[#F6F9FC] text-red-400 hover:text-red-500`}
+                    >
+                        <LogOut size={24} /> {/* Increased size for the icon */}
+                        <span className="md:hidden lg:block">Logout</span>
+                    </Link>
                     <div className="flex items-center md:justify-center lg:justify-between sm:justify-between justify-between w-[100%]  p-2 bg-white rounded-lg shadow-md border border-gray-200">
                         {/* Avatar */}
                         <div className="flex  items-center md:space-x-0 lg:space-x-4 space-x-4">
