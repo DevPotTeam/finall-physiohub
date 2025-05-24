@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button.jsx";
 import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const LevelCard = ({ title, subTitle, icon, isSelected, onClick }) => {
@@ -26,7 +27,7 @@ const LevelCard = ({ title, subTitle, icon, isSelected, onClick }) => {
 
 
 export default function Steps({ title, subTitle, data, onNext, isMulti, step, formData, setFormData }) {
-
+    const router = useRouter()
     const [selected, setSelected] = useState([]);
     const handleStepData = (value) => {
         setSelected((prev) => {
@@ -119,7 +120,7 @@ export default function Steps({ title, subTitle, data, onNext, isMulti, step, fo
         <div className="flex justify-between">
                 <Button
                     variant="outline"
-                    onClick={() => {}}
+                    onClick={() => {router.push("/")}}
                     className="px-6 py-3 text-sm font-semibold text-[#6c4ce6] border-[#6c4ce6] rounded-sm hover:bg-[#6c4ce6] hover:text-white transition-all duration-200"
                 >
                     I’ll do this later
