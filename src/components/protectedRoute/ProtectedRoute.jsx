@@ -19,8 +19,9 @@ const ProtectedRoute = ({ children }) => {
 
 
   useEffect(() => {
-    const token = Cookies.get("token");
-    const role = Cookies.get("role")
+    const token = localStorage.getItem("token")
+    
+    const role = JSON?.parse(localStorage.getItem("user"))?.role
     const isProtectedRoute = protectedPaths.some((path) =>
       pathname.startsWith(path)
     );

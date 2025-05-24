@@ -12,11 +12,11 @@ function Header({scrollToSection}) {
   const [role, setRole] = useState("")
 
   useEffect(() => {
-    const token = Cookies.get("token");
+    const token = localStorage.getItem("token")
     if (token) {
       setIsLoggedIn(true);
     }
-    const role = Cookies.get("role")
+    const role = JSON.parse(localStorage.getItem("user"))?.role
     if(role){
       setRole(role)
     }

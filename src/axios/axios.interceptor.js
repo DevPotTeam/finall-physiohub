@@ -12,7 +12,7 @@ const api = axios.create({
 
 api.interceptors.request.use((config)=>{
   
-    const accessToken = Cookies.get("token")
+    const accessToken = localStorage.getItem("token")
    
 
     if(accessToken){

@@ -67,7 +67,10 @@ export default function Steps({ title, subTitle, data, onNext, isMulti, step, fo
                 </div>
                 <div className="flex flex-col w-full justify-center items-center">
                     <div className="w-full h-2 bg-[#e0e0e0] rounded-full">
-                        <div className="w-[25%] h-full bg-[#6c4ce6] rounded-full"></div>
+                        <div 
+                            className="h-full bg-[#6c4ce6] rounded-full transition-all duration-300 ease-in-out"
+                            style={{ width: `${(step / 6) * 100}%` }}
+                        ></div>
                     </div>
                 </div>
             </div>

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,27 +11,30 @@ import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import Cookies from "js-cookie";
-const api_url = process.env.NEXT_PUBLIC_API_BASE_URL
+const api_url = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function LoginPage() {
-  const [firstVisit, setFirstVisit] = useState(true)
+  const [firstVisit, setFirstVisit] = useState(true);
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState("")
+  const [role, setRole] = useState("");
+  const [googleLoading, setGoogleLoading] = useState(false);
   const router = useRouter();
 
- const handleForgotClick = () => {
-  localStorage.setItem("otptype" , "forgot")
-  router.push("/auth/verify-email")
- }
+  const handleForgotClick = () => {
+    localStorage.setItem("otptype", "forgot");
+    router.push("/auth/verify-email");
+  };
 
-  useEffect(()=>{
-    Cookies.remove("token")
-    Cookies.remove("role")
-  },[])
+  // useEffect(()=>{
+  //   localStorage.removeItem("token")
+  //   localStorage.removeItem("role")
+  //   Cookies.remove("token")
+  //   Cookies.remove("role")
+  // },[])
 
   const validate = () => {
     const newErrors = {};
@@ -65,24 +68,30 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const response = await axios.post(`${api_url}/auth/login`, formData,{
-        withCredentials: true
+      const response = await axios.post(`${api_url}/auth/login`, formData, {
+        withCredentials: true,
       });
       const { token, user, message } = response.data;
-
-      // Store in localStorage (or cookies, or context)
+      localStorage.setItem("token", token);
+      localStorage.setItem("role", user.role);
+      // Store in   localStorage (or cookies, or context)
       localStorage.setItem("user", JSON.stringify(user));
-      if(!user.isEmailVerified){
-        router.push("/auth/verify-email")
+      if (!user.isEmailVerified) {
+        router.push("/auth/verify-email");
       }
-      const firstVisit = localStorage.getItem("firstVisit")
-      if(firstVisit == true){
+      const firstVisit = localStorage.getItem("firstVisit");
+      if (firstVisit == "true") {
         router.push("/onboarding");
-      } 
-      if(user.isEmailVerified) {
-        router.push(user.role == "user" ? "/user/dashboard" : user.role == "teacher" ||user.role == "instructor" ?"/teacher/course" : "/")
       }
-
+      if (user.isEmailVerified) {
+        router.push(
+          user.role == "user"
+            ? "/user/dashboard"
+            : user.role == "teacher" || user.role == "instructor"
+            ? "/teacher/course"
+            : "/"
+        );
+      }
     } catch (error) {
       const errMsg = error.response?.data?.errorMessage?.message;
       setApiError(errMsg);
@@ -90,60 +99,88 @@ export default function LoginPage() {
     } finally {
       // setLoading(false);
     }
-
   };
 
-
-  const handleGoogleAuth = async()=>{
+  const handleGoogleAuth = async () => {
+    setGoogleLoading(true);
     try {
-      // const response = await axios.get("http://localhost:8000/api/v1/auth/google",{
-      //   withCredentials: true
-      // });
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("role");
+
       window.location.href = `${api_url}/auth/google`;
-      const { token, user, message } = response.data;
-      // Store in localStorage (or cookies, or context)
-      // localStorage.setItem("user", JSON.stringify(user));
-      // if(!user.isEmailVerified){
-      //   router.push("/auth/verify-email")
-      // }
-      // const firstVisit = localStorage.getItem("firstVisit")
-      // if(firstVisit == true){
-      //   router.push("/onboarding");
-      // } else {
-      //   router.push("/")
-      // }
-
-
     } catch (error) {
-      const errMsg =
-        error.response?.data?.message;
+      const errMsg = error.response?.data?.message;
       setApiError(errMsg);
     } finally {
-      setLoading(false);
+      setGoogleLoading(false);
     }
-  }
+  };
+
+useEffect(()=>{
+  const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get("token");
+      const user = urlParams.get("user");
+
+      if (token && user) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", user);
+        const userObj = JSON.parse(user);
+        localStorage.setItem("role", userObj.role);
+
+        const firstVisit = localStorage.getItem("firstVisit");
+
+        if (firstVisit == "true") {
+          console.log("firstvisit : ", firstVisit)
+          router.push("/onboarding");
+        } else {
+          const userObj = JSON.parse(localStorage.getItem("user"));
+          if (userObj.role === "user") {
+            
+            router.push("/user/dashboard");
+          } else if (
+            userObj.role === "teacher" ||
+            userObj.role === "instructor"
+          ) {
+            router.push("/teacher/course");
+          }
+        }
+      }
+}, [])
+
 
   return (
     <CardContent>
-      <img className="md:flex lg:hidden hidden sm:w-[160px] w-full mb-10" src={'/logo-on-light.png'} />
-      <h2 className="text-xl font-bold text-gray-900 mb-4">Login to Your Account</h2>
-      <p className="text-sm text-gray-500 mb-4">Access your personalized dashboard by logging into your account.</p>
+      <img
+        className="md:flex lg:hidden hidden sm:w-[160px] w-full mb-10"
+        src={"/logo-on-light.png"}
+      />
+      <h2 className="text-xl font-bold text-gray-900 mb-4">
+        Login to Your Account
+      </h2>
+      <p className="text-sm text-gray-500 mb-4">
+        Access your personalized dashboard by logging into your account.
+      </p>
 
       {apiError && <p className="text-sm text-red-500 mb-3">{apiError}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Email */}
         <div>
-          <label className="text-sm font-medium text-gray-700">Email Address</label>
+          <label className="text-sm font-medium text-gray-700">
+            Email Address
+          </label>
           <Input
             placeholder="Enter your email"
             name="email"
             type="email"
             value={formData.email}
             onChange={handleChange}
-            className={`mt-1 ${errors.email ? 'border-red-500' : ''}`}
+            className={`mt-1 ${errors.email ? "border-red-500" : ""}`}
           />
-          {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+          {errors.email && (
+            <p className="text-sm text-red-500">{errors.email}</p>
+          )}
         </div>
 
         {/* Password */}
@@ -156,37 +193,58 @@ export default function LoginPage() {
               type={showPassword ? "text" : "password"}
               value={formData.password}
               onChange={handleChange}
-              className={`mt-1 ${errors.password ? 'border-red-500' : ''}`}
+              className={`mt-1 ${errors.password ? "border-red-500" : ""}`}
             />
             <span
               className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? <EyeOff className="text-xl" /> : <Eye className="text-xl" />}
+              {showPassword ? (
+                <EyeOff className="text-xl" />
+              ) : (
+                <Eye className="text-xl" />
+              )}
             </span>
           </div>
-          {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
+          {errors.password && (
+            <p className="text-sm text-red-500">{errors.password}</p>
+          )}
         </div>
 
         {/* Forgot Password */}
-        <div className="text-right text-sm text-blue-600 cursor-pointer" onClick={handleForgotClick}>Forgot password?</div>
+        <div
+          className="text-right text-sm text-blue-600 cursor-pointer"
+          onClick={handleForgotClick}
+        >
+          Forgot password?
+        </div>
 
         {/* Submit */}
-        <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white" disabled={loading}>
+        <Button
+          type="submit"
+          className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+          disabled={loading}
+        >
           {loading ? "Logging in..." : "Login"}
         </Button>
 
         {/* Google */}
         <Separator className="my-2" />
       </form>
-        <Button onClick={handleGoogleAuth} variant="outline" className="w-full flex items-center justify-center gap-2">
-          <FcGoogle className="text-lg" /> Continue with Google
-        </Button>
+      <Button
+        onClick={handleGoogleAuth}
+        variant="outline"
+        className="w-full flex items-center justify-center gap-2"
+        disabled={googleLoading}
+      >
+        <FcGoogle className="text-lg" />{" "}
+        {googleLoading ? "Loading..." : "Continue with Google"}
+      </Button>
 
       {/* Sign Up */}
       <p className="text-sm text-center text-gray-600 mt-4">
         Don&apos;t have an account yet?{" "}
-        <Link href={'/auth/signup'}>
+        <Link href={"/auth/signup"}>
           <span className="text-blue-600 cursor-pointer">Sign up</span>
         </Link>
       </p>

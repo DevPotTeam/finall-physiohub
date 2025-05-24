@@ -219,7 +219,7 @@ export default function Onboarding() {
           />
         );
       case 6:
-        return <StartEnd isEnd={true} onClick={() => router.push("/user/dashboard")} />;
+        return <StartEnd isEnd={true} onClick={() => {router.push("/user/dashboard"); localStorage.setItem("firstVisit", false)}} />;
     }
   };
   
