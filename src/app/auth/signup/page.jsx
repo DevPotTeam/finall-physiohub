@@ -87,13 +87,29 @@ export default function SignUpPage() {
       router.push("/"); // or wherever you want
     }
   }, []);
+  
   const handleGoogleAuth = async()=>{
       try {
-        // const response = await axios.get("http://localhost:8000/api/v1/auth/google",{
+        localStorage.setItem("firstVisit", true)
+        localStorage.removeItem("token")
+        localStorage.removeItem("user")
+        localStorage.removeItem("role")
+        // const response = await axios.get(`${api_url}/auth/google`,{
         //   withCredentials: true
         // });
         window.location.href = `${api_url}/auth/google`;
-        const { token, user, message } = response.data;
+
+        const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      const user = urlParams.get('user');
+      console.log(token)
+      if (token && user) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", user);
+        const userObj = JSON.parse(user);
+        localStorage.setItem("role", userObj.role);
+        
+      }
         // Store in localStorage (or cookies, or context)
         // localStorage.setItem("user", JSON.stringify(user));
         // if(!user.isEmailVerified){
@@ -110,7 +126,7 @@ export default function SignUpPage() {
       } catch (error) {
         const errMsg =
           error.response?.data?.message;
-        setApiError(errMsg);
+          setResponseMessage({ type: 'error', text: errMsg });
       } finally {
         setLoading(false);
       }

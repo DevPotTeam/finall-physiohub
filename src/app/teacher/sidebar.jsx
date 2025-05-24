@@ -81,6 +81,7 @@ const Sidebar = ({onClose}) => {
                 <div className="mt-auto pl-2 pr-2 mb-5">
                 <Link 
                 href={"/auth/login"}
+                onClick={() => {localStorage.removeItem("token"); localStorage.removeItem("user")}}
                         className={`mb-4 flex items-center justify-center md:space-x-0 lg:space-x-2 space-x-2 text-sm cursor-pointer font-semibold p-4 rounded-lg w-full bg-[#F6F9FC] text-red-400 hover:text-red-500`}
                     >
                         <LogOut size={24} /> {/* Increased size for the icon */}

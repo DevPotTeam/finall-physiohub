@@ -12,8 +12,8 @@ export default function Footer({scrollToSection}) {
   const [role, setRole] = useState("")
 
   useEffect(()=>{
-    const token = Cookies.get("token")
-    const role = Cookies.get("role")
+    const token = localStorage.getItem("token")
+    const role = JSON.parse(localStorage.getItem("user"))?.role
     if(token){
       setIsLoggedIn(true)
     }
