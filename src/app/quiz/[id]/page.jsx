@@ -720,12 +720,12 @@ export default function QuizCard({params}) {
 
     {/* Action Buttons */}
     <div className="flex flex-col sm:flex-row gap-4 w-full mt-10 px-4">
-      <button 
+      <Link href={"/user/dashboard"} 
         className="px-6 py-3 border-2 border-purple-200 rounded-xl text-purple-700 hover:bg-purple-50 transition-all flex items-center justify-center gap-2 font-medium"
       >
         <ArrowLeft className="w-5 h-5" />
         Back to Dashboard
-      </button>
+      </Link>
       
       <Link
         href={"/user/quizs"}

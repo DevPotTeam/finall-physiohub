@@ -137,15 +137,30 @@ export default function AddLessons({params}) {
   };
 
   const handleLessonsAdd = async () => {
-    const {data, error, status} = await usePost(`/courses/add-to-course/${id}`, formData)
-    if(status == 201){
-      showToast("Lesson Added Successfully", "success")
+    // Clean up the formData by removing open, id, and options from each card
+    const cleanedContents = cards.map(({ open, id, options, ...rest }) => rest);
+    
+    try {
+      for (const lesson of cleanedContents) {
+        const lessonData = {
+          lessonTitle: formData.lessonTitle,
+          contents: [lesson]
+        };
+        
+        const {data, error, status} = await usePost(`/courses/add-to-course/${id}`, lessonData);
+        
+        if (error) {
+          showToast(error[0], "error");
+          return;
+        }
+      }
+      
+      showToast("All Lessons Added Successfully", "success");
       setTimeout(() => {
-        router.push("/teacher/course")
+        router.push("/teacher/course");
       }, 2000);
-    }
-    if(error){
-      showToast(error[0], "error")
+    } catch (error) {
+      showToast("Error adding lessons", "error");
     }
   };
 

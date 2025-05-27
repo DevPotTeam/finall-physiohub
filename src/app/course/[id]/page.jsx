@@ -246,7 +246,7 @@ export default function CourseDetail({params}) {
                                                 <video 
                                                   controls 
                                                   
-                                                  className="w-full"
+                                                  className="w-full h-[500px]"
                                                   poster="https://via.placeholder.com/800x450?text=Video+Thumbnail"
                                                   src={content.url}
                                                 >
@@ -277,7 +277,7 @@ export default function CourseDetail({params}) {
                                         ))}
                                       </div>
                                       
-                                      {/* {!isCompleted && (
+                                      {!isCompleted && (
                                         <motion.button
                                           whileHover={{ scale: 1.02 }}
                                           whileTap={{ scale: 0.98 }}
@@ -286,7 +286,7 @@ export default function CourseDetail({params}) {
                                         >
                                           Mark as Complete
                                         </motion.button>
-                                      )} */}
+                                      )}
                                     </div>
                                   </motion.div>
                                 )}
