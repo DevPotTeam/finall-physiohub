@@ -18,13 +18,11 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
   const [frontCardImageLoading, setFrontCardImageLoading] = useState(false);
   const [backCardImageLoading, setBackCardImageLoading] = useState(false);
   const [topics, setTopics] = useState([]);
-  const [showTopicModal, setShowTopicModal] = useState(false);
-  const [newTopicName, setNewTopicName] = useState("");
-  const [flashcard, setFlashcard] = useState({
+  const [selectedTopic, setSelectedTopic] = useState("");
+  const [flashcards, setFlashcards] = useState([{
     title: "",
     description: "",
     hint: "",
-    imageUrl: "",
     masteryLevel: 0,
     subject: "",
     confidenceLevel: "",
@@ -32,8 +30,7 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
     frontImage: "",
     backContent: "",
     backImage: "",
-    topic: "",
-  });
+  }]);
 
   const showToast = (message, type = 'success') => {
     setNotification({ message, type });
@@ -51,23 +48,24 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
     fetchTopics();
   }, []);
 
-  const handleChange = (e) => {
+  const handleChange = (e, index) => {
     const { name, value } = e.target;
-    if (name == "masteryLevel") {
-      setFlashcard((prev) => ({
-        ...prev,
+    const updatedFlashcards = [...flashcards];
+    if (name === "masteryLevel") {
+      updatedFlashcards[index] = {
+        ...updatedFlashcards[index],
         [name]: Number(value),
-      }));
-      return;
+      };
+    } else {
+      updatedFlashcards[index] = {
+        ...updatedFlashcards[index],
+        [name]: value,
+      };
     }
-    setFlashcard((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFlashcards(updatedFlashcards);
   };
 
-  const handleUpload = async (eOrFiles, name) => {
-    if (name === "imageUrl") setImageLoading(true);
+  const handleUpload = async (eOrFiles, name, index) => {
     if (name === "frontImage") setFrontCardImageLoading(true);
     if (name === "backImage") setBackCardImageLoading(true);
 
@@ -82,19 +80,22 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
     );
 
     if (data) {
-      console.log(data)
-      setFlashcard((prev) => ({ ...prev, [name]: data }));
+      const updatedFlashcards = [...flashcards];
+      updatedFlashcards[index] = {
+        ...updatedFlashcards[index],
+        [name]: data,
+      };
+      setFlashcards(updatedFlashcards);
     }
 
-    setImageLoading(false);
     setFrontCardImageLoading(false);
     setBackCardImageLoading(false);
   };
 
-  const handleDrop = (event, name) => {
+  const handleDrop = (event, name, index) => {
     event.preventDefault();
     if (event.dataTransfer?.files) {
-      handleUpload(event.dataTransfer.files, name);
+      handleUpload(event.dataTransfer.files, name, index);
     }
   };
 
@@ -102,394 +103,338 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
     event.preventDefault();
   };
 
-  const handleRemoveImage = (name) => {
-    setFlashcard((prev) => ({
-      ...prev,
+  const handleRemoveImage = (name, index) => {
+    const updatedFlashcards = [...flashcards];
+    updatedFlashcards[index] = {
+      ...updatedFlashcards[index],
       [name]: "",
-    }));
+    };
+    setFlashcards(updatedFlashcards);
   };
 
-  const handleCreateTopic = async () => {
-    if (!newTopicName.trim()) {
-      showToast("Topic name cannot be empty", "error");
+  const addNewFlashcard = () => {
+    setFlashcards([...flashcards, {
+      title: "",
+      description: "",
+      hint: "",
+      masteryLevel: 0,
+      subject: "",
+      confidenceLevel: "",
+      frontContent: "",
+      frontImage: "",
+      backContent: "",
+      backImage: "",
+    }]);
+  };
+
+  const removeFlashcard = (index) => {
+    const updatedFlashcards = flashcards.filter((_, i) => i !== index);
+    setFlashcards(updatedFlashcards);
+  };
+
+  const handleCreateFlashCards = async () => {
+    if (!selectedTopic) {
+      showToast("Please select a topic", "error");
       return;
     }
 
-    const { data, error, status } = await usePost("/main-topics", {
-      name: newTopicName
-    });
+    const validFlashcards = flashcards.filter(fc => 
+      fc.frontContent.trim() && fc.backContent.trim()
+    );
 
-    if (status === 201) {
-      showToast("Topic created successfully", "success");
-      setNewTopicName("");
-      setShowTopicModal(false);
-      fetchTopics();
-    } else {
-      showToast(error?.[0] || "Failed to create topic", "error");
+    if (validFlashcards.length === 0) {
+      showToast("Please add at least one valid flashcard with front and back content", "error");
+      return;
     }
-  };
 
-  const handleCreateFlashCard = async () => {
-    const { data, error, status } = await usePost(`/flashcards/create`, {
-      ...flashcard,
-    });
-    if (status == 201) {
+    try {
+      console.log(validFlashcards)
+      for (let i = 0; i < validFlashcards.length; i++) {
+        
+        const flashcard = validFlashcards[i];
+        const { data, error, status } = await usePost(`/flashcards/create`, {
+          ...flashcard,
+          topic: selectedTopic,
+        });
+
+        if (status === 201) {
+          showToast(`Created flashcard ${i + 1} of ${validFlashcards.length}`, "success");
+        } else if (error) {
+          showToast(`Error creating flashcard ${i + 1}: ${error[0]}`, "error");
+          break;
+        }
+      }
+      
       setTimeout(() => {
         setShowInFlashCard("FlashCards");
       }, 2000);
-      showToast("FlashCard Created Successfully", "success")
-    }
-    if (error) {
-      showToast(error[0], "error")
+    } catch (error) {
+      showToast("An error occurred while creating flashcards", "error");
     }
   };
 
   return (
     <>
-      <PublishFlashCardHeader handleCreateFlashCard={handleCreateFlashCard} setShowInFlashCard={setShowInFlashCard}/>
-      <div className=" p-6 bg-white rounded-lg shadow-md w-full mx-auto md:max-w-[80%] max-w-[95%]">
-        {/* Cover Image Upload */}
-        <div className="mb-4 ">
-          <label className="block font-semibold text-gray-700">Title</label>
-          <Input
-            placeholder="Write question here"
-            className="my-2"
-            name="title"
-            value={flashcard.title}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-4 ">
-          <label className="block font-semibold text-gray-700">Description</label>
-          <Input
-            placeholder="Write question here"
-            className="my-2"
-            name="description"
-            value={flashcard.description}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="grid md:grid-cols-2 gap-2">
-          <div className="mb-4 ">
-            <label className="block font-semibold text-gray-700">Hint</label>
-            <Input
-              placeholder="Write Hint here"
-              className="my-2"
-              name="hint"
-              value={flashcard.hint}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-4 ">
-            <label className="block font-semibold text-gray-700">Subject</label>
-            <Input
-              placeholder="Write Subject here"
-              className="my-2"
-              name="subject"
-              value={flashcard.subject}
-              onChange={handleChange}
-            />
-          </div>
-        </div>
-
-        <div className="mb-4 ">
-          <label className="block font-semibold text-gray-700">Mastery Level</label>
-          <Input
-            placeholder="Write Mastery Level here"
-            className="my-2"
-            type={"number"}
-            name="masteryLevel"
-            value={flashcard.masteryLevel}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-2">
-          <div className="mb-4">
-            <label className="block font-semibold text-gray-700">Confidence Level</label>
-            <Select
-              name="confidenceLevel"
-              value={flashcard.confidenceLevel}
-              onChange={handleChange}
-              className="w-full"
-            >
-              <option value="">Choose Level</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </Select>
-          </div>
-
-          <div className="mb-4">
-            <label className="block font-semibold text-gray-700">Topic</label>
-            <div className="flex md:flex-row flex-col items-center gap-2">
-            <Select
-              name="topic"
-              value={flashcard.topic}
-              onChange={handleChange}
-              className="w-full"
-            >
-              <option value="">Choose Topic</option>
-              {topics.map((topic) => (
-                <option key={topic._id} value={topic._id}>{topic.name}</option>
-              ))}
-            </Select>
-            <Button
-              type="button"
-              onClick={() => setShowTopicModal(true)}
-              variant="outline"
-              className="gap-2 md:w-auto w-full"
-            >
-              <Plus className="w-4 h-4" />
-             Add New Topic
-            </Button>
-            </div>
-          </div>
-        </div>
-        {/* Thumbnail Upload */}
-        <div className="mb-4">
-          <label className="block font-semibold text-gray-700">Image</label>
-          {!flashcard.imageUrl ? (
-            <div
-              className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500 "
-              onDrop={(e) => {
-                handleDrop(e, "imageUrl");
-              }}
-              onDragOver={(e) => {
-                handleDragOver(e, "imageUrl");
-              }}
-            >
-              {imageLoading ? (
-                <div className="w-12 h-12 border-4 border-t-purple-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div>
-              ) : (
-                <label className="ud-btn btn-white text-center cursor-pointer">
-                  <div className="icon mb5">
-                    <Upload className="w-6 h-6 mb-2 text-purple-600 justify-self-center " />
-                  </div>
-                  <h4 className="title fz17 mb1">
-                    Upload/Drag photos of your FlashCard
-                  </h4>
-                  <p className="text fz-10 mb10">
-                    Photos must be JPEG or PNG format and at least 2048x768
-                  </p>
-                  Browse Files
-                  <input
-                    ref={fileInputRef}
-                    id="fileInput"
-                    type="file"
-                    name="imageUrl"
-                    multiple
-                    className="ud-btn btn-white"
-                    onChange={(e) => {
-                      handleUpload(e, "imageUrl");
-                    }}
-                    style={{ display: "none" }}
-                    required
-                  />
-                </label>
-              )}
+      <PublishFlashCardHeader handleCreateFlashCard={handleCreateFlashCards} setShowInFlashCard={setShowInFlashCard}/>
+      <div className="p-6 bg-white rounded-lg shadow-md w-full mx-auto md:max-w-[80%] max-w-[95%]">
+        <div className="mb-6">
+          <label className="block font-semibold text-gray-700 mb-4">Select Topic</label>
+          {selectedTopic ? (
+            <div className="flex items-center gap-4">
+              <div className="p-4 border border-purple-600 bg-purple-50 rounded-lg flex-1">
+                <h3 className="font-medium text-gray-900">
+                  {topics.find(t => t._id === selectedTopic)?.name}
+                </h3>
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => setSelectedTopic("")}
+                className="flex items-center gap-2"
+              >
+                <X size={16} />
+                Change Topic
+              </Button>
             </div>
           ) : (
-            <div>
-              <button
-                className="justify-self-end cursor-pointer"
-                onClick={() => {
-                  handleRemoveImage("imageUrl");
-                }}
-              >
-                <X />
-              </button>
-              <div className="md:w-[150px] w-[100px] md:h-[150px] h-[100px]">
-                <Image
-                  src={flashcard.imageUrl}
-                  height={200}
-                  width={200}
-                  alt="cover-image"
-                  className="w-full h-full"
-                />
-              </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {topics.map((topic) => (
+                <div
+                  key={topic._id}
+                  onClick={() => setSelectedTopic(topic._id)}
+                  className="p-4 border border-gray-200 rounded-lg cursor-pointer transition-all duration-200 hover:border-purple-400"
+                >
+                  <h3 className="font-medium text-gray-900">{topic.name}</h3>
+                </div>
+              ))}
             </div>
           )}
         </div>
 
-        <div className="border p-4 mb-4 rounded shadow-sm">
-          {/* Front */}
-          <div className="flex md:flex-row flex-col md:gap-3 items-center">
-            <div className="md:mb-4 mb-2">
-              {!flashcard.frontImage ? (
-                <div
-                  className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500 h-10 w-[100px]"
-                  onDrop={(e) => {
-                    handleDrop(e, "frontImage");
-                  }}
-                  onDragOver={(e) => {
-                    handleDragOver(e, "frontImage");
-                  }}
+        {selectedTopic ? (
+          <>
+            {flashcards.map((flashcard, index) => (
+              <div key={index} className="border p-6 rounded-lg mb-6 relative">
+                <button
+                  onClick={() => removeFlashcard(index)}
+                  className="absolute top-4 right-4 text-red-500 hover:text-red-700"
                 >
-                  {frontCardImageLoading ? (
-                    <div className="w-3 h-3 border-2 p-2 border-t-purple-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div>
-                  ) : (
-                    <label className=" text-center cursor-pointer">
-                      <div className="icon mb5">
-                        <Upload className="w-4 h-4 text-purple-600 justify-self-center" />
-                      </div>
-                      <h4 className="title fz17 mb1">Front</h4>
-                      <input
-                        ref={fileInputRef}
-                        id="fileInput"
-                        type="file"
-                        name="frontImage"
-                        multiple
-                        className=""
-                        onChange={(e) => {
-                          handleUpload(e, "frontImage");
-                        }}
-                        style={{ display: "none" }}
-                        required
-                      />
-                    </label>
-                  )}
-                </div>
-              ) : (
-                <div>
-                  <button
-                    className="justify-self-end cursor-pointer"
-                    onClick={() => {
-                      handleRemoveImage("frontImage");
-                    }}
-                  >
-                    <X />
-                  </button>
-                  <Image
-                    src={flashcard.frontImage}
-                    height={100}
-                    width={100}
-                    alt="cover-image"
-                  />
-                </div>
-              )}
-            </div>
-            <div className="mb-3 w-full">
-              <label className="block font-semibold text-gray-700">Front</label>
-              <Input
-                placeholder="Front Content"
-                name="frontContent"
-                value={flashcard.frontContent}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
-          {/* Back */}
-          <div className="flex md:flex-row flex-col md:gap-3 items-center">
-            <div className="md:mb-4 mb-2">
-              {!flashcard.backImage ? (
-                <div
-                  className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500 h-10 w-[100px]"
-                  onDrop={(e) => {
-                    handleDrop(e, "backImage");
-                  }}
-                  onDragOver={(e) => {
-                    handleDragOver(e, "backImage");
-                  }}
-                >
-                  {backCardImageLoading ? (
-                    <div className="w-3 h-3 border-2 p-2 border-t-purple-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div>
-                  ) : (
-                    <label className=" text-center cursor-pointer">
-                      <div className="icon mb5">
-                        <Upload className="w-4 h-4 text-purple-600 justify-self-center" />
-                      </div>
-                      <h4 className="title fz17 mb1">Back</h4>
-                      <input
-                        ref={fileInputRef}
-                        id="fileInput"
-                        type="file"
-                        name="backImage"
-                        multiple
-                        className=""
-                        onChange={(e) => {
-                          handleUpload(e, "backImage");
-                        }}
-                        style={{ display: "none" }}
-                        required
-                      />
-                    </label>
-                  )}
-                </div>
-              ) : (
-                <div>
-                  <button
-                    className="justify-self-end cursor-pointer"
-                    onClick={() => {
-                      handleRemoveImage("backImage");
-                    }}
-                  >
-                    <X />
-                  </button>
-                  <Image
-                    src={flashcard.backImage}
-                    height={100}
-                    width={100}
-                    alt="cover-image"
-                  />
-                </div>
-              )}
-            </div>
-            <div className="mb-3 w-full">
-              <label className="block font-semibold text-gray-700">Back</label>
-              <Input
-                placeholder="Back Content"
-                name="backContent"
-                value={flashcard.backContent}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-        </div>
-
-        {showTopicModal && (
-          <div className="fixed inset-0 bg-black/30 bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">Create New Topic</h3>
-                <button 
-                  onClick={() => setShowTopicModal(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <X className="w-5 h-5" />
+                  <X size={20} />
                 </button>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Topic Name
-                  </label>
+                <h3 className="text-lg font-semibold mb-4">Flashcard {index + 1}</h3>
+                
+                <div className="mb-4">
+                  <label className="block font-semibold text-gray-700">Title</label>
                   <Input
-                    type="text"
-                    value={newTopicName}
-                    onChange={(e) => setNewTopicName(e.target.value)}
-                    placeholder="Enter topic name"
+                    placeholder="Write question here"
+                    className="my-2"
+                    name="title"
+                    value={flashcard.title}
+                    onChange={(e) => handleChange(e, index)}
                   />
                 </div>
-                <div className="flex justify-end gap-3">
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowTopicModal(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleCreateTopic}
-                  >
-                    Create
-                  </Button>
+                <div className="mb-4">
+                  <label className="block font-semibold text-gray-700">Description</label>
+                  <Input
+                    placeholder="Write question here"
+                    className="my-2"
+                    name="description"
+                    value={flashcard.description}
+                    onChange={(e) => handleChange(e, index)}
+                  />
+                </div>
+                <div className="grid md:grid-cols-2 gap-2">
+                  <div className="mb-4">
+                    <label className="block font-semibold text-gray-700">Hint</label>
+                    <Input
+                      placeholder="Write Hint here"
+                      className="my-2"
+                      name="hint"
+                      value={flashcard.hint}
+                      onChange={(e) => handleChange(e, index)}
+                    />
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block font-semibold text-gray-700">Subject</label>
+                    <Input
+                      placeholder="Write Subject here"
+                      className="my-2"
+                      name="subject"
+                      value={flashcard.subject}
+                      onChange={(e) => handleChange(e, index)}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-2">
+                  <div className="mb-4">
+                    <label className="block font-semibold text-gray-700">Confidence Level</label>
+                    <Select
+                      name="confidenceLevel"
+                      value={flashcard.confidenceLevel}
+                      onChange={(e) => handleChange(e, index)}
+                      className="w-full"
+                    >
+                      <option value="">Choose Level</option>
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                    </Select>
+                  </div>
+                  <div className="mb-4">
+                    <label className="block font-semibold text-gray-700">Mastery Level</label>
+                    <Input
+                      placeholder="Write Mastery Level here"
+                      className="mt-0.5"
+                      type={"number"}
+                      max={3}
+                      name="masteryLevel"
+                      value={flashcard.masteryLevel}
+                      onChange={(e) => handleChange(e, index)}
+                    />
+                  </div>
+                </div>
+
+                <div className="border p-4 mb-4 rounded shadow-sm">
+                  {/* Front */}
+                  <div className="flex md:flex-row flex-col md:gap-3 items-center">
+                    <div className="md:mb-4 mb-2">
+                      {!flashcard.frontImage ? (
+                        <div
+                          className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500 h-10 w-[100px]"
+                          onDrop={(e) => handleDrop(e, "frontImage", index)}
+                          onDragOver={handleDragOver}
+                        >
+                          {frontCardImageLoading ? (
+                            <div className="w-3 h-3 border-2 p-2 border-t-purple-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div>
+                          ) : (
+                            <label className="text-center cursor-pointer">
+                              <div className="icon mb5">
+                                <Upload className="w-4 h-4 text-purple-600 justify-self-center" />
+                              </div>
+                              <h4 className="title fz17 mb1">Front (Optional)</h4>
+                              <input
+                                type="file"
+                                name="frontImage"
+                                multiple
+                                className=""
+                                onChange={(e) => handleUpload(e, "frontImage", index)}
+                                style={{ display: "none" }}
+                              />
+                            </label>
+                          )}
+                        </div>
+                      ) : (
+                        <div>
+                          <button
+                            className="justify-self-end cursor-pointer"
+                            onClick={() => handleRemoveImage("frontImage", index)}
+                          >
+                            <X />
+                          </button>
+                          <Image
+                            src={flashcard.frontImage}
+                            height={100}
+                            width={100}
+                            alt="cover-image"
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <div className="mb-3 w-full">
+                      <label className="block font-semibold text-gray-700">
+                        Front/Term <span className="text-red-500">*</span>
+                      </label>
+                      <Input
+                        placeholder="Front Content (Required)"
+                        name="frontContent"
+                        value={flashcard.frontContent}
+                        onChange={(e) => handleChange(e, index)}
+                        required
+                        className={!flashcard.frontContent.trim() ? "border-red-300" : ""}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Back */}
+                  <div className="flex md:flex-row flex-col md:gap-3 items-center">
+                    <div className="md:mb-4 mb-2">
+                      {!flashcard.backImage ? (
+                        <div
+                          className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500 h-10 w-[100px]"
+                          onDrop={(e) => handleDrop(e, "backImage", index)}
+                          onDragOver={handleDragOver}
+                        >
+                          {backCardImageLoading ? (
+                            <div className="w-3 h-3 border-2 p-2 border-t-purple-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div>
+                          ) : (
+                            <label className="text-center cursor-pointer">
+                              <div className="icon mb5">
+                                <Upload className="w-4 h-4 text-purple-600 justify-self-center" />
+                              </div>
+                              <h4 className="title fz17 mb1">Back (Optional)</h4>
+                              <input
+                                type="file"
+                                name="backImage"
+                                multiple
+                                className=""
+                                onChange={(e) => handleUpload(e, "backImage", index)}
+                                style={{ display: "none" }}
+                              />
+                            </label>
+                          )}
+                        </div>
+                      ) : (
+                        <div>
+                          <button
+                            className="justify-self-end cursor-pointer"
+                            onClick={() => handleRemoveImage("backImage", index)}
+                          >
+                            <X />
+                          </button>
+                          <Image
+                            src={flashcard.backImage}
+                            height={100}
+                            width={100}
+                            alt="cover-image"
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <div className="mb-3 w-full">
+                      <label className="block font-semibold text-gray-700">
+                        Back/Description <span className="text-red-500">*</span>
+                      </label>
+                      <Input
+                        placeholder="Back Content (Required)"
+                        name="backContent"
+                        value={flashcard.backContent}
+                        onChange={(e) => handleChange(e, index)}
+                        required
+                        className={!flashcard.backContent.trim() ? "border-red-300" : ""}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
+            ))}
+
+            <div className="flex justify-center mb-6">
+              <Button
+                onClick={addNewFlashcard}
+                className="flex items-center gap-2"
+              >
+                <Plus size={20} />
+                Add Another Flashcard
+              </Button>
             </div>
+          </>
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            Please select a topic to start creating flashcards
           </div>
         )}
+
         {notification && (
           <div
             className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${

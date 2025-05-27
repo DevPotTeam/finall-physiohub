@@ -76,83 +76,106 @@ function Flashcard({ flashCardData, length, currentCard }) {
         >
           <div className="flashcard-inner">
             <div className="flashcard-front relative">
-              {/* Your existing front content */}
-              <div
-                className="bg-black-50 rounded-lg"
-                style={{ backgroundImage: flashCardData.frontImage }}
-              >
-                <div className="absolute top-3 left-3 flex items-center gap-2">
-                  <Volume2
-                    className="w-5 h-5 text-gray-500 cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation(); // prevent flip
-                      speakText(flashCardData?.frontContent); // or backContent
-                    }}
-                  />
-                  <div
-                    className="relative inline-block"
-                    onMouseEnter={() => setShowHint(true)}
-                    onMouseLeave={() => setShowHint(false)}
-                  >
-                    <button className="flex items-center gap-1 text-sm bg-white px-2 py-1 rounded-full border hover:shadow cursor-pointer">
-                      <WandSparkles className="w-4 h-4 text-purple-600 " />
-                      <span className="text-purple-600 font-medium">
-                        Get a hint
-                      </span>
-                    </button>
+              <div className="absolute top-3 left-3 flex items-center gap-2 z-10">
+                <Volume2
+                  className="w-5 h-5 text-black cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    speakText(flashCardData?.frontContent);
+                  }}
+                />
+                <div
+                  className="relative inline-block"
+                  onMouseEnter={() => setShowHint(true)}
+                  onMouseLeave={() => setShowHint(false)}
+                >
+                  <button className="flex items-center gap-1 text-sm bg-white/90 px-2 py-1 rounded-full border hover:shadow cursor-pointer">
+                    <WandSparkles className="w-4 h-4 text-purple-600 " />
+                    <span className="text-purple-600 font-medium">
+                      Get a hint
+                    </span>
+                  </button>
 
-                    {showHint && (
-                      <div className="absolute top-full left-16 transform -translate-x-1/2 mt-2 px-3 py-2 bg-white text-gray-800 rounded-lg shadow-lg w-48 text-sm">
-                        {flashCardData.hint}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="absolute top-3 right-3 flex items-center gap-2 bg-white p-2 rounded-lg">
-                  <Star className="w-4 h-4 text-gray-400" />
+                  {showHint && (
+                    <div className="absolute top-full left-16 transform -translate-x-1/2 mt-2 px-3 py-2 bg-white text-gray-800 rounded-lg shadow-lg w-48 text-sm">
+                      {flashCardData.hint}
+                    </div>
+                  )}
                 </div>
               </div>
-              <h1 className="text-center sm:text-lg text-base font-semibold">
-                {flashCardData?.frontContent}
-              </h1>
+              <div className="absolute top-3 right-3 flex items-center gap-2 bg-white/90 p-2 rounded-lg z-10">
+                <Star className="w-4 h-4 text-gray-400" />
+              </div>
+              <div className="bg-black-50 rounded-lg  h-[350px] relative overflow-hidden">
+                {flashCardData?.frontImage ? (
+                  <img 
+                    src={flashCardData.frontImage} 
+                    alt="Front content"
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                ) : null}
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50">
+                  <h1 className="absolute bottom-4 left-0 right-0 text-center sm:text-lg text-base font-semibold text-white px-4">
+                    {flashCardData?.frontContent}
+                  </h1>
+                </div>
+              </div>
+              {!flashCardData?.frontImage && (
+                <h1 className="text-center sm:text-lg text-base font-semibold mt-4">
+                  {flashCardData?.frontContent}
+                </h1>
+              )}
             </div>
             <div className="flashcard-back relative">
-              {/* Back side content */}
-              <div className="bg-indigo-50 rounded-lg min-h-[350px] ">
-                <div className="absolute top-3 left-3 flex items-center gap-2">
-                  <Volume2
-                    className="w-5 h-5 text-gray-500 cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation(); // prevent flip
-                      speakText(flashCardData?.backContent); // or backContent
-                    }}
-                  />
-                  <div
-                    className="relative inline-block"
-                    onMouseEnter={() => setShowHint(true)}
-                    onMouseLeave={() => setShowHint(false)}
-                  >
-                    <button className="flex items-center gap-1 text-sm bg-white px-2 py-1 rounded-full border hover:shadow cursor-pointer">
-                      <WandSparkles className="w-4 h-4 text-purple-600 " />
-                      <span className="text-purple-600 font-medium">
-                        Get a hint
-                      </span>
-                    </button>
+              <div className="absolute top-3 left-3 flex items-center gap-2 z-10">
+                <Volume2
+                  className="w-5 h-5 text-black cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    speakText(flashCardData?.backContent);
+                  }}
+                />
+                <div
+                  className="relative inline-block"
+                  onMouseEnter={() => setShowHint(true)}
+                  onMouseLeave={() => setShowHint(false)}
+                >
+                  <button className="flex items-center gap-1 text-sm bg-white/90 px-2 py-1 rounded-full border hover:shadow cursor-pointer">
+                    <WandSparkles className="w-4 h-4 text-purple-600 " />
+                    <span className="text-purple-600 font-medium">
+                      Get a hint
+                    </span>
+                  </button>
 
-                    {showHint && (
-                      <div className="absolute top-full left-16 transform -translate-x-1/2 mt-2 px-3 py-2 bg-white text-gray-800 rounded-lg shadow-lg w-48 text-sm">
-                        {flashCardData.hint}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="absolute top-3 right-3 flex items-center gap-2 bg-white p-2 rounded-lg">
-                  <Star className="w-4 h-4 text-gray-400" />
+                  {showHint && (
+                    <div className="absolute top-full left-16 transform -translate-x-1/2 mt-2 px-3 py-2 bg-white text-gray-800 rounded-lg shadow-lg w-48 text-sm">
+                      {flashCardData.hint}
+                    </div>
+                  )}
                 </div>
               </div>
-              <h1 className="text-center sm:text-lg text-base font-semibold">
-                {flashCardData?.backContent}
-              </h1>
+              <div className="absolute top-3 right-3 flex items-center gap-2 bg-white/90 p-2 rounded-lg z-10">
+                <Star className="w-4 h-4 text-gray-400" />
+              </div>
+              <div className="bg-indigo-50 rounded-lg h-[350px] relative overflow-hidden">
+                {flashCardData?.backImage ? (
+                  <img 
+                    src={flashCardData.backImage} 
+                    alt="Back content"
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                ) : null}
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50">
+                  <h1 className="absolute bottom-4 left-0 right-0 text-center sm:text-lg text-base font-semibold text-white px-4">
+                    {flashCardData?.backContent}
+                  </h1>
+                </div>
+              </div>
+              {!flashCardData?.backImage && (
+                <h1 className="text-center sm:text-lg text-base font-semibold mt-4">
+                  {flashCardData?.backContent}
+                </h1>
+              )}
             </div>
           </div>
         </div>
