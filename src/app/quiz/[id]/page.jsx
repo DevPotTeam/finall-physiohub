@@ -78,9 +78,9 @@ import usePost from "@/hooks/usePost";
 //   },
 // ];
 
-export default function QuizCard({params}) {
-  const { id } = React.use(params); 
-  const [questions, setQuestions] = useState([])
+export default function QuizCard({ params }) {
+  const { id } = React.use(params);
+  const [questions, setQuestions] = useState([]);
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [explanation, setExplanation] = useState("");
@@ -90,40 +90,81 @@ export default function QuizCard({params}) {
   const [textAnswer, setTextAnswer] = useState("");
   const [isAnswered, setIsAnswered] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(150);
+  const [quizTime, setQuizTime] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(() => {
+    // Try to get the stored time from localStorage
+    const storedTime =
+      typeof window !== "undefined"
+        ? localStorage.getItem(`quiz_${id}_time`)
+        : null;
+    if (storedTime) {
+      const { time, timestamp } = JSON.parse(storedTime);
+      const elapsed = Math.floor((Date.now() - timestamp) / 1000);
+      return Math.max(0, time - elapsed);
+    }
+    return 0;
+  });
   const [isSubmited, setIsSubmited] = useState(false);
   const [correctAnswer, setCorrectAnswer] = useState("");
   const [userAnswers, setUserAnswers] = useState([]);
-  const [startTime, setStartTime] = useState(null);
-  const [elapsed, setElapsed] = useState(0);
   const [result, setResult] = useState([]);
   // const [mainTopic, setMainTopic] = useState("")
 
-  const fetchQuizData = async ()=>{
-    const {data, error, status} = await useGet(`/quizzes/${id}`)
-    
-    if(status == 200){
-      setQuestions(data.questions)
+  const fetchQuizData = async () => {
+    const { data, error, status } = await useGet(`/quizzes/${id}`);
+    setQuizTime(data.quizDurationInMinutes);
+    if (status == 200) {
+      setQuestions(data.questions);
+      // Only set initial time if there's no stored time
+      if (!localStorage.getItem(`quiz_${id}_time`)) {
+        const initialTime = data.quizDurationInMinutes * 60;
+        setTimeLeft(initialTime);
+        // Store initial time in localStorage
+        localStorage.setItem(
+          `quiz_${id}_time`,
+          JSON.stringify({
+            time: initialTime,
+            timestamp: Date.now(),
+          })
+        );
+      }
       // setMainTopic(data.mainTopic.name)
     }
-  }
-  useEffect(()=>{
-    fetchQuizData()
-    if (startTime === null) {
-      setStartTime(Date.now());
-    }
-  },[])
-
-
+  };
   useEffect(() => {
-    if (!startTime) return;
-  
-    const interval = setInterval(() => {
-      setElapsed(Math.floor((Date.now() - startTime) / 1000));
+    fetchQuizData();
+  }, []);
+
+  // Timer countdown effect
+  useEffect(() => {
+    if (timeLeft <= 0 || isSubmited) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        const newTime = prevTime - 1;
+        // Update localStorage with new time
+        localStorage.setItem(
+          `quiz_${id}_time`,
+          JSON.stringify({
+            time: newTime,
+            timestamp: Date.now(),
+          })
+        );
+
+        if (newTime <= 0) {
+          clearInterval(timer);
+          handleSubmit(); // Auto submit when time runs out
+          localStorage.removeItem(`quiz_${id}_time`); // Clean up localStorage
+          return 0;
+        }
+        return newTime;
+      });
     }, 1000);
-  
-    return () => clearInterval(interval);
-  }, [startTime]);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [timeLeft, isSubmited, id]);
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -166,7 +207,7 @@ export default function QuizCard({params}) {
   //   } else if (current.type === "short-answer") {
   //     selectedTextOption = textAnswer;
   //   }
-  
+
   //   // Save answer
   //   setUserAnswers((prev) => [
   //     ...prev,
@@ -184,31 +225,34 @@ export default function QuizCard({params}) {
   const handleCheckAnswer = () => {
     if (isAnswered) return;
 
-
     const current = questions[currentQuestion];
     let correct = false;
-   
-    const correctAnswer = questions[currentQuestion].options.filter(option=> option.correctAnswer)
-    if(correctAnswer){
-      setCorrectAnswer(correctAnswer[0].value)
-      console.log(correctAnswer)
+
+    const correctAnswer = questions[currentQuestion].options.filter(
+      (option) => option.correctAnswer
+    );
+    if (correctAnswer) {
+      setCorrectAnswer(correctAnswer[0].value);
+      console.log(correctAnswer);
     }
     if (current.type === "checkbox") {
       const correctAnswers = current.options
         .filter((opt) => opt.correctAnswer)
         .map((opt) => opt._id);
-  
+
       correct =
         multipleOptions.length === correctAnswers.length &&
         multipleOptions.every((id) => correctAnswers.includes(id));
     } else if (current.type === "radio") {
-      const correctAnswer = current.options.find((opt) => opt.correctAnswer)?._id;
+      const correctAnswer = current.options.find(
+        (opt) => opt.correctAnswer
+      )?._id;
       correct = selectedOption === correctAnswer;
     } else if (current.type === "short-answer") {
       const correctAnswer = current.answer?.toLowerCase().trim();
       correct = textAnswer.toLowerCase().trim() === correctAnswer;
     }
-  
+
     // Get selected text option
     let selectedTextOption = "";
     if (current.type === "checkbox") {
@@ -217,11 +261,12 @@ export default function QuizCard({params}) {
         .map((opt) => opt.value)
         .join(", ");
     } else if (current.type === "radio") {
-      selectedTextOption = current.options.find((opt) => opt._id === selectedOption)?.value || "";
+      selectedTextOption =
+        current.options.find((opt) => opt._id === selectedOption)?.value || "";
     } else if (current.type === "short-answer") {
       selectedTextOption = textAnswer;
     }
-  
+
     // Save answer
     setUserAnswers((prev) => [
       ...prev,
@@ -230,12 +275,11 @@ export default function QuizCard({params}) {
         selectedTextOption,
       },
     ]);
-  
+
     setIsCorrect(correct);
     setExplanation(current.explanation || "");
     setIsAnswered(true);
   };
-  
 
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
@@ -261,37 +305,48 @@ export default function QuizCard({params}) {
     }
   };
 
-  const handleSubmit = async() => {
+  const handleSubmit = async () => {
     setIsSubmited(true);
-    const endTime = Date.now();
-    const completionTimeInSeconds = Math.floor((endTime - startTime) / 1000);
-  
+    localStorage.removeItem(`quiz_${id}_time`); // Clean up localStorage
+
+    const timeUsed = (quizTime * 60) - timeLeft; // Calculate time used in seconds
+
     const finalPayload = {
-      answers: userAnswers,
-      completionTime: completionTimeInSeconds,
+      answers:
+        userAnswers.length === 0
+          ? [
+              {
+                questionIndex: 0,
+                selectedImageOption: " ",
+              },
+            ]
+          : userAnswers,
+      completionTime: timeUsed,
     };
 
-    const fetchResult =  async() => {
-      const { data, error, status } = await usePost(`/quizzes/generate-results/${id}`);
-      
+    const fetchResult = async () => {
+      const { data, error, status } = await usePost(
+        `/quizzes/generate-results/${id}`
+      );
+
       if (status === 201 && Array.isArray(data)) {
         const lastResult = data[0]; // get last object
         setResult(lastResult);
       }
-    }
-    
-      const {data, error, status} = await usePost(`/quizzes/submit-quiz/${id}`, finalPayload)
-      if(status == 201){
-        const {data, error, status} = await usePost("/users/attendance")
-        console.log(status) 
-        if(status == 201){
-          fetchResult()
-        }
+    };
+
+    const { data, error, status } = await usePost(
+      `/quizzes/submit-quiz/${id}`,
+      finalPayload
+    );
+    if (status == 201) {
+      const { data, error, status } = await usePost("/users/attendance");
+      console.log(status);
+      if (status == 201 && userAnswers.length > 0) {
+        fetchResult();
       }
+    }
   };
-
-
- 
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg">
@@ -308,9 +363,10 @@ export default function QuizCard({params}) {
           onClick={handleBack}
         />
         <div className="w-full h-2 bg-gray-200 rounded-full mx-4">
-          <div className=" h-full bg-[#6c4ce6] rounded-full"
+          <div
+            className=" h-full bg-[#6c4ce6] rounded-full"
             style={{
-              width : `${((currentQuestion + 1) / questions.length) * 100 }%`
+              width: `${((currentQuestion + 1) / questions.length) * 100}%`,
             }}
           ></div>
         </div>
@@ -331,9 +387,9 @@ export default function QuizCard({params}) {
             </div>
 
             <div className="text-gray-600 md:text-sm text-xs">
-              <span className="font-semibold">Quize Started </span>
-              <div className="text-lg   font-bold text-center">
-                {formatTime(elapsed)} 
+              <span className="font-semibold">Time Remaining </span>
+              <div className="text-lg font-bold text-center">
+                {formatTime(timeLeft)}
               </div>
             </div>
             <div className="text-gray-700 md:text-base text-xs font-semibold">
@@ -344,12 +400,16 @@ export default function QuizCard({params}) {
           <div className="my-10 relative">
             <h3 className="text-xs border-s-2 border-blue-600 ps-2 mb-3 text-gray-400 uppercase font-semibold">
               Question {currentQuestion + 1} of {questions.length}
-               {/* • Topic
+              {/* • Topic
               {mainTopic} */}
             </h3>
             {questions[currentQuestion]?.image && (
               <div className="md:w-52 w-38 md:h-52 h-38 rounded-md justify-self-center">
-                <img src={questions[currentQuestion].image} className="w-full h-full" alt="question Image"/>
+                <img
+                  src={questions[currentQuestion].image}
+                  className="w-full h-full"
+                  alt="question Image"
+                />
               </div>
             )}
             <p className="text-gray-800 mt-2 md:text-[15px] text-[14px]">
@@ -408,7 +468,7 @@ export default function QuizCard({params}) {
                             : "bg-gray-100"
                         }`}
                       >
-                        {index+1}
+                        {index + 1}
                       </div>
                       <div className="w-full flex justify-between items-center">
                         <p className="md:text-sm text-[13px] font-semibold">
@@ -672,90 +732,136 @@ export default function QuizCard({params}) {
       ) : (
         <>
           <div className="flex justify-center items-center min-h-[80vh] bg-gradient-to-br rounded-lg from-purple-50 to-blue-50">
-  <div className="w-full max-w-2xl flex flex-col items-center px-4 py-8">
-    {/* Celebration Animation */}
-    <div className="sm:w-[180px] w-[120px] sm:h-[180px] h-[120px] mb-6 animate-bounce">
-      <LottiePlayer animationFile={run} width="100%" height="100%" />
-    </div>
+            <div className="w-full max-w-2xl flex flex-col items-center px-4 py-8">
+              {/* Celebration Animation */}
+              <div className="sm:w-[180px] w-[120px] sm:h-[180px] h-[120px] mb-6 animate-bounce">
+                <LottiePlayer 
+                  animationFile={userAnswers.length === 0 ? cry : run} 
+                  width="100%" 
+                  height="100%" 
+                />
+              </div>
 
-    {/* Header */}
-    <h1 className="text-3xl font-bold text-purple-800 mb-2">Quiz Completed!</h1>
-    <p className="text-gray-600 mb-8">Your performance breakdown</p>
+              {/* Header */}
+              <h1 className="text-3xl font-bold text-purple-800 mb-2">
+                Quiz Completed!
+              </h1>
+              <p className="text-gray-600 mb-8">
+                {userAnswers.length === 0 
+                  ? "You didn't answer any questions" 
+                  : "Your performance breakdown"}
+              </p>
 
-    {/* Score Card */}
-    <div className="w-full bg-white rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-xl">
-      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4 text-center">
-        <img 
-          src="/CompletionBadge.png" 
-          alt="Achievement Badge" 
-          className="w-24 h-24 mx-auto mb-2 animate-pulse"
-        />
-        <h2 className="text-2xl font-bold text-white">Great Job!</h2>
-      </div>
+              {/* Score Card - Only show if user answered questions */}
+              {userAnswers.length > 0 && (
+                <div className="w-full bg-white rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-xl">
+                  <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4 text-center">
+                    <img
+                      src="/CompletionBadge.png"
+                      alt="Achievement Badge"
+                      className="w-24 h-24 mx-auto mb-2 animate-pulse"
+                    />
+                    <h2 className="text-2xl font-bold text-white">Great Job!</h2>
+                  </div>
 
-      <div className="p-6 grid grid-cols-2 gap-4">
-        <div className="bg-purple-50 p-4 rounded-lg">
-          <p className="text-sm text-purple-600 font-medium">Score</p>
-          <p className="text-3xl font-bold text-purple-800">{result.score}</p>
-        </div>
-        
-        <div className="bg-blue-50 p-4 rounded-lg">
-          <p className="text-sm text-blue-600 font-medium">Rank</p>
-          <p className="text-3xl font-bold text-blue-800">Top {result.rank}</p>
-        </div>
-        
-        <div className="bg-green-50 p-4 rounded-lg">
-          <p className="text-sm text-green-600 font-medium">Time</p>
-          <p className="text-xl font-bold text-green-800">{result.completionTime}</p>
-        </div>
-        
-        <div className="bg-yellow-50 p-4 rounded-lg">
-          <p className="text-sm text-yellow-600 font-medium">Accuracy</p>
-          <p className="text-xl font-bold text-yellow-800">
-            {Math.round((result.correctAnswers / (result.correctAnswers + result.incorrectAnswers)) * 100)}%
-          </p>
-        </div>
-      </div>
-    </div>
+                  <div className="p-6 grid grid-cols-2 gap-4">
+                    <div className="bg-purple-50 p-4 rounded-lg">
+                      <p className="text-sm text-purple-600 font-medium">Score</p>
+                      <p className="text-3xl font-bold text-purple-800">
+                        {result.score}
+                      </p>
+                    </div>
 
-    {/* Action Buttons */}
-    <div className="flex flex-col sm:flex-row gap-4 w-full mt-10 px-4">
-      <Link href={"/user/dashboard"} 
-        className="px-6 py-3 border-2 border-purple-200 rounded-xl text-purple-700 hover:bg-purple-50 transition-all flex items-center justify-center gap-2 font-medium"
-      >
-        <ArrowLeft className="w-5 h-5" />
-        Back to Dashboard
-      </Link>
-      
-      <Link
-        href={"/user/quizs"}
-        className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg transition-all flex items-center justify-center gap-2 font-medium"
-      >
-        Next Quiz
-        <ArrowRight className="w-5 h-5" />
-      </Link>
-    </div>
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <p className="text-sm text-blue-600 font-medium">Rank</p>
+                      <p className="text-3xl font-bold text-blue-800">
+                        Top {result.rank}
+                      </p>
+                    </div>
 
-    {/* Progress Visualization (Optional) */}
-    <div className="w-full mt-8 bg-white p-4 rounded-xl shadow">
-      <h3 className="font-medium text-gray-700 mb-3">Question Analysis</h3>
-      <div className="flex items-center gap-2">
-        <div 
-          className="h-4 bg-green-200 rounded-full" 
-          style={{ width: `${(result.correctAnswers / (result.correctAnswers + result.incorrectAnswers)) * 100}%` }}
-        ></div>
-        <div 
-          className="h-4 bg-red-200 rounded-full" 
-          style={{ width: `${(result.incorrectAnswers / (result.correctAnswers + result.incorrectAnswers)) * 100}%` }}
-        ></div>
-      </div>
-      <div className="flex justify-between mt-2 text-sm">
-        <span className="text-green-600">{result.correctAnswers} Correct</span>
-        <span className="text-red-600">{result.incorrectAnswers} Incorrect</span>
-      </div>
-    </div>
-  </div>
-</div>
+                    <div className="bg-green-50 p-4 rounded-lg">
+                      <p className="text-sm text-green-600 font-medium">Time</p>
+                      <p className="text-xl font-bold text-green-800">
+                        {Math.floor(result.completionTime / 60)} mins {result.completionTime % 60} secs
+                      </p>
+                    </div>
+
+                    <div className="bg-yellow-50 p-4 rounded-lg">
+                      <p className="text-sm text-yellow-600 font-medium">
+                        Accuracy
+                      </p>
+                      <p className="text-xl font-bold text-yellow-800">
+                        {Math.round(
+                          (result.correctAnswers /
+                            (result.correctAnswers + result.incorrectAnswers)) *
+                            100
+                        )}
+                        %
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 w-full mt-10 px-4">
+                <Link
+                  href={"/user/dashboard"}
+                  className="px-6 py-3 border-2 border-purple-200 rounded-xl text-purple-700 hover:bg-purple-50 transition-all flex items-center justify-center gap-2 font-medium"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                  Back to Dashboard
+                </Link>
+
+                <Link
+                  href={"/user/quizs"}
+                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg transition-all flex items-center justify-center gap-2 font-medium"
+                >
+                  Next Quiz
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </div>
+
+              {/* Progress Visualization - Only show if user answered questions */}
+              {userAnswers.length > 0 && (
+                <div className="w-full mt-8 bg-white p-4 rounded-xl shadow">
+                  <h3 className="font-medium text-gray-700 mb-3">
+                    Question Analysis
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="h-4 bg-green-200 rounded-full"
+                      style={{
+                        width: `${
+                          (result.correctAnswers /
+                            (result.correctAnswers + result.incorrectAnswers)) *
+                          100
+                        }%`,
+                      }}
+                    ></div>
+                    <div
+                      className="h-4 bg-red-200 rounded-full"
+                      style={{
+                        width: `${
+                          (result.incorrectAnswers /
+                            (result.correctAnswers + result.incorrectAnswers)) *
+                          100
+                        }%`,
+                      }}
+                    ></div>
+                  </div>
+                  <div className="flex justify-between mt-2 text-sm">
+                    <span className="text-green-600">
+                      {result.correctAnswers} Correct
+                    </span>
+                    <span className="text-red-600">
+                      {result.incorrectAnswers} Incorrect
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </>
       )}
     </div>

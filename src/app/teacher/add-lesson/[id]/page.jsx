@@ -271,14 +271,14 @@ export default function AddLessons({params}) {
                               </label>}
                             </div>
                           ) : (
-                            <div className="h-[200px] w-[100px]">
+                            <div className="w-full max-w-3xl mx-auto aspect-video">
                               <video
                                 src={formData.contents[index]?.url}
-                                height={300}
-                                width={200}
+                                className="w-full h-full object-cover rounded-lg"
                                 alt="cover-image"
                                 muted
                                 autoPlay
+                                controls
                               />
                             </div>
                           )}

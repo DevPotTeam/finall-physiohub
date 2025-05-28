@@ -70,7 +70,7 @@ function Header({scrollToSection}) {
                 </Link> */}
                 {isLoggedIn ? (
 
-                  <Link href={`${role == "user" ? "/user/dashboard" : role == "teacher" || role == "instructor" &&"/teacher/course"} `}>
+                  <Link href={`${role == "user" ? "/user/dashboard" : (role == "teacher" || role == "instructor") ? "/teacher/course" : false} `}>
                     <IoMdPerson className="text-purple-600 text-3xl" />
                   </Link> 
                 ) : (
