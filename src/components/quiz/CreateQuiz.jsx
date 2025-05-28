@@ -35,8 +35,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
   const [topics, setTopics] = useState([]);
   const [quizData, setQuizData] = useState({
     title: "",
-    startTime: "",
-    endTime: "",
+    quizDurationInMinutes: "",
     mainTopic: "",
     // subTopics: [],
     quizStatus: "draft",
@@ -65,7 +64,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
   const [questionImageLoading, setQuestionImageLoading] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const showToast = (message, type = 'success') => {
+  const showToast = (message, type = "success") => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 5000);
   };
@@ -76,9 +75,9 @@ export default function CreateQuiz({ setShowInQuiz }) {
       setTopics(data);
     }
   };
-  useEffect(()=>{
-    fetchTopics()
-  },[])
+  useEffect(() => {
+    fetchTopics();
+  }, []);
 
   const handleQuizChange = (e) => {
     const { name, value } = e.target;
@@ -128,7 +127,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
   };
 
   const handleQuestionChange = (index, field, value) => {
-    console.log(value)
+    
     const updatedQuestions = [...questions];
     updatedQuestions[index][field] = value;
     setQuestions(updatedQuestions);
@@ -141,19 +140,21 @@ export default function CreateQuiz({ setShowInQuiz }) {
   };
 
   const handleTextAnswerChange = (questionIndex, value) => {
-    setQuestions(prevQuestions => {
+    setQuestions((prevQuestions) => {
       return prevQuestions.map((q, idx) => {
         if (idx === questionIndex) {
           return {
             ...q,
             options: [
-              { 
-                type: "text", 
-                value: value, 
-                correctAnswer: true // Assuming short answer is always correct
+              {
+                type: "text",
+                value: value,
+                correctAnswer: true, // Assuming short answer is always correct
               },
               // Keep other options if needed, or empty them
-              ...q.options.slice(1).map(opt => ({ ...opt, correctAnswer: false }))
+              ...q.options
+                .slice(1)
+                .map((opt) => ({ ...opt, correctAnswer: false })),
             ],
           };
         }
@@ -165,7 +166,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
   const handleCorrectAnswerChange = (questionIndex, optionIndex) => {
     const updatedQuestions = [...questions];
     const currentQuestion = updatedQuestions[questionIndex];
-    
+
     if (currentQuestion.type === QuestionType.Radio) {
       // For radio type, only one correct answer allowed
       currentQuestion.options.forEach((option, idx) => {
@@ -173,7 +174,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
       });
     } else if (currentQuestion.type === QuestionType.Checkbox) {
       // For checkbox type, toggle the selected option
-      currentQuestion.options[optionIndex].correctAnswer = 
+      currentQuestion.options[optionIndex].correctAnswer =
         !currentQuestion.options[optionIndex].correctAnswer;
     }
     // For other types (short answer, dropdown), no correct answer needed
@@ -260,8 +261,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
     try {
       const quizPayload = {
         title: quizData.title,
-        startTime: quizData.startTime,
-        endTime: quizData.endTime,
+        quizDurationInMinutes: Number(quizData.quizDurationInMinutes),
         mainTopic: quizData.mainTopic,
         subTopics: quizData.subTopics,
         status: quizData.quizStatus,
@@ -272,33 +272,38 @@ export default function CreateQuiz({ setShowInQuiz }) {
           image: q.image,
           type: q.type,
           description: q.description,
-          options: q.options
-        }))
+          options: q.options,
+        })),
       };
-      console.log(quizPayload)
+      console.log(quizPayload);
 
-      const { data, error, status } = await usePost("/quizzes/create", quizPayload);
+      const { data, error, status } = await usePost(
+        "/quizzes/create",
+        quizPayload
+      );
       if (status == 201) {
         setTimeout(() => {
           setShowInQuiz("Quizs");
         }, 2000);
-        showToast("Quiz Created Successfully", "success")
+        showToast("Quiz Created Successfully", "success");
       }
       if (error) {
-        showToast(error[0], "error")
+        showToast(error[0], "error");
       }
     } catch (error) {
-      showToast(error[0], "error")
+      showToast(error[0], "error");
     } finally {
       setLoading(false);
     }
   };
 
-
-
   return (
     <>
-      <PublishQuizHeader handleSubmit={handleSubmit} loading={loading} setShowInQuiz={setShowInQuiz}/>
+      <PublishQuizHeader
+        handleSubmit={handleSubmit}
+        loading={loading}
+        setShowInQuiz={setShowInQuiz}
+      />
       <div className="p-6 bg-white rounded-lg shadow-md w-full mx-auto md:max-w-[80%] max-w-[95%]">
         {/* Quiz Title */}
         <div className="mb-4">
@@ -311,34 +316,55 @@ export default function CreateQuiz({ setShowInQuiz }) {
             className="w-full"
           />
         </div>
-
-        {/* Date and Time */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+         {/* Quiz and Card Topic Selection */}
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block text-gray-700">Start Time</label>
-            <Input
-              type="datetime-local"
-              name="startTime"
-              value={quizData.startTime}
+            <label className="block text-gray-700">Main Topic</label>
+            <Select
+              name="mainTopic"
+              value={quizData.mainTopic}
               onChange={handleQuizChange}
               className="w-full"
-            />
+            >
+              <option value="">Choose category</option>
+              {topics.map((topic) => (
+                <option key={topic._id} value={topic._id}>
+                  {topic.name}
+                </option>
+              ))}
+            </Select>
           </div>
-          <div>
-            <label className="block text-gray-700">End Time</label>
-            <Input
-              type="datetime-local"
-              name="endTime"
-              value={quizData.endTime}
-              onChange={handleQuizChange}
-              className="w-full"
-            />
+          {/* Quiz Timer */}
+          <div className="mb-4">
+            <label className="block text-gray-700">
+              Quiz Timer (in minutes)
+            </label>
+            <div className="relative">
+              <Input
+                name="quizDurationInMinutes"
+                type="number"
+                value={quizData.quizDurationInMinutes}
+                onChange={handleQuizChange}
+                placeholder="Enter duration or select from suggestions"
+                className="w-full mt-0.5"
+                list="duration-suggestions"
+                min="1"
+              />
+              <datalist id="duration-suggestions">
+                <option value="30">30 minutes</option>
+                <option value="60">60 minutes</option>
+                <option value="90">90 minutes</option>
+                <option value="120">120 minutes</option>
+              </datalist>
+            </div>
           </div>
         </div>
 
         {/* Cover Image Upload */}
         <div className="mb-4">
-          <label className="block text-gray-700 font-semibold">Cover Image</label>
+          <label className="block text-gray-700 font-semibold">
+            Cover Image
+          </label>
           {!quizData.banner ? (
             <div
               className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500"
@@ -382,40 +408,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
           )}
         </div>
 
-
-        {/* Quiz and Card Topic Selection */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label className="block text-gray-700">Main Topic</label>
-            <Select
-              name="mainTopic"
-              value={quizData.mainTopic}
-              onChange={handleQuizChange}
-              className="w-full"
-            >
-              <option value="">Choose category</option>
-              {topics.map((topic) => (
-                <option key={topic._id} value={topic._id}>{topic.name}</option>
-              ))}
-            </Select>
-          </div>
-          {/* <div>
-            <label className="block text-gray-700">Sub Topics</label>
-            <Select
-              name="subTopics"
-              value={quizData.subTopics[0] || ""}
-              onChange={(e) =>
-                setQuizData({ ...quizData, subTopics: [e.target.value] })
-              }
-              className="w-full"
-            >
-              <option value="">Choose sub-category</option>
-              <option value="67e8354fd7db5610a12b895d">World History</option>
-              <option value="67e8354fd7db5610a12b895e">Countries</option>
-              <option value="67e8354fd7db5610a12b895f">Biology</option>
-            </Select>
-          </div> */}
-        </div>
+       
 
         {/* Questions Section */}
         <div className="mb-4 space-y-4">
@@ -469,7 +462,9 @@ export default function CreateQuiz({ setShowInQuiz }) {
                               ref={fileInputRef}
                               type="file"
                               className="ud-btn btn-white"
-                              onChange={(e) => handleQuestionImageUpload(e, index)}
+                              onChange={(e) =>
+                                handleQuestionImageUpload(e, index)
+                              }
                               style={{ display: "none" }}
                               required
                             />
@@ -549,16 +544,18 @@ export default function CreateQuiz({ setShowInQuiz }) {
                           />
                         </div>
                       ))}
-                    </div>)
-                  }
-                  {q.type == "short-answer"&&<Textarea
+                    </div>
+                  )}
+                  {q.type == "short-answer" && (
+                    <Textarea
                       placeholder="Write Answer here..."
-                      value={q[index]?.options[0]?.value} 
+                      value={q[index]?.options[0]?.value}
                       onChange={(e) =>
                         handleTextAnswerChange(index, e.target.value)
                       }
                       className="mt-4"
-                    />}
+                    />
+                  )}
 
                   {/* Explanation */}
                   <Textarea
@@ -590,7 +587,10 @@ export default function CreateQuiz({ setShowInQuiz }) {
             } text-white`}
           >
             {notification.message}
-            <button onClick={() => setNotification(null)} className="ml-4 text-xl">
+            <button
+              onClick={() => setNotification(null)}
+              className="ml-4 text-xl"
+            >
               ×
             </button>
           </div>

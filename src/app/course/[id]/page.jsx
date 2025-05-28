@@ -242,11 +242,11 @@ export default function CourseDetail({params}) {
                                   
                                             {/* Video Player for video content */}
                                             {content.type === 'video' && (
-                                              <div className="mt-3 bg-black rounded-lg overflow-hidden">
+                                              <div className="w-full max-w-3xl mx-auto aspect-video">
                                                 <video 
                                                   controls 
                                                   
-                                                  className="w-full sm:max-h-[500px] max-h-[400px]"
+                                                  className="w-full h-full object-cover rounded-lg"
                                                   poster="https://via.placeholder.com/800x450?text=Video+Thumbnail"
                                                   src={content.url}
                                                 >

@@ -78,6 +78,7 @@ export default function LoginPage() {
       localStorage.setItem("user", JSON.stringify(user));
       if (!user.isEmailVerified) {
         router.push("/auth/verify-email");
+        return;
       }
       const firstVisit = localStorage.getItem("firstVisit");
       if (firstVisit == "true") {
