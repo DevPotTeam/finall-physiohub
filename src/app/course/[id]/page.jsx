@@ -218,10 +218,10 @@ export default function CourseDetail({params}) {
                                     variants={accordionVariants}
                                     className="overflow-hidden"
                                   >
-                                    <div className="p-4 border-t bg-gray-50">
+                                    <div className="sm:p-4 p-1 border-t bg-gray-50">
                                       <div className="space-y-4">
                                         {lesson.contents.map(content => (
-                                          <div key={content._id} className="bg-white p-4 rounded-lg shadow-sm">
+                                          <div key={content._id} className="bg-white sm:p-4 p-2 rounded-lg shadow-sm">
                                             <div className="flex items-start mb-3">
                                               <div className="bg-blue-100 p-2 rounded-lg mr-3">
                                                 {content.type === 'video' ? (
@@ -246,7 +246,7 @@ export default function CourseDetail({params}) {
                                                 <video 
                                                   controls 
                                                   
-                                                  className="w-full h-[500px]"
+                                                  className="w-full sm:max-h-[500px] max-h-[400px]"
                                                   poster="https://via.placeholder.com/800x450?text=Video+Thumbnail"
                                                   src={content.url}
                                                 >
