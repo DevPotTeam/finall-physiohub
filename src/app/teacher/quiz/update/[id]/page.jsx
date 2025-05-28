@@ -36,8 +36,7 @@ export default function UpdateQuiz({ params }) {
   const router = useRouter();
   const [quizData, setQuizData] = useState({
     title: "",
-    startTime: "",
-    endTime: "",
+    quizDurationInMinutes: "",
     mainTopic: "",
     subTopics: [],
     quizStatus: "",
@@ -65,8 +64,7 @@ export default function UpdateQuiz({ params }) {
   useEffect(() => {
     setQuizData({
       title: data.title || "",
-      startTime: data.startTime || "",
-      endTime: data.endTime || "",
+      quizDurationInMinutes: data.quizDurationInMinutes || "",
       mainTopic: data.mainTopic || "",
       subTopics: data.subTopics || [],
       quizStatus: data.quizStatus || "",
@@ -274,8 +272,7 @@ export default function UpdateQuiz({ params }) {
   const handleQuizUpdate = async () => {
     const quizPayload = {
       title: quizData.title,
-      startTime: quizData.startTime,
-      endTime: quizData.endTime,
+      quizDurationInMinutes: Number(quizData.quizDurationInMinutes),
       mainTopic: quizData.mainTopic,
       subTopics: quizData.subTopics,
       status: quizData.quizStatus,
@@ -327,27 +324,26 @@ export default function UpdateQuiz({ params }) {
           />
         </div>
 
-        {/* Date and Time */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label className="block text-gray-700">Start Time</label>
+        {/* Quiz Duration */}
+        <div className="mb-4">
+          <label className="block text-gray-700">Quiz Timer (in minutes)</label>
+          <div className="relative">
             <Input
-              type="datetime-local"
-              name="startTime"
-              value={quizData.startTime}
+              name="quizDurationInMinutes"
+              type="number"
+              value={quizData.quizDurationInMinutes}
               onChange={handleQuizChange}
-              className="w-full"
+              placeholder="Enter duration or select from suggestions"
+              className="w-full mt-0.5"
+              list="duration-suggestions"
+              min="1"
             />
-          </div>
-          <div>
-            <label className="block text-gray-700">End Time</label>
-            <Input
-              type="datetime-local"
-              name="endTime"
-              value={quizData.endTime}
-              onChange={handleQuizChange}
-              className="w-full"
-            />
+            <datalist id="duration-suggestions">
+              <option value="30">30 minutes</option>
+              <option value="60">60 minutes</option>
+              <option value="90">90 minutes</option>
+              <option value="120">120 minutes</option>
+            </datalist>
           </div>
         </div>
 
