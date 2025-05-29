@@ -58,7 +58,7 @@ const Flashcard = ({
         )}
       </div>
       <div>
-        <h3 className="text-lg font-semibold mt-4">{title}</h3>
+        <h3 className="md:text-lg text-base font-semibold mt-4">{title}</h3>
         <p className="text-sm text-gray-600">{description}</p>
         <div className="mt-2">
           <Rating name="simple-controlled" value={rating} readOnly />
@@ -176,7 +176,7 @@ const CourseCard = ({ course }) => {
           <img
             src={course.coverImageUrl}
             alt="Course cover"
-            className="w-full h-[180px] object-cover"
+            className="w-full md:h-[180px] h-[150px] object-cover"
           />
         ) : (
           <div className="bg-gray-300 h-[180px] w-full animate-pulse"></div>
@@ -185,7 +185,7 @@ const CourseCard = ({ course }) => {
       <h5 className="text-gray-400 mt-4 text-md font-semibold">
         {course.lessons?.length || 0} lessons
       </h5>
-      <h3 className="text-xl font-bold text-gray-800 mt-1">{course.title}</h3>
+      <h3 className="md:text-xl text-base font-bold text-gray-800 mt-1">{course.title}</h3>
       <p className="text-sm text-gray-600 mt-4">{course.description}</p>
       <div className="flex justify-between items-center mt-4 text-sm"></div>
     </div>

@@ -48,12 +48,12 @@ export default function FlashCardHeader({setShowInFlashCard}) {
             type="button"
             onClick={() => setShowTopicModal(true)}
             variant="outline"
-            className="gap-2 md:w-auto w-full py-5"
+            className="gap-2 md:w-auto px-2 md:py-5 py-2 md:text-base text-xs"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 " />
             Add New Topic
           </Button>
-          <button onClick={()=>{setShowInFlashCard("CreateFlashCard")}} className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg md:text-base text-xs">
+          <button onClick={()=>{setShowInFlashCard("CreateFlashCard")}} className="bg-purple-600 hover:bg-purple-700 text-white md:px-4 px-2 py-2 rounded-lg md:text-base text-xs">
             + Create new
           </button>
         </div>

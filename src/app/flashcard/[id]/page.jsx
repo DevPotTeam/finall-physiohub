@@ -78,7 +78,7 @@ const Flashcard = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-3 sm:max-w-[60%] max-w-[90%] mx-auto my-5">
+      <div className="flex flex-col gap-3 sm:max-w-[60%] max-w-[93%] mx-auto my-5">
         <div className="flex justify-between items-center">
           <Link
             href={"/user/flashcards"}

@@ -131,7 +131,7 @@ function Home() {
     <>
       <Header scrollToSection={scrollToSection} />
       <div className="h-full w-full mt-10 relative overflow-hidden">
-        <section className="relative bg-gradient-to-r from-gray-100 to-purple-100 py-16 px-6 md:px-12 lg:px-24 flex flex-col md:flex-row items-center">
+        <section className="relative bg-gradient-to-r from-gray-100 to-purple-100 py-16 px-3 md:px-12 lg:px-24 flex flex-col md:flex-row items-center">
           {/* Left Content */}
           <div className="md:w-1/2 text-center md:text-left z-10">
             <p className="text-sm text-purple-600 font-semibold">
@@ -157,7 +157,7 @@ function Home() {
           </div>
 
           {/* Right Content */}
-          <div className="flex flex-row justify-end gap-3 md:w-[50%] w-full md:mt-0 mt-10">
+          <div className="flex flex-row justify-end gap-2 md:w-[50%] w-full md:mt-0 mt-10">
             {/* First Column (takes max space) */}
             <div className="flex-1 flex flex-col justify-between items-end">
               <Card className="  md:max-w-[14rem] w-[11rem] rounded-[20px] shadow-md overflow-hidden mb-5 self-end">
