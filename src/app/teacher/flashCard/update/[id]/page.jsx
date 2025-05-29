@@ -72,7 +72,7 @@ useEffect(() => {
       frontContent : data.frontContent || "",
       backImage : data.backImage || "",
       backContent : data.backContent || "",
-      topics : data.topics || ""
+      topic : data.topic?._id || ""
     })); 
 }, [data]);
 
@@ -246,7 +246,9 @@ useEffect(() => {
             >
               <option value="">Choose Topic</option>
               {topics.map((topic, index) => (
-                <option key={index} value={topic._id}>{topic.name}</option>
+                <option key={index} value={topic._id} selected={topic._id === data.topic?._id}>
+                  {topic.name}
+                </option>
               ))}
             </Select>
           </div>

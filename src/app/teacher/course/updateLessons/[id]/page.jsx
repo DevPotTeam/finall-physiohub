@@ -48,21 +48,16 @@ export default function AddLessons({ params }) {
 
   useEffect(() => {
     if (data && data.length > 0) {
-      data.map((d) => {
-        const cardsWithOpen = d.contents.map((item) => ({
+      const processedData = data.map((d) => ({
+        lessonTitle: d.lessonTitle,
+        contents: d.contents.map((item) => ({
           ...item,
-          open: true, // default to true or false based on your UI preference
-        }));
-
-        setCards((prev) => [...prev, ...cardsWithOpen]);
-        setFormData((prev) => [
-          ...prev,
-          {
-            lessonTitle: d.lessonTitle,
-            contents: cardsWithOpen,
-          },
-        ]);
-      });
+          open: true,
+        })),
+      }));
+      
+      setFormData(processedData);
+      setCards(processedData.flatMap(d => d.contents));
     }
   }, [data]);
 
@@ -77,10 +72,10 @@ export default function AddLessons({ params }) {
       label: "Video",
       value: "video",
     },
-    {
-      label: "Image",
-      value: "image",
-    },
+    // {
+    //   label: "Image",
+    //   value: "image",
+    // },
     {
       label: "Article",
       value: "article",
@@ -119,24 +114,21 @@ export default function AddLessons({ params }) {
   const handleCardChange = (lessonIndex, cardIndex, field, value) => {
     setFormData((prev) => {
       const updated = [...prev];
+      if (!updated[lessonIndex] || !updated[lessonIndex].contents) {
+        return prev;
+      }
       const updatedContents = [...updated[lessonIndex].contents];
+      if (!updatedContents[cardIndex]) {
+        updatedContents[cardIndex] = {};
+      }
       updatedContents[cardIndex][field] = value;
+      // Clear URL when type changes
+      if (field === 'type') {
+        updatedContents[cardIndex].url = '';
+      }
       updated[lessonIndex].contents = updatedContents;
       return updated;
     });
-  };
-  const handleImageUpload = async (e, index) => {
-    const file = e.target.files[0];
-    const formImageData = new FormData();
-    formImageData.append("file", file);
-
-    const { data, error, status } = await usePost(
-      `/quizzes/upload`,
-      formImageData
-    );
-    if (data) {
-      handleCardChange(index, "url", data);
-    }
   };
 
   const handleVideoUpload = async (e, index) => {
@@ -152,6 +144,32 @@ export default function AddLessons({ params }) {
 
     if (status == 201) {
       setLoading(false);
+      setFormData((prev) => {
+        const updated = [...prev];
+        const updatedContents = [...updated[index].contents];
+        updatedContents[index] = {
+          ...updatedContents[index],
+          url: data
+        };
+        updated[index].contents = updatedContents;
+        return updated;
+      });
+    } else {
+      setLoading(false);
+      showToast("Failed to upload video", "error");
+    }
+  };
+
+  const handleImageUpload = async (e, index) => {
+    const file = e.target.files[0];
+    const formImageData = new FormData();
+    formImageData.append("file", file);
+
+    const { data, error, status } = await useImagePost(
+      `/quizzes/upload`,
+      formImageData
+    );
+    if (data) {
       handleCardChange(index, "url", data);
     }
   };
@@ -166,22 +184,41 @@ export default function AddLessons({ params }) {
   };
 
   const handleLessonsUpdate = async () => {
-    const { data, error, status } = await usePut(
-      `/courses/update/${id}`,
-      formData
-    );
-    if (status == 201) {
-      showToast("Course Updated Successfully", "success");
-      setTimeout(() => {
-        router.push("/teacher/course");
-      }, 2000);
+    try {
+      setLoading(true);
+      // Process each lesson in formData
+      const processedLessons = formData.map(lesson => ({
+        lessonTitle: lesson.lessonTitle,
+        contents: lesson.contents.map(content => ({
+          title: content.title,
+          type: content.type,
+          url: content.url
+        }))
+      }));
+
+      const { data, error, status } = await usePut(
+        `/courses/update/${id}`,
+        { lessons: processedLessons }
+      );
+
+      if (status === 200) {
+        showToast("Lessons updated successfully!", "success");
+        setTimeout(() => {
+          router.push("/teacher/course");
+        }, 3000);
+      } else if (error) {
+        showToast(error, "error");
+      }
+    } catch (err) {
+      showToast("Failed to update lessons", "error");
+    } finally {
+      setLoading(false);
     }
-    if (error) [showToast(error[0], "error")];
   };
 
   return (
     <>
-      <UpdateLessonHeader handleLessonsUpdate={handleLessonsUpdate} formDataLength={formData.length} id={id} />
+      <UpdateLessonHeader handleLessonsUpdate={handleLessonsUpdate} formDataLength={formData.length} id={id} loading={loading} />
       {formData.length!==0?(<div className="p-6 bg-white rounded-lg shadow-md w-full mx-auto md:max-w-[80%] max-w-[95%]">
         {formData.map((formdata, index) => (
           <div key={index}>
@@ -301,7 +338,7 @@ export default function AddLessons({ params }) {
                                         multiple
                                         className="ud-btn btn-white"
                                         onChange={(e) => {
-                                          handleVideoUpload(e, i);
+                                          handleVideoUpload(e, index);
                                         }}
                                         style={{ display: "none" }}
                                         required
@@ -310,16 +347,31 @@ export default function AddLessons({ params }) {
                                   )}
                                 </div>
                               ) : (
-                                <div className="h-[200px] w-full">
+                                <div className="w-full max-w-3xl mx-auto aspect-video">
+                                  <button
+                                    onClick={() => {
+                                      setFormData((prev) => {
+                                        const updated = [...prev];
+                                        const updatedContents = [...updated[index].contents];
+                                        updatedContents[i] = {
+                                          ...updatedContents[i],
+                                          url: ""
+                                        };
+                                        updated[index].contents = updatedContents;
+                                        return updated;
+                                      });
+                                    }}
+                                    className=" mb-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
                                   <video
                                     src={formdata.contents[i].url}
-                                    height={100}
-                                    width={100}
-                                    alt="cover-image"
-                                    muted
-                                    autoPlay
-                                    className="object-center h-full w-full"
+                                    alt="video-preview"
+                                    controls
+                                    className="relative w-full h-full object-cover rounded-lg"
                                   />
+                                  
                                 </div>
                               )}
                             </div>
@@ -329,7 +381,7 @@ export default function AddLessons({ params }) {
                               <label className="block text-gray-700 font-semibold">
                                 Image
                               </label>
-                              {!formData.coverImage ? (
+                              {!formdata.contents[i]?.url ? (
                                 <div
                                   className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500 "
                                   onDrop={handleDrop}
@@ -352,10 +404,11 @@ export default function AddLessons({ params }) {
                                       id="fileInput"
                                       type="file"
                                       name="images"
+                                      accept="image/*"
                                       multiple
                                       className="ud-btn btn-white"
                                       onChange={(e) => {
-                                        handleImageUpload(e, index);
+                                        handleImageUpload(e, i);
                                       }}
                                       style={{ display: "none" }}
                                       required
@@ -363,13 +416,20 @@ export default function AddLessons({ params }) {
                                   </label>
                                 </div>
                               ) : (
-                                <div>
-                                  <Image
-                                    src={formData.coverImage}
-                                    height={400}
-                                    width={200}
+                                <div className="relative h-[200px] w-full">
+                                  <img
+                                    src={formdata.contents[i].url}
+                                    height={100}
+                                    width={100}
                                     alt="cover-image"
+                                    className="object-center h-full w-full"
                                   />
+                                  <button
+                                    onClick={() => handleCardChange(index, i, "url", "")}
+                                    className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
                                 </div>
                               )}
                             </div>
@@ -379,7 +439,11 @@ export default function AddLessons({ params }) {
                       {q.type == "article" && (
                         <>
                           <label>Article Link</label>
-                          <Textarea placeholder="Enter Title here" />
+                          <Textarea 
+                            placeholder="Enter Article URL here" 
+                            value={q.url || ""}
+                            onChange={(e) => handleCardChange(index, i, "url", e.target.value)}
+                          />
                         </>
                       )}
                     </div>
@@ -392,22 +456,21 @@ export default function AddLessons({ params }) {
         <Button onClick={addQuestion} className="flex items-center gap-2">
           <PlusCircle size={16} /> Add Question
         </Button>
-        {notification && (
+      </div>):<h1 className="text-center">No Lessons to Update</h1> }
+      
+      {notification && (
           <div
             className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${
               notification.type === "error" ? "bg-red-500" : "bg-green-500"
             } text-white`}
           >
             {notification.message}
-            <button
-              onClick={() => setNotification(null)}
-              className="ml-4 text-xl"
-            >
+            <button onClick={() => setNotification(null)} className="ml-4 text-xl">
               ×
             </button>
           </div>
         )}
-      </div>):<h1 className="text-center">No Lessons to Update</h1> }
     </>
   );
 }
+

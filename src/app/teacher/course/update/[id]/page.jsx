@@ -6,6 +6,7 @@ import {
   PlusCircle,
   Trash2,
   Upload,
+  X,
 } from "lucide-react";
 import { Input } from "@/components/ui/input.jsx";
 import UpdateCourseHeader from "@/components/course/UpdateCourseHeader";
@@ -306,13 +307,19 @@ export default function UpdateCourse({ params }) {
               )}
             </div>
           ) : (
-            <div>
+            <div className="relative">
               <Image
                 src={formData.coverImageUrl}
                 height={400}
                 width={200}
                 alt="cover-image"
               />
+              <button
+                onClick={() => setFormData(prev => ({ ...prev, coverImageUrl: null }))}
+                className="absolute top-0"
+              >
+                <X className="text-black" />
+              </button>
             </div>
           )}
         </div>

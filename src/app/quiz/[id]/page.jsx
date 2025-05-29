@@ -108,6 +108,7 @@ export default function QuizCard({ params }) {
   const [correctAnswer, setCorrectAnswer] = useState("");
   const [userAnswers, setUserAnswers] = useState([]);
   const [result, setResult] = useState([]);
+  const [showFeedback, setShowFeedback] = useState(true);
   // const [mainTopic, setMainTopic] = useState("")
 
   const fetchQuizData = async () => {
@@ -439,6 +440,10 @@ export default function QuizCard({ params }) {
                     borderColor = "border-red-500"; // Wrong answer gets a red border
                     bgColor = "bg-red-50";
                   }
+                  if (isAnswered && option.correctAnswer) {
+                    borderColor = "border-green-300";
+                    bgColor = "bg-green-50";
+                  }
 
                   return (
                     <label
@@ -609,7 +614,7 @@ export default function QuizCard({ params }) {
                 })}
             </div>
 
-            {isAnswered && (
+            {isAnswered && showFeedback && (
               <div
                 className={`flex sm:flex-row flex-col items-center  ${
                   isCorrect
@@ -617,7 +622,13 @@ export default function QuizCard({ params }) {
                     : "sm:flex-row-reverse flex-col left-[8%] sm:bottom-[-10%] bottom-[-5%]"
                 } sm:gap-5 gap-3 absolute z-10 justify-self-center`}
               >
-                <div className="mt-4 p-3 border rounded-lg bg-white shadow-md space-x-3 max-w-[300px]">
+                <div className="mt-4 p-3 border rounded-lg bg-white shadow-md space-x-3 max-w-[300px] relative">
+                  <button 
+                    onClick={() => setShowFeedback(false)}
+                    className="absolute -top-2 -right-2 bg-gray-200 hover:bg-gray-300 rounded-full p-1"
+                  >
+                    <RxCrossCircled className="text-gray-600 size-5" />
+                  </button>
                   <span
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-white`}
                   >
