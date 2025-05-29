@@ -4,22 +4,51 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { ApiFetchRequest } from "@/axios/apiRequest";
 
-const CourseCard = ({ title, description, coverImageUrl, instructor }) => (
-  <div className="bg-white rounded-lg shadow-md overflow-hidden p-2 border">
-    <div className="md:min-h-52 h-40 bg-gradient-to-b from-gray-200 to-purple-200 rounded-lg mb-3 relative p-2">
-      {coverImageUrl && (
-        <img 
-          src={coverImageUrl} 
-          alt={title}
-          className="w-full h-full object-cover rounded-lg"
-        />
-      )}
+const CourseCard = ({ title, description, coverImageUrl, instructor }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [role, setRole] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsLoggedIn(true);
+    }
+    const userRole = JSON.parse(localStorage.getItem("user"))?.role;
+    if (userRole) {
+      setRole(userRole);
+    }
+  }, []);
+
+  const handleCardClick = () => {
+    if (!isLoggedIn) {
+      window.location.href = "/auth/login";
+    } else if (role === "user") {
+      window.location.href = "/user/courses";
+    } else if (role === "teacher" || role === "instructor") {
+      window.location.href = "/teacher/course";
+    }
+  };
+
+  return (
+    <div 
+      className="bg-white rounded-lg shadow-md overflow-hidden p-2 border cursor-pointer hover:shadow-lg transition-shadow"
+      onClick={handleCardClick}
+    >
+      <div className="md:min-h-52 h-40 bg-gradient-to-b from-gray-200 to-purple-200 rounded-lg mb-3 relative p-2">
+        {coverImageUrl && (
+          <img 
+            src={coverImageUrl} 
+            alt={title}
+            className="w-full h-full object-cover rounded-lg"
+          />
+        )}
+      </div>
+      <p className="text-sm text-purple-600 font-medium">{instructor}</p>
+      <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+      <p className="text-sm text-gray-600 mt-2 line-clamp-2">{description}</p>
     </div>
-    <p className="text-sm text-purple-600 font-medium">{instructor}</p>
-    <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-    <p className="text-sm text-gray-600 mt-2 line-clamp-2">{description}</p>
-  </div>
-);
+  );
+};
 
 const BlogSection = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

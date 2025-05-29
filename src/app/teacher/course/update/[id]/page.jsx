@@ -35,7 +35,7 @@ export default function UpdateCourse({ params }) {
     isFree: true,
     price: 0,
     estimatedDuration: "",
-    coverImageUrl: null,
+    banner: null,
   });
 
   const showToast = (message, type = "success") => {
@@ -316,7 +316,7 @@ export default function UpdateCourse({ params }) {
               />
               <button
                 onClick={() => setFormData(prev => ({ ...prev, coverImageUrl: null }))}
-                className="absolute top-0"
+                className="absolute top-0 bg-gray-50 p-1 rounded-full"
               >
                 <X className="text-black" />
               </button>

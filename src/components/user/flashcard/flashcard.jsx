@@ -23,6 +23,10 @@ function Flashcard({ flashCardData, length, currentCard }) {
     shuffleTerms: false,
   });
 
+  // Generate random rating between 3 and 5
+  const randomRating = Math.floor(Math.random() * (5 - 3 + 1)) + 3;
+  const flashcardRating = flashCardData.rating || randomRating;
+
   const handleSave = () => {
     // Save settings logic here
     console.log("Settings saved:", { questionFormat, studyOptions });
@@ -104,7 +108,7 @@ function Flashcard({ flashCardData, length, currentCard }) {
                 </div>
               </div>
               <div className="absolute top-3 right-3 flex items-center gap-2 bg-white/90 p-2 rounded-lg z-10">
-                <Star className="w-4 h-4 text-gray-400" />
+                <Star className="w-4 h-4 text-gray-400" fill="currentColor" />
               </div>
               <div className="bg-black-50 rounded-lg md:h-[350px] h-[280px]">
                 {flashCardData?.frontImage ? (
@@ -330,18 +334,16 @@ function Flashcard({ flashCardData, length, currentCard }) {
         {/* Right: Rating */}
         <div className="flex items-center gap-2">
           <span className="text-2xl font-semibold text-gray-900">
-            {flashCardData.rating}
+            {flashcardRating}
           </span>
           <div className="flex text-orange-400">
             <Rating
               name="simple-controlled"
-              value={flashCardData.rating ?? 0}
+              value={flashcardRating}
               readOnly
             />
           </div>
-          <span className="text-sm text-gray-500">
-            {flashCardData?.ratingCount} Ratings
-          </span>
+          
           <span className="text-gray-400 text-sm ml-2">›</span>
         </div>
       </div>

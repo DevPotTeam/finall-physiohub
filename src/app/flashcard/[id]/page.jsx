@@ -125,7 +125,7 @@ const Flashcard = () => {
               onClick={handleNext}
               disabled={currentCard === filteredFlashcards.length - 1}
             >
-              Continue
+              Next Card
             </button>
           </div>
         </div>

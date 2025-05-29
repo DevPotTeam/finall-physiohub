@@ -7,14 +7,27 @@ import Link from "next/link";
 import useDelete from "@/hooks/useDelete";
 import { Rating } from "@mui/material";
 import { useState, useEffect } from "react";
+import useGet from "@/hooks/useGet";
 
-export default function Courses({ setShowInCourse, initialData }) {
-  const [courses, setCourses] = useState(initialData || []);
-  const [loading, setLoading] = useState(false);
+export default function Courses({ setShowInCourse }) {
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchCourses = async () => {
+    setLoading(true);
+    try {
+      const { data } = await useGet(`/courses/my-courses`);
+      setCourses(data || []);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setCourses(initialData || []);
-  }, [initialData]);
+    fetchCourses();
+  }, []);
 
   const handleCourseDelete = async (id) => {
     setLoading(true);

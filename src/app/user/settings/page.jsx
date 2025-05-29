@@ -74,9 +74,8 @@ const Settings = () => {
           "Content-Type": "multipart/form-data",
         },
       });
-
-      setUserData(prev => prev ? { ...prev, profilePic: uploadResponse.data } : null);
-      showToast("Profile picture updated successfully");
+      console.log(uploadResponse)
+      setUserData(prev => prev ? { ...prev, profilePic: `https://${uploadResponse.data.data.url}` } : null);
     } catch (error) {
       showToast("Failed to upload profile picture", 'error');
     } finally {
@@ -108,9 +107,9 @@ const Settings = () => {
       const localUser = JSON.parse(localStorage.getItem("user"))
       localStorage.removeItem("user")
       localStorage.setItem("user", JSON.stringify({email : formData.email, name : formData.name, role : localUser.role, id: localUser.id, isEmailVerified : localUser.isEmailVerified}))
-      setTimeout(() => {
-        window.location.reload()
-      }, 2000);
+      // setTimeout(() => {
+      //   window.location.reload()
+      // }, 2000);
     } catch (error) {
       console.log(error)
       showToast("Failed to update profile", 'error');
@@ -297,21 +296,6 @@ const Settings = () => {
           <Link href={"/auth/verify-email"} className="px-6 py-2 border-2 border-purple-600 text-purple-600 font-medium rounded-md hover:bg-purple-50 transition">
             Reset password
           </Link>
-        </div>
-
-        <div className="my-8">
-          <h2 className="text-xl font-semibold mb-2">Delete account</h2>
-          <p className="text-sm text-gray-500 mb-4">
-            We will archive your accounts for 30 days before permanently deleting it, and all information associated with your account.
-          </p>
-          <button 
-          disabled={true}
-            type="button"
-            className="bg-red-600 text-white px-6 py-2 rounded-md font-medium hover:bg-red-700 transition"
-          >
-            Delete account
-            
-          </button>
         </div>
 
         <div className="flex justify-end mt-10">

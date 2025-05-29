@@ -86,6 +86,10 @@ export default function AddLessons({params}) {
     const updatedCards = [...cards];
     updatedCards[index][field] = value;
     setCards(updatedCards);
+    setFormData(prev => ({
+      ...prev,
+      contents: updatedCards
+    }));
   };
 
   const handleImageUpload = async (e, index) => {
@@ -240,7 +244,7 @@ export default function AddLessons({params}) {
                           <label className="block text-gray-700 font-semibold">
                             Video
                           </label>
-                          {!formData.contents[index].url ? (
+                          {!cards[index].url ? (
                             <div
                               className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500 "
                               onDrop={(e)=>{handleDrop(e, index, q.type )}}
@@ -273,7 +277,7 @@ export default function AddLessons({params}) {
                           ) : (
                             <div className="w-full max-w-3xl mx-auto aspect-video">
                               <video
-                                src={formData.contents[index]?.url}
+                                src={cards[index].url}
                                 className="w-full h-full object-cover rounded-lg"
                                 alt="cover-image"
                                 muted

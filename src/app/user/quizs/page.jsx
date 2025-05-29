@@ -110,13 +110,16 @@ export default function Quizs() {
   const [filteredQuizzes, setFilteredQuizzes] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchQuizs = async () => {
+    setIsLoading(true);
     const { data, error, status } = await useGet(`/quizzes`);
     if (status === 200) {
       setQuizzes(data || []);
       setFilteredQuizzes(data || []);
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -156,18 +159,32 @@ export default function Quizs() {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <div className="grid xl:grid-cols-3 sm:grid-cols-2 gap-4 mt-4">
-          {(isSearching ? filteredQuizzes : quizzes)?.map((quiz) => (
-            <QuizCard
-              key={quiz._id}
-              imageSrc={quiz.banner  || "/auth-activity.png"}
-              title={quiz.title}
-              questions={quiz.questions?.length || 0}
-              id={quiz._id}
-            />
-          ))}
+          {isLoading ? (
+            // Loading skeleton
+            Array(6).fill(0).map((_, index) => (
+              <div key={index} className="flex flex-col justify-between bg-white rounded-xl border overflow-hidden p-4 max-w-[350px] relative">
+                <div className="h-[180px] w-[100%] bg-gray-200 rounded-2xl animate-pulse"></div>
+                <div className="mt-4">
+                  <div className="h-6 w-3/4 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 w-1/2 bg-gray-200 rounded mt-2 animate-pulse"></div>
+                  <div className="h-10 w-full bg-gray-200 rounded mt-4 animate-pulse"></div>
+                </div>
+              </div>
+            ))
+          ) : (
+            (isSearching ? filteredQuizzes : quizzes)?.map((quiz) => (
+              <QuizCard
+                key={quiz._id}
+                imageSrc={quiz.banner || "/auth-activity.png"}
+                title={quiz.title}
+                questions={quiz.questions?.length || 0}
+                id={quiz._id}
+              />
+            ))
+          )}
         </div>
         
-        {isSearching && filteredQuizzes.length === 0 && (
+        {!isLoading && isSearching && filteredQuizzes.length === 0 && (
           <div className="text-center py-8">
             <p className="text-gray-500">No quizzes found matching your search.</p>
           </div>
