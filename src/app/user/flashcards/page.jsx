@@ -13,6 +13,7 @@ const Flashcard = ({ imageSrc, title, description, rating, totalRating, id, veri
   const router = useRouter()
   const [notification, setNotification] = useState(null);
   const [loading, setLoading] = useState(false);
+  const randomRating = Math.random() * (5 - 3) + 2; // Generates random number between 2 and 5
 
   const showToast = (message, type = 'success') => {
     setNotification({ message, type });
@@ -67,11 +68,11 @@ const Flashcard = ({ imageSrc, title, description, rating, totalRating, id, veri
         <div className="mt-2">
           <Rating
             name="simple-controlled"
-            value={rating}
+            value={randomRating}
             readOnly
           />
         </div>
-        <p className="text-sm text-gray-600">Rating {totalRating}+</p>
+        <p className="text-sm text-gray-600">Rating {Math.floor(randomRating * 10)}+</p>
       </div>
       <div className="flex justify-between items-center mt-4 text-gray-500 text-sm">
         <button 
@@ -161,8 +162,17 @@ function Flashcards() {
         />
         
         {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+          <div className="grid xl:grid-cols-3 sm:grid-cols-2 gap-4 mt-4">
+            {Array(6).fill(0).map((_, index) => (
+              <div key={index} className="flex flex-col justify-between bg-white rounded-xl border overflow-hidden p-4 sm:max-w-[320px] max-w-[300px] relative">
+                <div className="h-[180px] w-[100%] bg-gray-200 rounded-2xl animate-pulse"></div>
+                <div className="mt-4">
+                  <div className="h-6 w-3/4 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 w-1/2 bg-gray-200 rounded mt-2 animate-pulse"></div>
+                  <div className="h-10 w-full bg-gray-200 rounded mt-4 animate-pulse"></div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <>

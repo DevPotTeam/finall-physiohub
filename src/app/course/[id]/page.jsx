@@ -119,7 +119,7 @@ export default function CourseDetail({params}) {
                 </Link>
       </div>
             <motion.div variants={itemVariants} className="bg-white rounded-lg shadow-md overflow-hidden mb-6 md:p-5 ">
-                <div className="md:flex">
+                <div className="md:flex ">
                     <motion.div 
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -129,17 +129,19 @@ export default function CourseDetail({params}) {
                         <img 
                             src={course.coverImageUrl} 
                             alt={course.title}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover rounded-lg"
                         />
                     </motion.div>
                     <motion.div 
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="p-6 md:w-2/3"
+                        className="p-6 md:w-2/3 flex flex-col  justify-between"
                     >
-                        <h1 className="md:text-2xl text-lg font-bold text-gray-800 mb-2">{course.title}</h1>
-                        <p className="text-gray-600 md:text-base text-sm mb-4">{course.description}</p>
+                       <div>
+                         <h1 className="md:text-2xl text-lg font-bold text-gray-800 mb-2">{course.title}</h1>
+                       <p className="text-gray-600 md:text-base text-sm mb-4">{course.description}</p>
+                       </div>
                         <div className="flex items-center justify-between">
                             <div className="flex items-center">
                                 <div className="bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center">

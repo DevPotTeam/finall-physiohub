@@ -413,7 +413,7 @@ export default function QuizCard({ params }) {
                 />
               </div>
             )}
-            <p className="text-gray-800 mt-2 md:text-[15px] text-[14px]">
+            <p className="text-gray-800 mt-2 md:text-[15px] text-[14px] w-full text-wrap">
               {questions[currentQuestion]?.question}
             </p>
 
@@ -532,7 +532,7 @@ export default function QuizCard({ params }) {
                       disabled={isAnswered}
                     />
                     <div
-                      className={`py-1 px-3 rounded ${
+                      className={`py-1 px-3 w-full rounded ${
                         multipleOptions.includes(option._id)
                           ? "bg-[#6C4CE6] text-white"
                           : "bg-gray-100"
@@ -540,7 +540,7 @@ export default function QuizCard({ params }) {
                     >
                       {option.value}
                     </div>
-                    <div className="w-full flex justify-between">
+                    <div className=" flex justify-between">
                       <p className="text-sm font-semibold">{option.text}</p>
                       <span className="w-6 h-6 border-2 rounded flex items-center justify-center mr-3">
                         {multipleOptions.includes(option._id) && (
@@ -744,132 +744,157 @@ export default function QuizCard({ params }) {
         <>
           <div className="flex justify-center items-center min-h-[80vh] bg-gradient-to-br rounded-lg from-purple-50 to-blue-50">
             <div className="w-full max-w-2xl flex flex-col items-center px-4 py-8">
-              {/* Celebration Animation */}
-              <div className="md:w-[180px] sm:w-[150px] w-[80px] md:h-[180px] sm:h-[150px] h-[50px] mb-6 animate-bounce">
-                <LottiePlayer 
-                  animationFile={userAnswers.length === 0 ? cry : run} 
-                  width="100%" 
-                  height="100%" 
-                />
-              </div>
-
-              {/* Header */}
-              <h1 className="md:text-3xl sm:text-2xl text-xl font-bold text-purple-800 mb-2 text-center">
-                Quiz Completed!
-              </h1>
-              <p className="md:text-base sm:text-sm text-xs text-gray-600 mb-8 text-center">
-                {userAnswers.length === 0 
-                  ? "You didn't answer any questions" 
-                  : "Your performance breakdown"}
-              </p>
-
-              {/* Score Card - Only show if user answered questions */}
-              {userAnswers.length > 0 && (
-                <div className="w-full bg-white rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-xl">
-                  <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4 text-center">
-                    <img
-                      src="/CompletionBadge.png"
-                      alt="Achievement Badge"
-                      className="md:w-24 sm:w-20 w-16 md:h-24 sm:h-20 h-16 mx-auto mb-2 animate-pulse"
+              {/* Loading State */}
+              {!result ? (
+                <div className="flex flex-col items-center">
+                  <h1 className="md:text-3xl sm:text-2xl text-xl font-bold text-purple-800 mb-2 text-center">
+                    Calculating Results...
+                  </h1>
+                  <p className="md:text-base sm:text-sm text-xs text-gray-600 mb-8 text-center">
+                    Please wait while we analyze your performance
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {/* Celebration Animation */}
+                  <div className="md:w-[180px] sm:w-[150px] w-[80px] md:h-[180px] sm:h-[150px] h-[50px] mb-6 animate-bounce">
+                    <LottiePlayer 
+                      animationFile={userAnswers.length === 0 ? cry : run} 
+                      width="100%" 
+                      height="100%" 
                     />
-                    <h2 className="md:text-2xl sm:text-xl text-lg font-bold text-white">Great Job!</h2>
                   </div>
 
-                  <div className="p-4 sm:p-6 grid grid-cols-2 gap-3 sm:gap-4">
-                    <div className="bg-purple-50 p-3 sm:p-4 rounded-lg">
-                      <p className="text-xs sm:text-sm text-purple-600 font-medium">Score</p>
-                      <p className="md:text-3xl sm:text-2xl text-xl font-bold text-purple-800">
-                        {result.score}
-                      </p>
-                    </div>
+                  {/* Header */}
+                  <h1 className="md:text-3xl sm:text-2xl text-xl font-bold text-purple-800 mb-2 text-center">
+                    Quiz Completed!
+                  </h1>
+                  <p className="md:text-base sm:text-sm text-xs text-gray-600 mb-8 text-center">
+                    {userAnswers.length === 0 
+                      ? "You didn't answer any questions" 
+                      : "Your performance breakdown"}
+                  </p>
 
-                    <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
-                      <p className="text-xs sm:text-sm text-blue-600 font-medium">Rank</p>
-                      <p className="md:text-3xl sm:text-2xl text-lg font-bold text-blue-800">
-                        Top {result.rank}
-                      </p>
-                    </div>
+                  {/* Score Card - Only show if user answered questions */}
+                  {userAnswers.length > 0 && (
+                    <div className="w-full bg-white rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-xl">
+                      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4 text-center">
+                        <img
+                          src="/CompletionBadge.png"
+                          alt="Achievement Badge"
+                          className="md:w-24 sm:w-20 w-16 md:h-24 sm:h-20 h-16 mx-auto mb-2 animate-pulse"
+                        />
+                        <h2 className="md:text-2xl sm:text-xl text-lg font-bold text-white">Great Job!</h2>
+                      </div>
 
-                    <div className="bg-green-50 p-3 sm:p-4 rounded-lg">
-                      <p className="text-xs sm:text-sm text-green-600 font-medium">Time</p>
-                      <p className="md:text-xl sm:text-lg text-sm font-bold text-green-800">
-                        {Math.floor(result.completionTime / 60)} mins {result.completionTime % 60} secs
-                      </p>
-                    </div>
+                      {!result.score ? <>
+                      <div className="p-4 sm:p-6">
+                        <div className="flex items-center justify-center space-x-2">
+                          <div className="w-2 h-2 bg-purple-600 rounded-full animate-pulse"></div>
+                          <div className="w-2 h-2 bg-purple-600 rounded-full animate-pulse delay-75"></div>
+                          <div className="w-2 h-2 bg-purple-600 rounded-full animate-pulse delay-150"></div>
+                        </div>
+                        <p className="text-center text-purple-600 font-medium mt-2 animate-pulse">
+                          Calculating your results...
+                        </p>
+                      </div>
+                      </> : <div className="p-4 sm:p-6 grid grid-cols-2 gap-3 sm:gap-4">
+                        <div className="bg-purple-50 p-3 sm:p-4 rounded-lg">
+                          <p className="text-xs sm:text-sm text-purple-600 font-medium">Score</p>
+                          <p className="md:text-3xl sm:text-2xl text-xl font-bold text-purple-800">
+                            {result.score}
+                          </p>
+                        </div>
 
-                    <div className="bg-yellow-50 p-3 sm:p-4 rounded-lg">
-                      <p className="text-xs sm:text-sm text-yellow-600 font-medium">
-                        Accuracy
-                      </p>
-                      <p className="md:text-xl sm:text-lg text-base font-bold text-yellow-800">
-                        {Math.round(
-                          (result.correctAnswers /
-                            (result.correctAnswers + result.incorrectAnswers)) *
-                            100
-                        )}
-                        %
-                      </p>
+                        <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
+                          <p className="text-xs sm:text-sm text-blue-600 font-medium">Rank</p>
+                          <p className="md:text-3xl sm:text-2xl text-lg font-bold text-blue-800">
+                            Top {result.rank}
+                          </p>
+                        </div>
+
+                        <div className="bg-green-50 p-3 sm:p-4 rounded-lg">
+                          <p className="text-xs sm:text-sm text-green-600 font-medium">Time</p>
+                          <p className="md:text-xl sm:text-lg text-sm font-bold text-green-800">
+                            {Math.floor(result.completionTime / 60)} mins {result.completionTime % 60} secs
+                          </p>
+                        </div>
+
+                        <div className="bg-yellow-50 p-3 sm:p-4 rounded-lg">
+                          <p className="text-xs sm:text-sm text-yellow-600 font-medium">
+                            Accuracy
+                          </p>
+                          <p className="md:text-xl sm:text-lg text-base font-bold text-yellow-800">
+                            {Math.round(
+                              (result.correctAnswers /
+                                (result.correctAnswers + result.incorrectAnswers)) *
+                                100
+                            )}
+                            %
+                          </p>
+                        </div>
+                      </div>}
                     </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full mt-8 sm:mt-10 px-2 sm:px-4">
+                    <Link
+                      href={"/user/dashboard"}
+                      className="px-4 sm:px-6 py-2 sm:py-3 border-2 border-purple-200 rounded-xl text-purple-700 hover:bg-purple-50 transition-all flex items-center justify-center gap-2 font-medium text-sm sm:text-base"
+                    >
+                      <ArrowLeft className="w-4 sm:w-5 h-4 sm:h-5" />
+                      Back to Dashboard
+                    </Link>
+
+                    <Link
+                      href={"/user/quizs"}
+                      className="px-4 sm:px-6 py-2 sm:py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg transition-all flex items-center justify-center gap-2 font-medium text-sm sm:text-base"
+                    >
+                      Next Quiz
+                      <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5" />
+                    </Link>
                   </div>
-                </div>
-              )}
 
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full mt-8 sm:mt-10 px-2 sm:px-4">
-                <Link
-                  href={"/user/dashboard"}
-                  className="px-4 sm:px-6 py-2 sm:py-3 border-2 border-purple-200 rounded-xl text-purple-700 hover:bg-purple-50 transition-all flex items-center justify-center gap-2 font-medium text-sm sm:text-base"
-                >
-                  <ArrowLeft className="w-4 sm:w-5 h-4 sm:h-5" />
-                  Back to Dashboard
-                </Link>
-
-                <Link
-                  href={"/user/quizs"}
-                  className="px-4 sm:px-6 py-2 sm:py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg transition-all flex items-center justify-center gap-2 font-medium text-sm sm:text-base"
-                >
-                  Next Quiz
-                  <ArrowRight className="w-4 sm:w-5 h-4 sm:h-5" />
-                </Link>
-              </div>
-
-              {/* Progress Visualization - Only show if user answered questions */}
-              {userAnswers.length > 0 && (
-                <div className="w-full mt-6 sm:mt-8 bg-white p-3 sm:p-4 rounded-xl shadow">
-                  <h3 className="font-medium text-gray-700 mb-2 sm:mb-3 text-sm sm:text-base">
-                    Question Analysis
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="h-3 sm:h-4 bg-green-200 rounded-full"
-                      style={{
-                        width: `${
-                          (result.correctAnswers /
-                            (result.correctAnswers + result.incorrectAnswers)) *
-                          100
-                        }%`,
-                      }}
-                    ></div>
-                    <div
-                      className="h-3 sm:h-4 bg-red-200 rounded-full"
-                      style={{
-                        width: `${
-                          (result.incorrectAnswers /
-                            (result.correctAnswers + result.incorrectAnswers)) *
-                          100
-                        }%`,
-                      }}
-                    ></div>
-                  </div>
-                  <div className="flex justify-between mt-2 text-xs sm:text-sm">
-                    <span className="text-green-600">
-                      {result.correctAnswers} Correct
-                    </span>
-                    <span className="text-red-600">
-                      {result.incorrectAnswers} Incorrect
-                    </span>
-                  </div>
-                </div>
+                  {/* Progress Visualization - Only show if user answered questions */}
+                  {userAnswers.length > 0 && (
+                    <div className="w-full mt-6 sm:mt-8 bg-white p-3 sm:p-4 rounded-xl shadow">
+                      <h3 className="font-medium text-gray-700 mb-2 sm:mb-3 text-sm sm:text-base">
+                        Question Analysis
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="h-3 sm:h-4 bg-green-200 rounded-full"
+                          style={{
+                            width: `${
+                              (result.correctAnswers /
+                                (result.correctAnswers + result.incorrectAnswers)) *
+                                100
+                            }%`,
+                          }}
+                        ></div>
+                        <div
+                          className="h-3 sm:h-4 bg-red-200 rounded-full"
+                          style={{
+                            width: `${
+                              (result.incorrectAnswers /
+                                (result.correctAnswers + result.incorrectAnswers)) *
+                                100
+                            }%`,
+                          }}
+                        ></div>
+                      </div>
+                      <div className="flex justify-between mt-2 text-xs sm:text-sm">
+                        <span className="text-green-600">
+                          {result.correctAnswers} Correct
+                        </span>
+                        <span className="text-red-600">
+                          {result.incorrectAnswers} Incorrect
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>

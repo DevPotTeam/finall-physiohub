@@ -6,6 +6,7 @@ import {
   PlusCircle,
   Trash2,
   Upload,
+  X,
 } from "lucide-react";
 import { Select } from "@/components/ui/select.jsx";
 import { Input } from "@/components/ui/input.jsx";
@@ -265,7 +266,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
         mainTopic: quizData.mainTopic,
         subTopics: quizData.subTopics,
         status: quizData.quizStatus,
-        coverImage: quizData.banner,
+        banner: quizData.banner,
         thumbnail: quizData.thumbnail,
         questions: questions.map((q) => ({
           question: q.question,
@@ -275,7 +276,6 @@ export default function CreateQuiz({ setShowInQuiz }) {
           options: q.options,
         })),
       };
-      console.log(quizPayload);
 
       const { data, error, status } = await usePost(
         "/quizzes/create",
@@ -295,6 +295,21 @@ export default function CreateQuiz({ setShowInQuiz }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRemoveImage = (name) => {
+    setQuizData((prev) => ({ ...prev, [name]: null }));
+  };
+
+  const handleRemoveQuestionImage = (index) => {
+    setQuestions((prevQuestions) => {
+      const updatedQuestions = [...prevQuestions];
+      updatedQuestions[index] = {
+        ...updatedQuestions[index],
+        image: null,
+      };
+      return updatedQuestions;
+    });
   };
 
   return (
@@ -397,13 +412,20 @@ export default function CreateQuiz({ setShowInQuiz }) {
               )}
             </div>
           ) : (
-            <div>
+            <div className="relative">
               <Image
                 src={quizData.banner}
                 height={400}
                 width={200}
                 alt="cover-image"
               />
+              <button
+                type="button"
+                onClick={() => handleRemoveImage("banner")}
+                className="absolute top-0 bg-white p-1 text-white rounded-full "
+              >
+                <X className="text-black" />
+              </button>
             </div>
           )}
         </div>
@@ -472,13 +494,20 @@ export default function CreateQuiz({ setShowInQuiz }) {
                         )}
                       </div>
                     ) : (
-                      <div>
+                      <div className="relative">
                         <Image
                           src={q.image}
                           height={400}
                           width={200}
                           alt="question-image"
                         />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveQuestionImage(index)}
+                          className="absolute top-0 bg-white text-white p-1 rounded-full "
+                        >
+                          <X className="text-black" />
+                        </button>
                       </div>
                     )}
                   </div>

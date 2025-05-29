@@ -113,12 +113,15 @@ function Courses() {
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   const fetchFlashCardsData = async() => {
+    setIsLoading(true);
     const { data, error, status } = await useGet(`/courses/getAllCourses`);
     if (status == 200) {
       setFlashCards(data);
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -157,23 +160,41 @@ function Courses() {
             onChange={handleSearchChange}
           />
           <div className="w-full grid xl:grid-cols-3 sm:grid-cols-2 gap-2 mt-4">
-            {(isSearching ? filteredCourses : flashCards)?.map((flashcard) => (
-              <Course  
-                key={flashcard._id}
-                imageSrc={flashcard.coverImageUrl}
-                title={flashcard.title}
-                verified={flashcard.verifiedByAdmin}
-                description={flashcard.description}
-                rating={flashcard.rating}
-                totalRating={flashcard.ratingCount}
-                id={flashcard._id}
-                instructor={flashcard.instructor}
-                enrolled={flashcard.enrolledStudents}
-                lessons={flashcard.lessons.length}
-              />
-            ))}
+            {isLoading ? (
+              // Skeleton loader
+              Array(6).fill(0).map((_, index) => (
+                <div key={index} className="flex flex-col justify-between bg-white rounded-xl border overflow-hidden p-4 sm:max-w-[320px] max-w-[300px] relative">
+                  <div className="h-[180px] w-[100%] bg-gray-200 animate-pulse rounded-2xl"></div>
+                  <div className="mt-4">
+                    <div className="h-6 bg-gray-200 animate-pulse rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-gray-200 animate-pulse rounded w-full mb-2"></div>
+                    <div className="h-4 bg-gray-200 animate-pulse rounded w-2/3 mb-2"></div>
+                    <div className="h-4 bg-gray-200 animate-pulse rounded w-1/2"></div>
+                  </div>
+                  <div className="mt-4">
+                    <div className="h-8 bg-gray-200 animate-pulse rounded w-full"></div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              (isSearching ? filteredCourses : flashCards)?.map((flashcard) => (
+                <Course  
+                  key={flashcard._id}
+                  imageSrc={flashcard.coverImageUrl}
+                  title={flashcard.title}
+                  verified={flashcard.verifiedByAdmin}
+                  description={flashcard.description}
+                  rating={flashcard.rating}
+                  totalRating={flashcard.ratingCount}
+                  id={flashcard._id}
+                  instructor={flashcard.instructor}
+                  enrolled={flashcard.enrolledStudents}
+                  lessons={flashcard.lessons.length}
+                />
+              ))
+            )}
           </div>
-          {isSearching && filteredCourses.length === 0 && (
+          {!isLoading && isSearching && filteredCourses.length === 0 && (
             <div className="text-center py-8">
               <p className="text-gray-500">No courses found matching your search.</p>
             </div>

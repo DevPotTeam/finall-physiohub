@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 export default function CreateFlashCard({ setShowInFlashCard }) {
   const fileInputRef = useRef(null);
   const [notification, setNotification] = useState(null);
+  const [isCreating, setIsCreating] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
   const [frontCardImageLoading, setFrontCardImageLoading] = useState(false);
   const [backCardImageLoading, setBackCardImageLoading] = useState(false);
@@ -153,6 +154,7 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
     }
 
     try {
+      setIsCreating(true);
       console.log(validFlashcards)
       for (let i = 0; i < validFlashcards.length; i++) {
         
@@ -175,12 +177,18 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
       }, 2000);
     } catch (error) {
       showToast("An error occurred while creating flashcards", "error");
+    } finally {
+      setIsCreating(false);
     }
   };
 
   return (
     <>
-      <PublishFlashCardHeader handleCreateFlashCard={handleCreateFlashCards} setShowInFlashCard={setShowInFlashCard}/>
+      <PublishFlashCardHeader 
+        handleCreateFlashCard={handleCreateFlashCards} 
+        setShowInFlashCard={setShowInFlashCard}
+        isCreating={isCreating}
+      />
       <div className="p-6 bg-white rounded-lg shadow-md w-full mx-auto md:max-w-[80%] max-w-[95%]">
         <div className="mb-6">
           <label className="block font-semibold text-gray-700 mb-4">Select Topic</label>

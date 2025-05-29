@@ -63,6 +63,7 @@ export default function UpdateQuiz({ params }) {
     const { data, status } = await useGet(`/quizzes/${id}`);
     if (status == 200) {
       setData(data);
+      console.log(data)
     }
   };
 
@@ -585,6 +586,18 @@ export default function UpdateQuiz({ params }) {
                       ))}
                     </div>
                   )}
+
+                           { q.type ==  QuestionType.ShortAnswer &&<div
+                          className="flex items-center gap-2 mb-2 border p-2 rounded"
+                        > <input
+                            type="text"
+                            placeholder={`Option`}
+                            className="w-full border-none outline-none rounded-lg"
+                            defaultValue={q.options[0].value}
+                            onChange={(e) =>
+                              handleOptionChange(index, 0, e.target.value)
+                            }
+                          /> </div>}
 
                   {/* Explanation */}
                   <Textarea
