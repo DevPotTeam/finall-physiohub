@@ -40,14 +40,23 @@ export default function UpdateQuiz({ params }) {
     mainTopic: "",
     subTopics: [],
     quizStatus: "",
-    coverImage: "",
+    banner: "",
     thumbnail: "",
     questions: [],
   });
 
+  const [topics, setTopics] = useState([]);
+
   const showToast = (message, type = "success") => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 5000);
+  };
+
+  const fetchTopics = async () => {
+    const { data, error, status } = await useGet(`/main-topics/`);
+    if (status === 200) {
+      setTopics(data);
+    }
   };
 
   const fetch = async () => {
@@ -59,6 +68,7 @@ export default function UpdateQuiz({ params }) {
 
   useEffect(() => {
     fetch();
+    fetchTopics();
   }, []);
 
   useEffect(() => {
@@ -68,6 +78,8 @@ export default function UpdateQuiz({ params }) {
       mainTopic: data.mainTopic || "",
       subTopics: data.subTopics || [],
       quizStatus: data.quizStatus || "",
+      banner: data.banner || "",
+      thumbnail: data.thumbnail || "",
     });
   }, [data]);
 
@@ -182,9 +194,8 @@ export default function UpdateQuiz({ params }) {
 
   const handleUpload = async (eOrFiles, name) => {
     if (name === "thumbnail") setThumbnialImageLoading(true);
-    if (name === "coverImage") setCoverImageLoading(true);
+    if (name === "banner") setCoverImageLoading(true);
 
-    // Support both input events and FileList directly
     const file = eOrFiles.target?.files?.[0] || eOrFiles[0];
     if (!file) return;
 
@@ -201,7 +212,7 @@ export default function UpdateQuiz({ params }) {
     }
 
     if (name === "thumbnail") setThumbnialImageLoading(false);
-    if (name === "coverImage") setCoverImageLoading(false);
+    if (name === "banner") setCoverImageLoading(false);
   };
 
   const handleDrop = (event, name) => {
@@ -247,14 +258,16 @@ export default function UpdateQuiz({ params }) {
     setQuestionImageLoading(false);
   };
 
-  
-  const handleRemoveQuestionImage = (name, index) => {
-    setFlashcard((prev) => ({
-      ...prev,
-      [name]: "",
-    }));
+  const handleRemoveQuestionImage = (index) => {
+    setQuestions((prevQuestions) => {
+      const updatedQuestions = [...prevQuestions];
+      updatedQuestions[index] = {
+        ...updatedQuestions[index],
+        image: null,
+      };
+      return updatedQuestions;
+    });
   };
-  
 
   const handleQuestionImageDrop = (event, index) => {
     event.preventDefault();
@@ -276,7 +289,7 @@ export default function UpdateQuiz({ params }) {
       mainTopic: quizData.mainTopic,
       subTopics: quizData.subTopics,
       status: quizData.quizStatus,
-      coverImage: quizData.coverImage,
+      banner: quizData.banner,
       thumbnail: quizData.thumbnail,
       questions: questions.map((q) => ({
         question: q.question,
@@ -303,6 +316,13 @@ export default function UpdateQuiz({ params }) {
     }
   };
 
+  const handleRemoveBannerImage = () => {
+    setQuizData((prev) => ({
+      ...prev,
+      banner: "",
+    }));
+  };
+
   return (
     <>
       <UpdateQuizHeader
@@ -322,6 +342,72 @@ export default function UpdateQuiz({ params }) {
             placeholder="Enter quiz title"
             className="w-full"
           />
+        </div>
+
+        {/* Cover Image Upload */}
+        <div className="mb-4">
+          <label className="block text-gray-700 font-semibold">Banner Image</label>
+          {!quizData.banner ? (
+            <div
+              className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500"
+              onDrop={(e) => handleDrop(e, "banner")}
+              onDragOver={handleDragOver}
+            >
+              {coverImageLoading ? (
+                <div className="w-12 h-12 border-4 border-t-purple-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div>
+              ) : (
+                <label className="ud-btn btn-white text-center cursor-pointer">
+                  <div className="icon mb5">
+                    <Upload className="w-6 h-6 mb-2 text-purple-600 justify-self-center" />
+                  </div>
+                  <h4 className="title fz17 mb1">Upload/Drag banner image</h4>
+                  Browse Files
+                  <input
+                    type="file"
+                    name="banner"
+                    className="ud-btn btn-white"
+                    onChange={(e) => handleUpload(e, "banner")}
+                    style={{ display: "none" }}
+                  />
+                </label>
+              )}
+            </div>
+          ) : (
+            <div className="relative">
+              <button
+                className="absolute top-0  cursor-pointer  rounded-full p-1 "
+                onClick={handleRemoveBannerImage}
+              >
+                <X className="text-black" />
+              </button>
+              <div className="md:w-[150px] w-[100px] md:h-[150px] h-[100px]">
+                <Image
+                  src={quizData.banner}
+                  height={400}
+                  width={200}
+                  alt="banner-image"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Main Topic Selection */}
+        <div className="mb-4">
+          <label className="block text-gray-700">Main Topic</label>
+          <Select
+            name="mainTopic"
+            value={quizData.mainTopic}
+            onChange={handleQuizChange}
+            className="w-full"
+          >
+            <option value="">Select a topic</option>
+            {topics.map((topic, index) => (
+               <option key={index} value={topic._id} selected={topic._id === data.mainTopic}>
+               {topic.name}
+             </option>
+            ))}
+          </Select>
         </div>
 
         {/* Quiz Duration */}
@@ -417,14 +503,12 @@ export default function UpdateQuiz({ params }) {
                       </div>
                     ) : (
                       <div>
-                        {/* <button
-                          className="justify-self-end cursor-pointer"
-                          onClick={() => {
-                            handleRemoveQuestionImage("image", index);
-                          }}
+                        <button
+                          className="justify-self-end cursor-pointer mb-2"
+                          onClick={() => handleRemoveQuestionImage(index)}
                         >
-                          <X />
-                        </button> */}
+                          <X className="text-black" />
+                        </button>
                         <div className="md:w-[150px] w-[100px] md:h-[150px] h-[100px]">
                           <Image
                             src={q.image}

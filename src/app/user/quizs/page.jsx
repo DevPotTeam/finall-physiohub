@@ -159,7 +159,7 @@ export default function Quizs() {
           {(isSearching ? filteredQuizzes : quizzes)?.map((quiz) => (
             <QuizCard
               key={quiz._id}
-              imageSrc={quiz.banner}
+              imageSrc={quiz.banner  || "/auth-activity.png"}
               title={quiz.title}
               questions={quiz.questions?.length || 0}
               id={quiz._id}

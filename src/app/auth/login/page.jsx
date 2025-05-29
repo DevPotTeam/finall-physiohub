@@ -24,6 +24,27 @@ export default function LoginPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user"));
+    
+    if (token && user) {
+      
+      window.history.pushState(null, '', window.location.href);
+      window.onpopstate = function () {
+        window.history.pushState(null, '', window.location.href);
+      };
+      
+      if (user.role === "user") {
+        router.replace("/user/dashboard");
+      } else if (user.role === "teacher" || user.role === "instructor") {
+        router.replace("/teacher/course");
+      } else {
+        router.replace("/");
+      }
+    }
+  }, [router]);
+
   const handleForgotClick = () => {
     localStorage.setItem("otptype", "forgot");
     router.push("/auth/verify-email");
@@ -92,6 +113,7 @@ export default function LoginPage() {
             ? "/teacher/course"
             : "/"
         );
+        
       }
     } catch (error) {
       const errMsg = error.response?.data?.errorMessage?.message;

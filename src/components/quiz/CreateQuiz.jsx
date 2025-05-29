@@ -203,7 +203,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
     }
 
     if (name === "thumbnail") setThumbnialImageLoading(false);
-    if (name === "coverImage") setCoverImageLoading(false);
+    if (name === "banner") setCoverImageLoading(false);
   };
 
   const handleDrop = (event, name) => {
@@ -265,7 +265,7 @@ export default function CreateQuiz({ setShowInQuiz }) {
         mainTopic: quizData.mainTopic,
         subTopics: quizData.subTopics,
         status: quizData.quizStatus,
-        coverImage: quizData.coverImage,
+        coverImage: quizData.banner,
         thumbnail: quizData.thumbnail,
         questions: questions.map((q) => ({
           question: q.question,

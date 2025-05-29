@@ -17,6 +17,7 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
   const [imageLoading, setImageLoading] = useState(false);
   const [frontCardImageLoading, setFrontCardImageLoading] = useState(false);
   const [backCardImageLoading, setBackCardImageLoading] = useState(false);
+  const [imageUrlLoading, setImageUrlLoading] = useState(false);
   const [topics, setTopics] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState("");
   const [flashcards, setFlashcards] = useState([{
@@ -30,6 +31,7 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
     frontImage: "",
     backContent: "",
     backImage: "",
+    imageUrl: "",
   }]);
 
   const showToast = (message, type = 'success') => {
@@ -68,6 +70,7 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
   const handleUpload = async (eOrFiles, name, index) => {
     if (name === "frontImage") setFrontCardImageLoading(true);
     if (name === "backImage") setBackCardImageLoading(true);
+    if (name === "imageUrl") setImageUrlLoading(true);
 
     const file = eOrFiles.target?.files?.[0] || eOrFiles[0];
     if (!file) return;
@@ -90,6 +93,7 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
 
     setFrontCardImageLoading(false);
     setBackCardImageLoading(false);
+    setImageUrlLoading(false);
   };
 
   const handleDrop = (event, name, index) => {
@@ -124,6 +128,7 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
       frontImage: "",
       backContent: "",
       backImage: "",
+      imageUrl: "",
     }]);
   };
 
@@ -288,10 +293,58 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
                       className="mt-0.5"
                       type={"number"}
                       max={3}
+                      min={1}
                       name="masteryLevel"
                       value={flashcard.masteryLevel}
                       onChange={(e) => handleChange(e, index)}
                     />
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block font-semibold text-gray-700">Main Image</label>
+                  <div className="flex items-center gap-4">
+                    {!flashcard.imageUrl ? (
+                      <div
+                        className="border-dashed border-2 border-gray-300 rounded-lg px-6 py-10 flex flex-col items-center justify-center text-gray-500 h-10 w-[100px]"
+                        onDrop={(e) => handleDrop(e, "imageUrl", index)}
+                        onDragOver={handleDragOver}
+                      >
+                        {imageUrlLoading ? (
+                          <div className="w-3 h-3 border-2 p-2 border-t-purple-600 border-b-transparent border-l-transparent border-r-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <label className="text-center cursor-pointer">
+                            <div className="icon mb5">
+                              <Upload className="w-4 h-4 text-purple-600 justify-self-center" />
+                            </div>
+                            <h4 className="title fz17 mb1">Upload Image</h4>
+                            <input
+                              type="file"
+                              name="imageUrl"
+                              multiple
+                              className=""
+                              onChange={(e) => handleUpload(e, "imageUrl", index)}
+                              style={{ display: "none" }}
+                            />
+                          </label>
+                        )}
+                      </div>
+                    ) : (
+                      <div>
+                        <button
+                          className="justify-self-end cursor-pointer"
+                          onClick={() => handleRemoveImage("imageUrl", index)}
+                        >
+                          <X />
+                        </button>
+                        <Image
+                          src={flashcard.imageUrl}
+                          height={200}
+                          width={200}
+                          alt="main-image"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
 

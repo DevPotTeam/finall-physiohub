@@ -104,7 +104,7 @@ export default function Quizs({ setShowInQuiz }) {
                 <div className="flex sm:flex-row flex-col items-center gap-5 w-full">
                   <div className="h-[180px] max-w-[230px]">
                     <Image
-                      src={"/auth-activity.png" || article.banner}
+                      src={article.banner || "/auth-activity.png"}
                       alt="image"
                       height={200}
                       width={240}
