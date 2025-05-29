@@ -29,7 +29,7 @@ export default function UserLayout({ children }) {
         <div className='flex justify-between w-[100%] px-5 pt-5 '>
             <Menu size={30} className='block sm:block lg:hidden md:hidden' onClick={()=>setSidebarOpen(true)}/>
         </div>
-        <div className='flex flex-col w-[100%] overflow-y-auto  p-6 lg:p-4 md:p-6'>
+        <div className='flex flex-col w-[100%] overflow-y-auto  p-3 lg:p-4 md:p-6'>
         {children}
         </div>
       </div>

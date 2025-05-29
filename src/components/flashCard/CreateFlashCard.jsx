@@ -187,14 +187,14 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
           {selectedTopic ? (
             <div className="flex items-center gap-4">
               <div className="p-4 border border-purple-600 bg-purple-50 rounded-lg flex-1">
-                <h3 className="font-medium text-gray-900">
+                <h3 className="font-medium text-gray-900 md:text-base text-xs">
                   {topics.find(t => t._id === selectedTopic)?.name}
                 </h3>
               </div>
               <Button
                 variant="outline"
                 onClick={() => setSelectedTopic("")}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 md:text-base text-xs"
               >
                 <X size={16} />
                 Change Topic
@@ -208,7 +208,7 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
                   onClick={() => setSelectedTopic(topic._id)}
                   className="p-4 border border-gray-200 rounded-lg cursor-pointer transition-all duration-200 hover:border-purple-400"
                 >
-                  <h3 className="font-medium text-gray-900">{topic.name}</h3>
+                  <h3 className="font-medium text-gray-900 md:text-base text-xs">{topic.name}</h3>
                 </div>
               ))}
             </div>
@@ -225,7 +225,7 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
                 >
                   <X size={20} />
                 </button>
-                <h3 className="text-lg font-semibold mb-4">Flashcard {index + 1}</h3>
+                <h3 className="md:text-lg text-base font-semibold mb-4">Flashcard {index + 1}</h3>
                 
                 <div className="mb-4">
                   <label className="block font-semibold text-gray-700">Title</label>
@@ -475,7 +475,7 @@ export default function CreateFlashCard({ setShowInFlashCard }) {
             <div className="flex justify-center mb-6">
               <Button
                 onClick={addNewFlashcard}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 md:text-base text-xs"
               >
                 <Plus size={20} />
                 Add Another Flashcard

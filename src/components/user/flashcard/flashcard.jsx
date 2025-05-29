@@ -71,7 +71,7 @@ function Flashcard({ flashCardData, length, currentCard }) {
         </div>
 
         <div
-          className={`flashcard-container ${isFlipped ? "flipped" : ""}`}
+          className={`flashcard-container md:h-[350px] h-[300px] ${isFlipped ? "flipped" : ""}`}
           onClick={() => setIsFlipped(!isFlipped)}
         >
           <div className="flashcard-inner">
@@ -106,12 +106,12 @@ function Flashcard({ flashCardData, length, currentCard }) {
               <div className="absolute top-3 right-3 flex items-center gap-2 bg-white/90 p-2 rounded-lg z-10">
                 <Star className="w-4 h-4 text-gray-400" />
               </div>
-              <div className="bg-black-50 rounded-lg  h-[350px] relative overflow-hidden">
+              <div className="bg-black-50 rounded-lg md:h-[350px] h-[280px]">
                 {flashCardData?.frontImage ? (
                   <img 
                     src={flashCardData.frontImage} 
                     alt="Front content"
-                    className="w-full h-full object-cover rounded-lg"
+                    className="w-full h-full rounded-lg"
                   />
                 ) : null}
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50">
@@ -157,12 +157,12 @@ function Flashcard({ flashCardData, length, currentCard }) {
               <div className="absolute top-3 right-3 flex items-center gap-2 bg-white/90 p-2 rounded-lg z-10">
                 <Star className="w-4 h-4 text-gray-400" />
               </div>
-              <div className="bg-indigo-50 rounded-lg h-[350px] relative overflow-hidden">
+              <div className="bg-indigo-50 rounded-lg md:h-[350px] h-[280px]">
                 {flashCardData?.backImage ? (
                   <img 
                     src={flashCardData.backImage} 
                     alt="Back content"
-                    className="w-full h-full object-cover rounded-lg"
+                    className="w-full h-full rounded-lg"
                   />
                 ) : null}
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50">

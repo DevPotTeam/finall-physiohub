@@ -124,12 +124,12 @@ export default function CourseDetail({params}) {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="md:w-1/3"
+                        className="md:max-w-1/2 w-full h-auto"
                     >
                         <img 
                             src={course.coverImageUrl} 
                             alt={course.title}
-                            className="w-full h-48 object-cover"
+                            className="w-full h-full object-cover"
                         />
                     </motion.div>
                     <motion.div 

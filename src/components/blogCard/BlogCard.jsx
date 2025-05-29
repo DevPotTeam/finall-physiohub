@@ -81,7 +81,7 @@ const BlogSection = () => {
           }`}
           className="bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-medium"
         >
-          Read More
+          Explore
         </Link>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
