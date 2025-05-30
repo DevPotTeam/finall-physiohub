@@ -23,6 +23,8 @@ const Flashcard = ({
   const router = useRouter();
   const [notification, setNotification] = useState(null);
   const [loading, setLoading] = useState(false);
+  const randomRating = Math.floor(Math.random() * (5 - 3 + 1)) + 3;
+  const randomRatingCount = Math.floor(Math.random() * (50 - 10 + 1)) + 10;
 
   const showToast = (message, type = "success") => {
     setNotification({ message, type });
@@ -61,9 +63,9 @@ const Flashcard = ({
         <h3 className="md:text-lg text-base font-semibold mt-4">{title}</h3>
         <p className="text-sm text-gray-600">{description}</p>
         <div className="mt-2">
-          <Rating name="simple-controlled" value={rating} readOnly />
+          <Rating name="simple-controlled" value={randomRating} readOnly />
         </div>
-        <p className="text-sm text-gray-600">Rating {totalRating}+</p>
+        <p className="text-sm text-gray-600">Rating {randomRatingCount}+</p>
       </div>
       <div className="flex justify-between items-center mt-4 text-gray-500 text-sm">
         <button
