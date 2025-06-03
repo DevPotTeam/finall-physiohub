@@ -25,6 +25,17 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const urltoken = urlParams.get("token");
+    const urluser = urlParams.get("user");
+
+    if (!urltoken && !urluser) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("role");
+      return;
+    }
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user"));
     
@@ -44,6 +55,8 @@ export default function LoginPage() {
       }
     }
   }, [router]);
+
+
 
   const handleForgotClick = () => {
     localStorage.setItem("otptype", "forgot");
@@ -95,42 +108,34 @@ export default function LoginPage() {
       const { token, user, message } = response.data;
       localStorage.setItem("token", token);
       localStorage.setItem("role", user.role);
-      // Store in   localStorage (or cookies, or context)
       localStorage.setItem("user", JSON.stringify(user));
+      
       if (!user.isEmailVerified) {
         router.push("/auth/verify-email");
         return;
       }
+      
       const firstVisit = localStorage.getItem("firstVisit");
       if (firstVisit == "true") {
-        router.push("/onboarding");
-      }
-      if (user.isEmailVerified) {
-        router.push(
-          user.role == "user"
-            ? "/user/dashboard"
-            : user.role == "teacher" || user.role == "instructor"
-            ? "/teacher/course"
-            : "/"
-        );
-        
+        router.replace("/onboarding");
+      } else if (user.isEmailVerified) {
+        const targetPath = user.role == "user" 
+          ? "/user/dashboard" 
+          : user.role == "teacher" || user.role == "instructor"
+            ? "/teacher/course" 
+            : "/";
+        router.replace(targetPath);
       }
     } catch (error) {
       const errMsg = error.response?.data?.errorMessage?.message;
       setApiError(errMsg);
       setLoading(false);
-    } finally {
-      // setLoading(false);
     }
   };
 
   const handleGoogleAuth = async () => {
     setGoogleLoading(true);
     try {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      localStorage.removeItem("role");
-
       window.location.href = `${api_url}/auth/google`;
     } catch (error) {
       const errMsg = error.response?.data?.message;
@@ -142,33 +147,29 @@ export default function LoginPage() {
 
 useEffect(()=>{
   const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get("token");
-      const user = urlParams.get("user");
+  const token = urlParams.get("token");
+  const user = urlParams.get("user");
 
-      if (token && user) {
-        localStorage.setItem("token", token);
-        localStorage.setItem("user", user);
-        const userObj = JSON.parse(user);
-        localStorage.setItem("role", userObj.role);
+  if (token && user) {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", user);
+    const userObj = JSON.parse(user);
+    localStorage.setItem("role", userObj.role);
 
-        const firstVisit = localStorage.getItem("firstVisit");
+    const firstVisit = localStorage.getItem("firstVisit");
 
-        if (firstVisit == "true") {
-          console.log("firstvisit : ", firstVisit)
-          router.push("/onboarding");
-        } else {
-          const userObj = JSON.parse(localStorage.getItem("user"));
-          if (userObj.role === "user") {
-            
-            router.push("/user/dashboard");
-          } else if (
-            userObj.role === "teacher" ||
-            userObj.role === "instructor"
-          ) {
-            router.push("/teacher/course");
-          }
-        }
-      }
+    if (firstVisit == "true") {
+      router.replace("/onboarding");
+    } else {
+      const userObj = JSON.parse(localStorage.getItem("user"));
+      const targetPath = userObj.role === "user" 
+        ? "/user/dashboard" 
+        : userObj.role === "teacher" || userObj.role === "instructor"
+          ? "/teacher/course" 
+          : "/";
+      router.replace(targetPath);
+    }
+  }
 }, [])
 
 
