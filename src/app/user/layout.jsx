@@ -36,7 +36,7 @@ export default function UserLayout({ children }) {
       {/* Main content */}
       <div className="flex flex-col flex-1 w-[100%]">
         <div className='flex justify-between w-[100%] p-6'>
-        <span className='text-xl font-semibold'>Hello {user.name}!</span>
+        <span className='text-xl font-semibold'>Hello {user?.name}!</span>
             <Menu size={30} className='block sm:block lg:hidden md:hidden' onClick={()=>setSidebarOpen(true)}/>
         </div>
         <div className='flex flex-col w-[100%] overflow-y-auto  p-6 lg:p-4 md:p-6'>
