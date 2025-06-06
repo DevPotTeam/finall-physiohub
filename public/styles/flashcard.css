@@ -14,7 +14,7 @@
 }
 
 .flashcard-container.flipped .flashcard-inner {
-  transform: rotateY(-180deg);
+  transform: rotateX(180deg);
 }
 
 .flashcard-front,
@@ -33,5 +33,5 @@
 }
 
 .flashcard-back {
-  transform: rotateY(-180deg);
+  transform: rotateX(180deg);
 }

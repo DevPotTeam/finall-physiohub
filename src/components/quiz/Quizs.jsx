@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image.js";
 import { Button } from "@/components/ui/button.jsx";
-import { Trash2, Edit, MessageSquareText, Clock, Sparkles } from "lucide-react";
+import { Trash2, Edit, MessageSquareText, Clock, Sparkles, X } from "lucide-react";
 import QuizHeader from "@/components/quiz/QuizHeader";
 import { useEffect, useState } from "react";
 import useGet from "@/hooks/useGet";
@@ -31,12 +31,9 @@ export default function Quizs({ setShowInQuiz }) {
   const [notification, setNotification] = useState(null);
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
-  // const fetchTeacherQuizs = async () => {
-  //   const { data, error, status } = await useGet(`/quizzes/my-quizzes`);
-  //   if (status == 200) {
-  //     setArticles(data);
-  //   }
-  // };
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [quizToDelete, setQuizToDelete] = useState(null);
+
   const fetchTeacherQuizs = async () => {
     setLoading(true);
     try {
@@ -57,10 +54,14 @@ export default function Quizs({ setShowInQuiz }) {
     setTimeout(() => setNotification(null), 5000);
   };
 
+  const handleDeleteClick = (id) => {
+    setQuizToDelete(id);
+    setDeleteModalOpen(true);
+  };
 
-  const handleQuizDelete = async (id) => {
+  const handleQuizDelete = async () => {
     try {
-      const { data, error, status } = await useDelete(`/quizzes/${id}`);
+      const { data, error, status } = await useDelete(`/quizzes/${quizToDelete}`);
       console.log(data)
       if(status == 200){
         showToast("Quiz Deleted Successfully", "success")
@@ -70,9 +71,12 @@ export default function Quizs({ setShowInQuiz }) {
       }
     } catch (error) {
       showToast("Failed to Delete Quiz", "error")
+    } finally {
+      setDeleteModalOpen(false);
+      setQuizToDelete(null);
     }
-   
   };
+
   return (
     <>
       <QuizHeader setShowInQuiz={setShowInQuiz} />
@@ -130,9 +134,7 @@ export default function Quizs({ setShowInQuiz }) {
                     variant="outline"
                     size="icon"
                     className="border-gray-300 text-gray-600 hover:bg-gray-100"
-                    onClick={() => {
-                      handleQuizDelete(article._id);
-                    }}
+                    onClick={() => handleDeleteClick(article._id)}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -150,6 +152,47 @@ export default function Quizs({ setShowInQuiz }) {
             </div>
           ))}
         </div>)}
+
+        {/* Delete Confirmation Modal */}
+        {deleteModalOpen && (
+          <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Delete Quiz</h3>
+                <button
+                  onClick={() => {
+                    setDeleteModalOpen(false);
+                    setQuizToDelete(null);
+                  }}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to delete this quiz? This action cannot be undone.
+              </p>
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setDeleteModalOpen(false);
+                    setQuizToDelete(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleQuizDelete}
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {notification && (
           <div
             className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${

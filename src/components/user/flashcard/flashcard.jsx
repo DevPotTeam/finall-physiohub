@@ -118,11 +118,11 @@ function Flashcard({ flashCardData, length, currentCard }) {
                     className="w-full h-full rounded-lg"
                   />
                 ) : null}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50">
-                  <h1 className="absolute bottom-4 left-0 right-0 text-center sm:text-lg text-base font-semibold text-white px-4">
+                {flashCardData?.frontImage && <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-600/30">
+                  <h1 className="absolute bottom-4 left-0 right-0 text-center sm:text-lg text-base font-semibold text-white px-4 drop-shadow-lg">
                     {flashCardData?.frontContent}
                   </h1>
-                </div>
+                </div>}
               </div>
               {!flashCardData?.frontImage && (
                 <h1 className="text-center sm:text-lg text-base font-semibold mt-4">
@@ -169,11 +169,11 @@ function Flashcard({ flashCardData, length, currentCard }) {
                     className="w-full h-full rounded-lg"
                   />
                 ) : null}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50">
-                  <h1 className="absolute bottom-4 left-0 right-0 text-center sm:text-lg text-base font-semibold text-white px-4">
+                {flashCardData?.backImage && <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-600/30">
+                  <h1 className="absolute bottom-4 left-0 right-0 text-center sm:text-lg text-base font-semibold text-white px-4 drop-shadow-sm">
                     {flashCardData?.backContent}
                   </h1>
-                </div>
+                </div>}
               </div>
               {!flashCardData?.backImage && (
                 <h1 className="text-center sm:text-lg text-base font-semibold mt-4">

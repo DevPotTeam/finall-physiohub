@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image.js";
 import { Button } from "@/components/ui/button.jsx";
-import { Trash2, Edit, Sparkles, MessageSquareText, Clock, PlusCircle } from "lucide-react";
+import { Trash2, Edit, Sparkles, MessageSquareText, Clock, PlusCircle, X } from "lucide-react";
 import FlashCardHeader from "@/components/flashCard/FlashCardHeader";
 import useGet from "@/hooks/useGet";
 import { useEffect, useState } from "react";
@@ -15,6 +15,9 @@ export default function FlashCards({ setShowInFlashCard }) {
   const [loading, setLoading] = useState(true);
   const [topics, setTopics] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState("");
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [flashCardToDelete, setFlashCardToDelete] = useState(null);
+  const [notification, setNotification] = useState(null);
 
   const fetchTopics = async () => {
     try {
@@ -42,10 +45,30 @@ export default function FlashCards({ setShowInFlashCard }) {
     fetchFlashCards();
   }, []);
 
-  const handleFlashCardDelete = async (id) => {
-    const { data, error, status } = await useDelete(`/flashcards/delete/${id}`);
-    if (status === 200) {
-      fetchFlashCards();
+  const showToast = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000);
+  };
+
+  const handleDeleteClick = (id) => {
+    setFlashCardToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleFlashCardDelete = async () => {
+    try {
+      const { data, error, status } = await useDelete(`/flashcards/delete/${flashCardToDelete}`);
+      if (status === 200) {
+        showToast("Flashcard Deleted Successfully", "success");
+        setTimeout(() => {
+          fetchFlashCards();
+        }, 1000);
+      }
+    } catch (error) {
+      showToast("Failed to Delete Flashcard", "error");
+    } finally {
+      setDeleteModalOpen(false);
+      setFlashCardToDelete(null);
     }
   };
 
@@ -129,7 +152,7 @@ export default function FlashCards({ setShowInFlashCard }) {
                         variant="outline"
                         size="icon"
                         className="border-gray-300 text-gray-600 hover:bg-gray-100"
-                        onClick={() => handleFlashCardDelete(article._id)}
+                        onClick={() => handleDeleteClick(article._id)}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -154,6 +177,59 @@ export default function FlashCards({ setShowInFlashCard }) {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {deleteModalOpen && (
+          <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Delete Flashcard</h3>
+                <button
+                  onClick={() => {
+                    setDeleteModalOpen(false);
+                    setFlashCardToDelete(null);
+                  }}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to delete this flashcard? This action cannot be undone.
+              </p>
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setDeleteModalOpen(false);
+                    setFlashCardToDelete(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleFlashCardDelete}
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {notification && (
+          <div
+            className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${
+              notification.type === "error" ? "bg-red-500" : "bg-green-500"
+            } text-white`}
+          >
+            {notification.message}
+            <button onClick={() => setNotification(null)} className="ml-4 text-xl">
+              ×
+            </button>
           </div>
         )}
       </div>
