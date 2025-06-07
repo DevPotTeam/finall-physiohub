@@ -25,7 +25,7 @@ function Header({scrollToSection}) {
   return (
     <>
       <div>
-        <nav className="bg-white shadow-md w-full fixed top-0 left-0 z-50">
+        <nav className="bg-white shadow-sm w-full fixed top-0 left-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-16 items-center">
               {/* Logo */}
@@ -71,18 +71,18 @@ function Header({scrollToSection}) {
                 {isLoggedIn ? (
 
                   <Link href={`${role == "user" ? "/user/dashboard" : (role == "teacher" || role == "instructor") ? "/teacher/course" : false} `}>
-                    <IoMdPerson className="text-purple-600 text-3xl" />
+                    <IoMdPerson className="text-[#7240fd] text-3xl" />
                   </Link> 
                 ) : (
                   <>
                     <Link href={"/auth/login"}>
-                      <button className="border border-purple-600 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-100">
+                      <button className="border border-[#7240fd] text-[#7240fd] px-4 py-2 rounded-lg hover:bg-purple-100">
                         Login
                       </button>
                     </Link>
                     <Link
                       href={"/auth/signup"}
-                      className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
+                      className="bg-[#7240fd] text-white px-4 py-2 rounded-lg hover:bg-[#5c40fd]"
                     >
                       Sign Up
                     </Link>
