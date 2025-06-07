@@ -6,11 +6,12 @@ import Image from "next/image";
 import { Card, CardContent } from "../components/ui/card";
 import { Activity, BadgeCheck, Check, LineChart } from "lucide-react";
 import { FaChartLine, FaFileAlt, FaHeadset, FaStar } from "react-icons/fa";
-import Accordion from "../components/accordian/Accordion.jsx"
-import BlogCard from "../components/blogCard/BlogCard.jsx"
-import HeroSection from "../components/heroSection/HeroSection.jsx"
+import Accordion from "../components/accordian/Accordion.jsx";
+import BlogCard from "../components/blogCard/BlogCard.jsx";
+import HeroSection from "../components/heroSection/HeroSection.jsx";
 import LottiePlayer from "../components/animations/LottiePlayer";
-import happy from "../components/animations/data/Happy.json";
+import hi from "../components/animations/data/Happy.json";
+import happy from "../components/animations/data/3 characters.json";
 import run from "../components/animations/data/Run.json";
 import Link from "next/link";
 import Cookies from "js-cookie";
@@ -45,8 +46,11 @@ const testimonials = [
 
 const TestimonialCard = ({ logo, company, quote, name, position }) => (
   <div className="bg-gray-50 p-6 rounded-lg max-w-sm text-center border md:min-h-[300px]">
-    <img src={logo} alt={company} className="h-6  mb-4  fill-current text-black" 
-      style={{filter: 'invert(1) grayscale(100%) contrast(100%)'}}
+    <img
+      src={logo}
+      alt={company}
+      className="h-6  mb-4  fill-current text-black"
+      style={{ filter: "invert(1) grayscale(100%) contrast(100%)" }}
     />
     <p className="text-gray-700 mt-10">“{quote}”</p>
     <div className="mt-10 flex sm:flex-row flex-col items-center justify-start gap-3">
@@ -68,19 +72,19 @@ function Home() {
   const [animated, setAnimated] = useState(false);
   const [percent, setPercent] = useState(0);
   const directionRef = useRef(1);
-  const [token, setToken] = useState(false)
-  const [role, setRole] = useState("")
+  const [token, setToken] = useState(false);
+  const [role, setRole] = useState("");
 
-  useEffect(()=>{
-    const token = localStorage.getItem("token")
-    const role = JSON.parse(localStorage.getItem("user"))?.role
-    if(role){
-      setRole(role)
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const role = JSON.parse(localStorage.getItem("user"))?.role;
+    if (role) {
+      setRole(role);
     }
-    if(token){
-      setToken(true)
+    if (token) {
+      setToken(true);
     }
-  },[])
+  }, []);
 
   const data = [
     { label: "Jan", value: 40 },
@@ -114,7 +118,6 @@ function Home() {
     const timeout = setTimeout(() => setAnimated(true), 4000);
     return () => clearTimeout(timeout);
   }, []);
-  
 
   const scrollToSection = (key) => {
     const refs = {
@@ -131,112 +134,22 @@ function Home() {
     <>
       <Header scrollToSection={scrollToSection} />
       <div className="h-full w-full mt-10 relative overflow-hidden">
-        <section className="relative bg-gradient-to-r from-gray-100 to-purple-100 py-16 px-3 md:px-12 lg:px-24 flex flex-col md:flex-row items-center">
+        <section
+          className="min-h-[90vh] relative bg-gradient-to-bl from-[#7240fd54] via-[#ffffff] to-[#7240fd56] 
+            py-16 flex flex-row text-center justify-center"
+        >
           {/* Left Content */}
-          <div className="md:w-1/2 text-center md:text-left z-10">
-            <p className="text-sm text-purple-600 font-semibold">
-              OVER 200+ RESOURCES
-            </p>
-            <h1 className="sm:text-6xl text-4xl font-bold text-gray-900 leading-tight mt-2">
-              Master Your <br />{" "}
-              <span className="text-purple-600">Physiotherapy</span> <br />{" "}
-              Skills Now!
-            </h1>
-            <p className="text-gray-600 mt-4 max-w-md">
-              Maximize your physiotherapy skills with <br /> our expert-led courses and
-              tailored resources.
-            </p>
-            <div className="mt-6 flex gap-4 justify-center md:justify-start">
-              <Link
-                href={`${token ? role == "user" ? "/user/dashboard" : "/teacher/course" :"/auth/login"}`}
-                className="bg-purple-600 text-white sm:px-6 px-3 py-3 rounded-lg font-medium hover:bg-purple-700"
-              >
-                Get Started
-              </Link>
-            </div>
-          </div>
-
-          {/* Right Content */}
-          <div className="flex flex-row justify-end gap-2 md:w-[50%] w-full md:mt-0 mt-10">
-            {/* First Column (takes max space) */}
-            <div className="flex-1 flex flex-col justify-between items-end">
-              <Card className="  md:max-w-[14rem] w-[11rem] rounded-[20px] shadow-md overflow-hidden mb-5 self-end">
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between items-start">
-                    <div className="flex flex-col items-start gap-2">
-                      <p className="text-sm font-medium text-black">
-                        Over time
-                      </p>
-                      <h2 className="text-2xl font-bold text-black">$40K</h2>
-                      <p className="text-xs text-gray-500">Last 7 days</p>
-                    </div>
-                    <div className="flex flex-col items-end gap-4">
-                      <LineChart className="h-5 w-5 text-purple-500" />
-
-                      <div className="text-xs px-2 py-[2px] rounded-full bg-purple-100 text-purple-700 font-medium flex items-center gap-1">
-                        <Activity className="w-3 h-3" />
-                        25%
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="w-full h-full relative rounded-lg overflow-hidden mt-10">
-                    <img
-                      src="/auth-activity.png"
-                      alt="Muscle Stats"
-                      // fill
-                      className="object-cover"
+          <div className="md:flex hidden flex-row justify-end gap-2 md:mt-0 mt-10 ">
+          <div className="h-full max-w-auto flex flex-col justify-between ">
+            <div className="w-fit px-2 rounded-[20px] bg-gray-100 shadow-xl rotate-15">
+              <Card className="md:w-[12rem] w-[7rem] rounded-[20px] shadow-md relative overflow-visible h-fit -rotate-8">
+                {/* <div className="absolute -top-17 -right-10 -translate-x-1/2 z-10">
+                    <LottiePlayer
+                      animationFile={happy}
+                      width="100px"
+                      height="100px"
                     />
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="md:w-[18rem] w-[12rem] rounded-[20px] bg-white shadow-md">
-                <CardContent className="flex flex-col justify-between">
-                  <h3 className="text-[#1F1F1F] text-[16px] font-semibold mb-6">
-                    Performance over time
-                  </h3>
-                  <div className="flex justify-between items-end">
-                    {data.map((item, index) => (
-                      <div key={index} className="flex flex-col items-center">
-                        <div className="w-[20px] h-[100px] bg-gray-200 rounded-sm overflow-hidden relative">
-                          <div
-                            className={`absolute bottom-0 w-full bg-[#F593D5] rounded-sm animate-bar`}
-                            style={{
-                              height: `${item.value}%`,
-                              animationDelay: `${index * 0.2}s`,
-                            }}
-                          />
-                        </div>
-                        <span className="text-[12px] text-[#333]">
-                          {item.label}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Second Column (fits content) */}
-            <div className="flex-none flex sm:mt-38 mt-10 justify-center text-center md:w-1/2 ">
-              {/* Your content here */}
-              <Card className="md:w-[11rem] w-[7rem] rounded-[20px] shadow-md relative overflow-visible h-fit">
-                <div className="absolute -top-17 -right-10 -translate-x-1/2 z-10">
-                  {/* <img
-
-                    src="/bird-ping.png" // Replace with your penguin image path
-                    alt="Penguin"
-                    width={100}
-                    height={100}
-                    // fill
-
-                  /> */}
-                  <LottiePlayer
-                    animationFile={happy}
-                    width="100px"
-                    height="100px"
-                  />
-                </div>
+                  </div> */}
 
                 <CardContent className="flex flex-col items-center justify-center md:mt-4 mt-2">
                   <h3 className="md:text-[22px] text-[18px] font-semibold text-gray-800 mb-4 w-full">
@@ -275,6 +188,140 @@ function Home() {
                 </CardContent>
               </Card>
             </div>
+            <div className="w-fit px-2 rounded-[20px] bg-gray-100 shadow-xl -rotate-8">
+              <Card className="md:w-[18rem] w-[12rem] rounded-[20px] bg-white shadow-md relative -rotate-12 ">
+                <div className="absolute -top-20 -right-20 -translate-x-1/2 z-10">
+                  <LottiePlayer animationFile={hi} width="100px" height="100px" />
+                </div>
+
+                <CardContent className="flex flex-col justify-between">
+                  <h3 className="text-[#1F1F1F] text-[16px] font-semibold mb-6">
+                    Performance over time
+                  </h3>
+                  <div className="flex justify-between items-end">
+                    {data.map((item, index) => (
+                      <div key={index} className="flex flex-col items-center">
+                        <div className="w-[20px] h-[100px] bg-gray-200 rounded-sm overflow-hidden relative">
+                          <div
+                            className={`absolute bottom-0 w-full bg-[#F593D5] rounded-sm animate-bar`}
+                            style={{
+                              height: `${item.value}%`,
+                              animationDelay: `${index * 0.2}s`,
+                            }}
+                          />
+                        </div>
+                        <span className="text-[12px] text-[#333]">
+                          {item.label}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+          </div>
+          
+          {/* Center Content */}
+          <div className="w-full text-center z-10 flex flex-col items-center">
+            <p className="text-sm text-purple-600 font-semibold">
+              OVER 200+ RESOURCES
+            </p>
+            <h1 className="sm:text-8xl text-4xl font-bold text-gray-900 leading-tight mt-2">
+              Master Your <br />{" "}
+              <span className="text-[#7240fd]">Physiotherapy</span> <br />{" "}
+              Skills Now!
+            </h1>
+            <p className="text-gray-600 mt-4 max-w-md text-center">
+              Maximize your physiotherapy skills with <br /> our expert-led
+              courses and tailored resources.
+            </p>
+            <div className="mt-6 flex gap-4 justify-center md:justify-start">
+              <Link
+                href={`${
+                  token
+                    ? role == "user"
+                      ? "/user/dashboard"
+                      : "/teacher/course"
+                    : "/auth/login"
+                }`}
+                className="bg-[#7240fd] text-white sm:px-6 px-3 py-3 rounded-lg font-medium hover:bg-[#4d40fd]"
+              >
+                Get Started
+              </Link>
+            </div>
+          </div>
+
+          {/* Right Content */}
+          <div className="md:flex hidden flex-row justify-end gap-2 md:mt-0 mt-10">
+            {/* First Column (takes max space) */}
+            <div className="flex-1 flex flex-col justify-between items-end">
+            <div className="w-fit px-2 rounded-[20px] bg-gray-100 shadow-xl -rotate-12">
+              <Card className="  md:min-w-[14rem] w-[10rem] rounded-[20px] shadow-md overflow-hidden mb-5 self-end rotate-7">
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-start">
+                    <div className="flex flex-col items-start gap-2">
+                      <p className="text-sm font-medium text-black text-nowrap">
+                        Over time
+                      </p>
+                      <h2 className="sm:text-2xl text-lg font-bold text-black">
+                        $40K
+                      </h2>
+                      <p className="text-xs text-gray-500">Last 7 days</p>
+                    </div>
+                    <div className="flex flex-col items-end gap-4">
+                      <LineChart className="h-5 w-5 text-purple-500" />
+
+                      <div className="text-xs px-2 py-[2px] rounded-full bg-purple-100 text-purple-700 font-medium flex items-center gap-1">
+                        <Activity className="w-3 h-3" />
+                        25%
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="w-full h-full relative rounded-lg overflow-hidden mt-10">
+                    <img
+                      src="/auth-activity.png"
+                      alt="Muscle Stats"
+                      // fill
+                      className="object-cover"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+              
+            <div className="w-fit px-2 rounded-[20px] bg-gray-100 shadow-xl rotate-7 ml-[-35px]">
+              <Card className="md:w-[12rem] w-[7rem] rounded-[20px] shadow-md relative overflow-visible h-fit rotate-7 ">
+              <div className="absolute -top-19 right-15 -translate-x-1/2 z-10">
+                  <LottiePlayer
+                    animationFile={happy}
+                    width="100px"
+                    height="100px"
+                  />
+                </div>
+
+              <CardContent className="flex flex-col justify-center md:mt-4 mt-2">
+               
+
+                <svg width="65" height="64" viewBox="0 0 65 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="8.62695" y="0.181152" width="56" height="56" rx="28" transform="rotate(8 8.62695 0.181152)" fill="#F0F2F5"/>
+                  <path d="M33.6447 18.6992L32.1211 17.4685L31.5353 19.3372C30.6064 22.2872 28.1482 24.8043 25.5946 26.457C20.5955 29.6941 19.0296 33.7557 19.9223 37.4155C20.7765 40.9178 23.8084 43.6598 27.1564 44.5168L27.9311 44.7145C26.1521 43.2513 25.2936 40.2965 26.0212 38.2808C26.7386 36.3 28.4755 34.5945 31.5437 33.2268L33.0904 32.5394L33.3976 34.205C33.5784 35.1891 34.0136 36.0204 34.4564 36.8649C34.6685 37.2717 34.884 37.6831 35.0737 38.115C35.7288 39.6141 35.7377 41.1799 34.9757 42.6253C34.2822 43.9389 33.3067 44.9112 32.0877 45.3552L33.3885 45.3926C36.631 45.4862 39.1281 44.7236 40.9071 43.1115C42.6707 41.5134 43.5277 39.2574 43.8764 36.7764C44.2011 34.4658 43.5865 31.9504 42.7454 29.8112C41.7592 27.3056 40.3176 25.1372 38.7106 23.0061C38.2961 23.6076 38.2845 23.8726 37.473 24.8182C36.9313 22.4019 35.5807 20.2431 33.6447 18.6992Z" fill="#FF7F04"/>
+                </svg>
+
+                <h3 className="md:text-[22px] text-[18px] font-semibold text-gray-800 w-full">
+                  200
+                </h3>
+                <p>Longest Steak</p>
+              </CardContent>
+            </Card>
+            </div>
+            </div>
+
+            {/* Second Column (fits content) */}
+            {/* <div className="flex-none flex sm:mt-38 mt-10 justify-center text-center md:w-1/2 ">
+              
+            </div> */}
           </div>
           <svg
             width="836"
@@ -312,7 +359,10 @@ function Home() {
           </svg>
         </section>
 
-        <section  ref={aboutRef} className="py-16 px-6 md:px-12 lg:px-24 flex flex-col items-center gap-12">
+        <section
+          ref={aboutRef}
+          className="py-16 px-6 md:px-12 lg:px-24 flex flex-col items-center gap-12"
+        >
           <div className="text-center">
             <p className="text-sm text-purple-600 font-semibold">
               OVER 200+ RESOURCES
@@ -329,7 +379,6 @@ function Home() {
           <div className=" grid md:grid-cols-2 grid-cols-1 items-center gap-20">
             {/* Left Image Card */}
             <div className=" text-center md:text-left">
-
               <h2 className="text-3xl font-bold text-gray-900 mt-2">
                 Learn with Flash Cards
               </h2>
@@ -345,7 +394,8 @@ function Home() {
                 </p>
                 <p className="flex items-center gap-2 text-start text-gray-700">
                   <span className="sm:w-3 w-2 sm:h-3 h-2 bg-purple-600 rounded-full"></span>{" "}
-                  Effortless Memorization with <br className="sm:hidden block"/> spaced repetition
+                  Effortless Memorization with{" "}
+                  <br className="sm:hidden block" /> spaced repetition
                 </p>
                 <p className="flex items-center gap-2 text-start text-gray-700">
                   <span className="sm:w-3 w-2 sm:h-3 h-2 bg-purple-600 rounded-full"></span>{" "}
@@ -437,7 +487,8 @@ function Home() {
               <div className="mt-6 mb-10 space-y-2">
                 <p className="flex items-center gap-2 text-start text-gray-700">
                   <span className="sm:w-3 w-2 sm:h-3 h-2 bg-[#FF7F04] rounded-full"></span>{" "}
-                  Time-based quizzes to improve<br className="sm:hidden block"/> your quick thinking and
+                  Time-based quizzes to improve
+                  <br className="sm:hidden block" /> your quick thinking and
                   diagnostics
                 </p>
                 <p className="flex items-center gap-2 text-start text-gray-700">
@@ -491,18 +542,26 @@ function Home() {
                 {/* User Info */}
                 <div className="bg-white p-4 rounded-xl shadow-md flex justify-between items-center">
                   <div>
-                    <h3 className="md:text-lg text-base font-semibold">Jennifer</h3>
-                    <p className="md:text-sm text-xs text-gray-500">Time remaining</p>
+                    <h3 className="md:text-lg text-base font-semibold">
+                      Jennifer
+                    </h3>
+                    <p className="md:text-sm text-xs text-gray-500">
+                      Time remaining
+                    </p>
                   </div>
                   <div className="flex items-center gap-1 bg-orange-100 md:px-3 px-2 py-1 rounded-full">
                     <FaStar className="text-orange-500" />
-                    <span className="md:text-sm text-xs font-medium">24 Points</span>
+                    <span className="md:text-sm text-xs font-medium">
+                      24 Points
+                    </span>
                   </div>
                 </div>
 
                 {/* Question Card */}
                 <div className="bg-white mt-6 p-4 rounded-xl shadow-md flex items-center gap-1 md:w-[360px] w-[270px] md:ms-[-45px] ms-[-17px]">
-                  <p className="text-gray-600 font-medium md:text-sm text-xs">A.</p>
+                  <p className="text-gray-600 font-medium md:text-sm text-xs">
+                    A.
+                  </p>
                   <div className="w-full bg-[#FF7F04] md:h-3 h-2 rounded-full mt-2 mb-2"></div>
                   <div className="w-2/3 bg-[#FF7F04] md:h-3 h-2 rounded-full"></div>
                   <div className="mt-3 flex justify-end items-center">
@@ -534,14 +593,13 @@ function Home() {
           <div className=" grid md:grid-cols-2 grid-cols-1 items-center gap-20 mt-38">
             {/* Right Text Section */}
             <div className=" text-center md:text-left">
-              <p className="text-xs font-semibold text-[#2CCFB9]">
-                
-              </p>
-              <h2 className="text-3xl font-bold text-gray-900 mt-2">
-                Courses
-              </h2>
+              <p className="text-xs font-semibold text-[#2CCFB9]"></p>
+              <h2 className="text-3xl font-bold text-gray-900 mt-2">Courses</h2>
               <p className="text-gray-600 mt-4">
-                Stay ahead with the latest techniques, evidence-based practices, and advancements in physiotherapy. Our courses are designed by experienced professionals to provide in-depth knowledge and practical skills for continuous professional growth.
+                Stay ahead with the latest techniques, evidence-based practices,
+                and advancements in physiotherapy. Our courses are designed by
+                experienced professionals to provide in-depth knowledge and
+                practical skills for continuous professional growth.
               </p>
               <div className="mt-6 mb-10 space-y-2">
                 <p className="flex items-center text-start gap-2 text-gray-700">
@@ -549,11 +607,16 @@ function Home() {
                   Explore detailed lessons.
                 </p>
                 <p className="flex items-center text-start gap-2 text-gray-700">
-                  <span className="sm:w-3 w-2 sm:h-3 h-2 bg-[#2CCFB9] rounded-full"></span> Access courses anytime, anywhere,<br className="sm:hidden block"/> and progress through lessons as you go.
+                  <span className="sm:w-3 w-2 sm:h-3 h-2 bg-[#2CCFB9] rounded-full"></span>{" "}
+                  Access courses anytime, anywhere,
+                  <br className="sm:hidden block" /> and progress through
+                  lessons as you go.
                 </p>
                 <p className="flex items-center text-start gap-2 text-gray-700">
                   <span className="sm:w-3 w-2 sm:h-3 h-2 bg-[#2CCFB9] rounded-full"></span>{" "}
-                  Gain in-detpth knowledge that for <br className="sm:hidden block"/> personal growth or professional development.
+                  Gain in-detpth knowledge that for{" "}
+                  <br className="sm:hidden block" /> personal growth or
+                  professional development.
                 </p>
               </div>
             </div>
@@ -876,7 +939,10 @@ function Home() {
           </div>
         </section>
 
-        <section  ref={featuresRef} className="py-16 px-6 md:px-12 lg:px-24 flex flex-col items-center gap-12 bg-[#F6F9FC]">
+        <section
+          ref={featuresRef}
+          className="py-16 px-6 md:px-12 lg:px-24 flex flex-col items-center gap-12 bg-[#F6F9FC]"
+        >
           <div className="text-center">
             <p className="text-sm text-purple-600 font-semibold">
               YOUR OWN DASHBOARD
@@ -890,18 +956,17 @@ function Home() {
             </p>
           </div>
           <div className="w-full h-full relative ">
-
-          <Image
-            src={"/dashboard.png"}
-            alt="image"
-            width={1000}
-            height={100}
-            className="md:w-[90%] w-[99%x] h-full mx-auto"
+            <Image
+              src={"/dashboard.png"}
+              alt="image"
+              width={1000}
+              height={100}
+              className="md:w-[90%] w-[99%x] h-full mx-auto"
             />
-          <div className="absolute md:bottom-10 -bottom-12 md:right-20 right-0 md:w-[120px] w-[70px] h-[120px]">
-            <LottiePlayer animationFile={run} width="100%" height="100%" />
-          </div>
+            <div className="absolute md:bottom-10 -bottom-12 md:right-20 right-0 md:w-[120px] w-[70px] h-[120px]">
+              <LottiePlayer animationFile={run} width="100%" height="100%" />
             </div>
+          </div>
         </section>
 
         <section className="py-16 px-6 md:px-12 lg:px-24 flex flex-col items-center gap-12">
@@ -925,19 +990,25 @@ function Home() {
           </div>
         </section>
 
-        <section ref={faqRef} className="py-16 px-6 md:px-12 lg:px-24 flex flex-col items-center gap-12 bg-[#F6F9FC]">
-              <Accordion/>
+        <section
+          ref={faqRef}
+          className="py-16 px-6 md:px-12 lg:px-24 flex flex-col items-center gap-12 bg-[#F6F9FC]"
+        >
+          <Accordion />
         </section>
 
-        <section ref={courseRef} className="scroll-mt-20 py-16 px-6 md:px-12 lg:px-24 flex flex-col items-center gap-12 bg-[#F6F9FC]">
-              <BlogCard/>
+        <section
+          ref={courseRef}
+          className="scroll-mt-20 py-16 px-6 md:px-12 lg:px-24 flex flex-col items-center gap-12 bg-[#F6F9FC]"
+        >
+          <BlogCard />
         </section>
 
         <section className="py-16 px-6 md:px-12 lg:px-24 flex flex-col items-center gap-12 bg-[#F6F9FC]">
-              <HeroSection/>
+          <HeroSection />
         </section>
       </div>
-      <Footer scrollToSection={scrollToSection}/>
+      <Footer scrollToSection={scrollToSection} />
     </>
   );
 }
